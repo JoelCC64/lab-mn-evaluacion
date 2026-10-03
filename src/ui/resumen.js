@@ -88,11 +88,12 @@ function HojaDetalle({ fila, evento, ctx, cerrar }) {
       <${Persona} estudiante=${fila.estudiante} />
       <table class="tabla"><tbody>
         <tr><td>Grupo</td><td>${fila.grupo ?? 'sin grupo'}</td></tr>
-        <tr><td>Asistencia</td><td>${asistencia.estado ?? 'sin registro'}${asistencia.motivo ? ` (${asistencia.motivo})` : ''}</td></tr>
+        <tr><td>Asistencia</td><td>${asistencia.estado ? (ctx.cfg.asistencia.estados[asistencia.estado]?.texto ?? asistencia.estado) : 'sin registro'}${asistencia.motivo ? ` (${asistencia.motivo})` : ''}</td></tr>
         ${asistencia.observacion && html`<tr><td>Observación</td><td>${asistencia.observacion}</td></tr>`}
         ${evento.con_nota && html`<tr><td>Nota del evento</td><td><b>${nota.estado === 'calculada' ? `${sobreDiez(nota.valor)}/10` : nota.estado}</b>${nota.motivo ? ` · ${nota.motivo}` : ''}</td></tr>`}
         ${nota.valor_sin_ajuste !== undefined && html`<tr><td>Sin el ajuste</td><td>${sobreDiez(nota.valor_sin_ajuste)}/10</td></tr>`}
-        ${partes.length > 0 && html`<tr><td>Rúbrica del grupo</td><td>${partes.map((p) => `${p.nombre}: ${p.valor ?? '—'}/${p.max}`).join(' · ')}</td></tr>`}
+        ${nota.partes?.asistencia_permanencia !== undefined && html`<tr><td>Asistencia y permanencia</td><td>${nota.partes.asistencia_permanencia}${nota.partes.asistencia_permanencia < 1 ? ' (se retiró antes)' : ''}</td></tr>`}
+        ${partes.length > 0 && html`<tr><td>${evento.tipo === 'taller' ? 'Evaluación del grupo' : 'Rúbrica del grupo'}</td><td>${partes.map((p) => `${p.nombre}: ${p.valor ?? '—'}/${p.max}`).join(' · ')}</td></tr>`}
         ${preparatorio.estado !== 'sin_nota' && html`<tr><td>Preparatorio</td><td>${preparatorio.estado === 'calculada' ? `${preparatorio.nivel}/2` : preparatorio.estado}${preparatorio.motivo ? ` · ${preparatorio.motivo}` : ''}</td></tr>`}
         ${control.estado !== 'sin_control' && html`<tr><td>Control oral</td><td>${control.estado === 'calculada' ? (control.valor !== null ? `${sobreDiez(control.valor)}/10 (${(control.puntajes ?? []).join(', ') || control.motivo})` : (control.aprobado ? 'aprobado' : 'no aprobado')) : control.estado}</td></tr>`}
       </tbody></table>

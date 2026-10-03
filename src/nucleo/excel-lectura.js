@@ -30,7 +30,8 @@ export function sinCorreos(texto) {
   return String(texto).replace(CORREO, '[correo omitido]').replace(/@/g, ' ');
 }
 
-function textoCodigo(v) {
+/** Código único como texto (9 dígitos), o null si la celda no tiene un código. */
+export function textoCodigo(v) {
   if (v === null || v === undefined) return null;
   if (typeof v === 'number') return Number.isInteger(v) ? String(v) : null;
   const t = String(v).replace(/\s+/g, '');

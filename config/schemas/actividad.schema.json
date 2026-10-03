@@ -43,6 +43,7 @@
               "properties": {
                 "id": { "$ref": "comun.schema.json#/$defs/id" },
                 "nombre": { "$ref": "comun.schema.json#/$defs/texto" },
+                "corto": { "$ref": "comun.schema.json#/$defs/texto" },
                 "peso": { "$ref": "comun.schema.json#/$defs/peso" },
                 "escala": { "$ref": "comun.schema.json#/$defs/escala" },
                 "indicadores": { "type": "array", "items": { "$ref": "comun.schema.json#/$defs/texto" } },
@@ -99,6 +100,7 @@
             "properties": {
               "unidad": { "const": "grupo" },
               "escala": { "$ref": "comun.schema.json#/$defs/escala" },
+              "descripcion": { "$ref": "comun.schema.json#/$defs/texto" },
               "incluye": { "type": "array", "items": { "type": "string" } },
               "exige_terminar_taller": { "type": "boolean" }
             }

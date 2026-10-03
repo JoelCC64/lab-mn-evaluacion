@@ -7,7 +7,7 @@ import {
 } from '../datos/acciones.js';
 import { gruposDe, notaControl, notaGrupo, rubrica } from '../nucleo/motor.js';
 import { grupoNuevo, listaDeGrupos } from '../nucleo/grupos.js';
-import { sobreDiez } from '../nucleo/motor-vista.js';
+import { seEvaluaPorGrupo, sobreDiez, textoNotaGrupo } from '../nucleo/motor-vista.js';
 import { preparatorioCalifica } from '../nucleo/config.js';
 
 export function Grupo({ id, grupo }) {
@@ -20,15 +20,14 @@ export function Grupo({ id, grupo }) {
   const i = lista.findIndex((x) => x.grupo === grupo);
   const siguiente = lista[i + 1]?.grupo ?? null;
   const config = evento.config ? ctx.cfg.actividades[evento.config] : null;
-  const conRubrica = evento.tipo === 'practica' && config;
+  const conRubrica = seEvaluaPorGrupo(evento) && config;
 
   return html`
     <${Pantalla} titulo=${`Grupo ${grupo}`} subtitulo=${`${nombreEvento(evento)} · ${evento.curso}`} atras=${enlace('evento', id, 'grupos')}>
       ${!g && html`<${Aviso} tono="aviso">El grupo ${grupo} ya no tiene integrantes en este evento.<//>`}
       ${g && conRubrica && html`<${Evaluacion} key=${`ev-${grupo}`} ctx=${ctx} evento=${evento} grupo=${grupo} config=${config} grupos=${grupos} />`}
-      ${g && evento.tipo === 'taller' && html`<${Aviso}>La evaluación integral del taller llega en la Fase 4. Aquí ya puedes hacer el pase del grupo.<//>`}
       ${g && html`<${Integrantes} key=${`in-${grupo}`} ctx=${ctx} evento=${evento} grupo=${grupo} integrantes=${g.integrantes} grupos=${grupos} />`}
-      ${g && evento.tipo === 'practica' && html`<${Cierre} key=${`ci-${grupo}`} ctx=${ctx} evento=${evento} grupo=${grupo} grupos=${grupos} />`}
+      ${g && config && (config.cierre?.length || config.penalizacion_total) && html`<${Cierre} key=${`ci-${grupo}`} ctx=${ctx} evento=${evento} grupo=${grupo} grupos=${grupos} config=${config} />`}
       ${g && html`<${PieListo} ctx=${ctx} evento=${evento} grupo=${grupo} grupos=${grupos} siguiente=${siguiente} />`}
     <//>`;
 }
@@ -50,14 +49,17 @@ function Evaluacion({ ctx, evento, grupo, config, grupos }) {
     setBorrando(false);
   };
 
+  const esTaller = config.tipo === 'taller';
+  const [num, den] = nota.completo ? textoNotaGrupo(nota).split('/') : [];
   return html`
     <div class="tarjeta">
       <div class="separado">
         <h2>Evaluación</h2>
         ${penalizado ? html`<${Chip} tono="mal">penalización total · 0<//>`
-          : nota.completo ? html`<span class="nota-grande">${sobreDiez(nota.valor)}<span class="tenue pequeno"> /10</span></span>`
+          : nota.completo ? html`<span class="nota-grande">${num}<span class="tenue pequeno"> /${den}</span></span>`
           : html`<${Chip}>faltan ${nota.faltan?.length ?? partes.length}<//>`}
       </div>
+      ${esTaller && html`<p class="tenue pequeno">${explicacionTaller(config)}</p>`}
       ${partes.map((p) => html`
         <div class="criterio">
           <button class="criterio-titulo" onClick=${() => setAbierto(abierto === p.id ? null : p.id)}>
@@ -70,6 +72,7 @@ function Evaluacion({ ctx, evento, grupo, config, grupos }) {
             ${p.escala.map((v) => html`<button class=${puntos.get(p.id) === v ? 'elegido' : ''} onClick=${() => elegir(p.id, v)}>${v}</button>`)}
           </div>
         </div>`)}
+      <${Preguntas} config=${config} abierto=${esTaller} />
       <${Etiquetas} ctx=${ctx} evento=${evento} grupo=${grupo} config=${config} grupos=${grupos} />
       <${NotaTexto} key=${`nota-${evento.id}-${grupo}`} evento=${evento} unidad="grupo" unidadId=${grupo}
         actual=${ctx.reg.notas.find((n) => n.evento === evento.id && n.unidad === 'grupo' && n.unidad_id === grupo)?.texto ?? ''} />
@@ -86,6 +89,14 @@ function Evaluacion({ ctx, evento, grupo, config, grupos }) {
 }
 
 function Guia({ ctx, config, parte }) {
+  if (config.tipo === 'taller') {
+    return html`
+      <div class="ayuda">
+        ${config.evaluacion_integral.descripcion && html`<p>${config.evaluacion_integral.descripcion}</p>`}
+        ${config.tareas?.length ? html`<b>Tareas del taller</b><ul>${config.tareas.map((t) => html`<li>${t.texto}</li>`)}</ul>` : null}
+        <div class="tenue pequeno">Escala ${parte.escala.join(' / ')}: el nivel lo decide el profesor.</div>
+      </div>`;
+  }
   if (config.criterios) {
     const c = config.criterios.find((x) => x.id === parte.id);
     return html`
@@ -101,6 +112,27 @@ function Guia({ ctx, config, parte }) {
       <div class="tenue pequeno">Aspecto ${asp.tipo}</div>
       ${ind.length ? html`<b>En esta práctica</b><ul>${ind.map((t) => html`<li>${t}</li>`)}</ul>` : null}
       <dl>${Object.entries(asp.descriptores).sort(([a], [b]) => b - a).map(([n, t]) => html`<dt>${n}</dt><dd>${t}</dd>`)}</dl>
+    </div>`;
+}
+
+function explicacionTaller(config) {
+  const pct = (x) => `${Math.round(x * 100)} %`;
+  return [config.evaluacion_integral.descripcion,
+    `Nota del taller: ${pct(config.pesos.asistencia_permanencia)} asistencia y permanencia (del pase) + ${pct(config.pesos.evaluacion_integral)} esta evaluación del grupo.`]
+    .filter(Boolean).join(' ');
+}
+
+/** Banco de preguntas para la discusión con el grupo (de la configuración de la actividad). */
+function Preguntas({ config, abierto: inicial }) {
+  const preguntas = config.preguntas_discusion ?? [];
+  const [abierto, setAbierto] = useState(inicial);
+  if (!preguntas.length) return null;
+  return html`
+    <div>
+      <button class="criterio-titulo" onClick=${() => setAbierto(!abierto)}>
+        <span>Preguntas para la discusión (${preguntas.length})</span><span class="mas">${abierto ? 'ocultar' : 'ver'}</span>
+      </button>
+      ${abierto && html`<ol class="preguntas-banco">${preguntas.map((p) => html`<li>${p}</li>`)}</ol>`}
     </div>`;
 }
 
@@ -154,8 +186,10 @@ const OPCIONES = [
 function Integrantes({ ctx, evento, grupo, integrantes, grupos }) {
   const [moviendo, setMoviendo] = useState(null);
   const [agregando, setAgregando] = useState(false);
+  const ap = evento.tipo === 'taller' ? ctx.cfg.actividades[evento.config]?.asistencia_permanencia : null;
   return html`
     <div class="seccion-titulo">Integrantes · pase final</div>
+    ${ap && html`<p class="tenue pequeno">Asistencia y permanencia: presente 1 · se retiró antes ${ap.se_retiro_antes} · no vino 0. Si alguien está pero no trabaja, anótalo en su observación.</p>`}
     <div class="lista">
       ${integrantes.map((e) => html`<${Integrante} key=${e.id} ctx=${ctx} evento=${evento} estudiante=${e} grupos=${grupos} alMover=${() => setMoviendo(e)} />`)}
     </div>
@@ -276,22 +310,24 @@ function HojaAgregar({ ctx, evento, grupo, grupos, cerrar }) {
 
 // ---------- Cierre del grupo ----------
 
-function Cierre({ ctx, evento, grupo, grupos }) {
+function Cierre({ ctx, evento, grupo, grupos, config }) {
   const { db } = useApp();
+  const conFirma = config.cierre?.includes('trabajo_firmado');
+  const conPenalizacion = Boolean(config.penalizacion_total);
   const rev = ctx.revisiones.get(`${evento.id}|${grupo}`) ?? {};
   const [pidiendoMotivo, setPidiendoMotivo] = useState(false);
   const [motivo, setMotivo] = useState('No desmontó ni guardó el equipo');
   return html`
     <div class="tarjeta">
-      <label class="interruptor">
+      ${conFirma && html`<label class="interruptor">
         <span><b>Trabajo firmado</b><br /><span class="tenue pequeno">Revisado y firmado al final de la clase</span></span>
         <input type="checkbox" checked=${Boolean(rev.trabajo_firmado)} onChange=${(e) => revisarGrupo(db, evento.id, grupos, grupo, { trabajo_firmado: e.currentTarget.checked })} />
-      </label>
-      <label class="interruptor">
+      </label>`}
+      ${conPenalizacion && html`<label class="interruptor">
         <span><b>Penalización total</b><br /><span class="tenue pequeno">${rev.penalizacion_total ? `0 en la práctica · ${rev.motivo_penalizacion}` : 'Si el grupo no desmonta y guarda el equipo (opcional)'}</span></span>
         <input type="checkbox" checked=${Boolean(rev.penalizacion_total)}
           onChange=${(e) => (e.currentTarget.checked ? setPidiendoMotivo(true) : revisarGrupo(db, evento.id, grupos, grupo, { penalizacion_total: false, motivo_penalizacion: null }))} />
-      </label>
+      </label>`}
     </div>
     ${pidiendoMotivo && html`
       <${Hoja} titulo="Penalización total" alCerrar=${() => setPidiendoMotivo(false)}>

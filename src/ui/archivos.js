@@ -51,7 +51,13 @@ export async function compartirODescargar(nombre, contenido, tipo = 'application
       if (e.name === 'AbortError') return 'cancelado';
     }
   }
-  const url = URL.createObjectURL(archivo);
+  descargar(nombre, contenido, tipo);
+  return 'descargado';
+}
+
+/** Descarga un archivo (en la Mac va a «Descargas»). */
+export function descargar(nombre, contenido, tipo = 'application/octet-stream') {
+  const url = URL.createObjectURL(new Blob([contenido], { type: tipo }));
   const a = document.createElement('a');
   a.href = url;
   a.download = nombre;
@@ -59,7 +65,39 @@ export async function compartirODescargar(nombre, contenido, tipo = 'application
   a.click();
   a.remove();
   setTimeout(() => URL.revokeObjectURL(url), 10000);
-  return 'descargado';
+}
+
+// ---------- Carpeta del Excel (Chrome en la Mac: API de acceso a archivos) ----------
+
+/** ¿El navegador puede guardar sobre un archivo existente? (Chrome en la Mac sí; Safari del iPhone no). */
+export const puedeGuardarSobreArchivos = () => typeof window.showDirectoryPicker === 'function';
+
+export function elegirCarpeta() {
+  return window.showDirectoryPicker({ id: 'excel-lab-mn', mode: 'readwrite' });
+}
+
+/** Permiso de lectura y escritura sobre la carpeta; con `pedir`, lo solicita (requiere un toque del usuario). */
+export async function permisoCarpeta(carpeta, pedir = false) {
+  const opciones = { mode: 'readwrite' };
+  if ((await carpeta.queryPermission(opciones)) === 'granted') return true;
+  return pedir ? (await carpeta.requestPermission(opciones)) === 'granted' : false;
+}
+
+/** Archivos .xlsx de la carpeta (sin los temporales de Excel «~$…»). */
+export async function excelsDeLaCarpeta(carpeta) {
+  const nombres = [];
+  for await (const [nombre, h] of carpeta.entries()) {
+    if (h.kind === 'file' && /\.xlsx$/i.test(nombre) && !nombre.startsWith('~$')) nombres.push(nombre);
+  }
+  return nombres.sort((a, b) => a.localeCompare(b, 'es'));
+}
+
+/** ¿Está abierto en Excel? Excel deja un archivo «~$…» junto al libro mientras lo tiene abierto. */
+export async function excelAbierto(carpeta, nombre) {
+  for await (const [n, h] of carpeta.entries()) {
+    if (h.kind === 'file' && n.startsWith('~$') && (n === `~$${nombre}` || n.slice(2) === nombre.slice(2))) return true;
+  }
+  return false;
 }
 
 // Fecha del último respaldo en este dispositivo (preferencia local; puede no estar disponible).

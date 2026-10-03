@@ -204,6 +204,14 @@ export async function quitarDelControl(db, evento, estudiante, motivoSalio, ahor
   });
 }
 
+// ---------- Retroalimentación de la práctica anterior (taller) ----------
+
+/** Marca (o desmarca) que el grupo de la práctica ya recibió su retroalimentación en el taller `evento`. */
+export async function marcarRetro(db, evento, grupo, dada, ahora = ahoraISO()) {
+  if (dada) await db.retroalimentaciones.put({ evento, grupo: String(grupo), dada: true, fecha: ahora });
+  else await db.retroalimentaciones.delete([evento, String(grupo)]);
+}
+
 // ---------- Ajuste individual ----------
 
 /** Ajuste explícito de la nota del evento (0–1), siempre con motivo. */

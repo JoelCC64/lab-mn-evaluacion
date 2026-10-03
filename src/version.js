@@ -1,2 +1,2 @@
 // Versión de la app (la escribe scripts/precache.mjs desde package.json).
-export const VERSION_APP = '0.3.0';
+export const VERSION_APP = '0.5.0';

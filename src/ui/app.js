@@ -6,6 +6,7 @@ import { Curso } from './curso.js';
 import { Evento } from './evento.js';
 import { Grupo } from './grupo.js';
 import { Datos } from './datos.js';
+import { Excel } from './excel.js';
 import { escucharVersionNueva } from './pwa.js';
 
 export function App({ cfg, db, demo }) {
@@ -37,6 +38,7 @@ export function App({ cfg, db, demo }) {
 function Rutas() {
   const [pantalla, a, b, c] = useRuta();
   if (pantalla === 'datos') return html`<${Datos} />`;
+  if (pantalla === 'excel') return html`<${Excel} />`;
   if (pantalla === 'curso' && a) return html`<${Curso} paralelo=${a} />`;
   if (pantalla === 'evento' && a && b === 'grupo' && c) return html`<${Grupo} id=${a} grupo=${c} />`;
   if (pantalla === 'evento' && a) return html`<${Evento} id=${a} pestana=${b} />`;

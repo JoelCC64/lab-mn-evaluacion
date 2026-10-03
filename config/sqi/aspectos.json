@@ -1,24 +1,24 @@
 {
-  "resp_pred_plan": { "nombre": "Respuestas, predicciones y planificación", "tipo": "objetiva", "escala": [0, 1, 2],
+  "resp_pred_plan": { "nombre": "Respuestas, predicciones y planificación", "corto": "respuestas", "tipo": "objetiva", "escala": [0, 1, 2],
     "descriptores": {
       "2": "Responde todas las preguntas. Predicciones, diagramas, variables y decisiones experimentales correctos y justificados.",
       "1": "Responde parcialmente o presenta errores menores. Justificaciones incompletas.",
       "0": "No responde, las respuestas no corresponden a la actividad o no presenta una planificación utilizable." } },
-  "ejec_registro": { "nombre": "Ejecución y registro de datos", "tipo": "objetiva", "escala": [0, 1, 2],
+  "ejec_registro": { "nombre": "Ejecución y registro de datos", "corto": "ejecución", "tipo": "objetiva", "escala": [0, 1, 2],
     "descriptores": {
       "2": "Realiza la actividad con un procedimiento adecuado. Registra claramente datos, unidades, observaciones, cambios y fuentes de incertidumbre solicitados.",
       "1": "Realiza la actividad, pero el procedimiento o el registro está incompleto, es poco claro o contiene errores menores.",
       "0": "No realiza la actividad o faltan datos y registros esenciales." } },
-  "analisis": { "nombre": "Análisis, interpretación y conclusiones", "tipo": "objetiva", "escala": [0, 1, 2],
+  "analisis": { "nombre": "Análisis, interpretación y conclusiones", "corto": "análisis", "tipo": "objetiva", "escala": [0, 1, 2],
     "descriptores": {
       "2": "Aplica correctamente las herramientas solicitadas y formula interpretaciones y conclusiones coherentes con los resultados.",
       "1": "Análisis parcial o con errores, pero permite reconocer el procedimiento y obtener alguna interpretación razonable.",
       "0": "No realiza el análisis o las conclusiones no se derivan de los datos." } },
-  "discusion": { "nombre": "Discusión y reflexión", "tipo": "subjetiva", "escala": [0, 1],
+  "discusion": { "nombre": "Discusión y reflexión", "corto": "discusión", "tipo": "subjetiva", "escala": [0, 1],
     "descriptores": {
       "1": "Participa y registra la discusión, reflexión, estrategia ética, lluvia de ideas o retroalimentación solicitada.",
       "0": "No participa o no registra la actividad solicitada." } },
-  "comunicacion": { "nombre": "Comunicación y colaboración", "tipo": "subjetiva", "escala": [0, 1],
+  "comunicacion": { "nombre": "Comunicación y colaboración", "corto": "comunicación", "tipo": "subjetiva", "escala": [0, 1],
     "descriptores": {
       "1": "Realiza la presentación o reporte solicitado y existe evidencia de participación en el trabajo grupal.",
       "0": "No realiza la presentación o no existe evidencia de participación." } }

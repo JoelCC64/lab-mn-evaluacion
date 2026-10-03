@@ -2,7 +2,7 @@
 // Guarda todos los archivos de la app para que funcione sin conexión.
 // En localhost usa primero la red (desarrollo); publicada, usa primero lo guardado (rápido y sin conexión).
 
-const VERSION = '0.3.0-15834e2f72';
+const VERSION = '0.5.0-5ed0963d24';
 const CACHE = `lab-mn-${VERSION}`;
 const ARCHIVOS = [
   "./",
@@ -15,20 +15,26 @@ const ARCHIVOS = [
   "src/app.js",
   "src/datos/acciones.js",
   "src/datos/consultas.js",
+  "src/datos/excel-datos.js",
   "src/datos/importar.js",
+  "src/datos/local.js",
   "src/datos/respaldo.js",
   "src/db.js",
   "src/estilos.css",
   "src/nucleo/calendario.js",
   "src/nucleo/config.js",
   "src/nucleo/estado-evento.js",
+  "src/nucleo/excel-escritura.js",
   "src/nucleo/excel-lectura.js",
   "src/nucleo/grupos.js",
   "src/nucleo/motor-vista.js",
   "src/nucleo/motor.js",
+  "src/nucleo/resultados.js",
+  "src/nucleo/retro.js",
   "src/nucleo/sorteo.js",
   "src/nucleo/tablas.js",
   "src/nucleo/util.js",
+  "src/nucleo/zip.js",
   "src/ui/app.js",
   "src/ui/archivos.js",
   "src/ui/base.js",
@@ -38,12 +44,14 @@ const ARCHIVOS = [
   "src/ui/curso.js",
   "src/ui/datos.js",
   "src/ui/evento.js",
+  "src/ui/excel.js",
   "src/ui/grupo.js",
   "src/ui/grupos.js",
   "src/ui/inicio.js",
   "src/ui/puerta.js",
   "src/ui/pwa.js",
   "src/ui/resumen.js",
+  "src/ui/retro.js",
   "src/vendor/dexie.js",
   "src/vendor/exceljs.min.js",
   "src/vendor/htm.js",

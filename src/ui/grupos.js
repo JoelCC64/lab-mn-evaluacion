@@ -5,7 +5,7 @@ import { HojaMover } from './grupo.js';
 import { cerrarPase, reabrirPase } from '../datos/acciones.js';
 import { gruposDe, notaGrupo } from '../nucleo/motor.js';
 import { listaDeGrupos } from '../nucleo/grupos.js';
-import { sobreDiez } from '../nucleo/motor-vista.js';
+import { seEvaluaPorGrupo, textoNotaGrupo } from '../nucleo/motor-vista.js';
 import { preparatorioCalifica } from '../nucleo/config.js';
 
 const hora = (iso) => new Date(iso).toLocaleTimeString('es-EC', { hour: '2-digit', minute: '2-digit' });
@@ -17,7 +17,7 @@ export function Grupos({ ctx, evento }) {
   const pase = ctx.pases.get(evento.id);
   const [cerrando, setCerrando] = useState(false);
   const [moviendo, setMoviendo] = useState(null);
-  const conRubrica = evento.tipo === 'practica' && evento.config;
+  const conRubrica = seEvaluaPorGrupo(evento);
 
   if (!lista.length && !sinGrupo.length) {
     return html`<${Aviso} tono="aviso">Este curso no tiene estudiantes. Carga el Excel del semestre en <a class="negrita" href=${enlace('datos')}>Datos</a>.<//>`;
@@ -40,7 +40,7 @@ export function Grupos({ ctx, evento }) {
               <div class="linea1">${g.integrantes.map((e) => e.nombre.split(' ')[0]).join(' · ')}</div>
               <div class="linea2 fila-flex">
                 ${nota && (rev?.penalizacion_total ? html`<${Chip} tono="mal">penalización<//>`
-                  : nota.completo ? html`<${Chip} tono="ok">${sobreDiez(nota.valor)}/10<//>` : html`<${Chip}>sin evaluar<//>`)}
+                  : nota.completo ? html`<${Chip} tono="ok">${textoNotaGrupo(nota)}<//>` : html`<${Chip}>sin evaluar<//>`)}
                 ${rev?.verificado ? html`<${Chip} tono="ok">pase ✓<//>` : null}
                 ${rev?.trabajo_firmado ? html`<${Chip} tono="info">firmado<//>` : null}
                 ${faltas ? html`<${Chip} tono="mal">${faltas} falta${faltas > 1 ? 's' : ''}<//>` : null}
@@ -78,7 +78,7 @@ export function Grupos({ ctx, evento }) {
 function HojaCerrar({ ctx, evento, lista, sinGrupo, grupos, cerrar, alCerrar }) {
   const { cfg, db } = useApp();
   const sinVerificar = lista.filter((g) => !ctx.revisiones.get(`${evento.id}|${g.grupo}`)?.verificado);
-  const conRubrica = evento.tipo === 'practica' && evento.config;
+  const conRubrica = seEvaluaPorGrupo(evento);
   const sinEvaluar = conRubrica ? lista.filter((g) => !notaGrupo(ctx, evento, g.grupo).completo) : [];
   const prepSinMarcar = preparatorioCalifica(cfg, ctx.curso.metodologia) && ['practica', 'taller'].includes(evento.tipo)
     && !ctx.revisionPrep.get(evento.id)?.revisada;

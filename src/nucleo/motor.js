@@ -63,17 +63,17 @@ function textoFalta(asis) {
 export function rubrica(cfg, config) {
   if (!config) return [];
   if (config.tipo === 'practica' && config.criterios) {
-    return config.criterios.map((c) => ({ id: c.id, nombre: c.nombre, peso: c.peso, escala: c.escala, max: Math.max(...c.escala) }));
+    return config.criterios.map((c) => ({ id: c.id, nombre: c.nombre, corto: c.corto ?? c.nombre, peso: c.peso, escala: c.escala, max: Math.max(...c.escala) }));
   }
   if (config.tipo === 'practica') {
     return config.aspectos_aplicables.map((a) => {
       const asp = cfg.sqi.aspectos[a];
-      return { id: a, nombre: asp.nombre, peso: null, escala: asp.escala, max: Math.max(...asp.escala) };
+      return { id: a, nombre: asp.nombre, corto: asp.corto ?? asp.nombre, peso: null, escala: asp.escala, max: Math.max(...asp.escala) };
     });
   }
   if (config.tipo === 'taller') {
     const ei = config.evaluacion_integral;
-    return [{ id: 'integral', nombre: 'Evaluación integral', peso: null, escala: ei.escala, max: Math.max(...ei.escala) }];
+    return [{ id: 'integral', nombre: 'Evaluación integral', corto: 'integral', peso: null, escala: ei.escala, max: Math.max(...ei.escala) }];
   }
   return [];
 }

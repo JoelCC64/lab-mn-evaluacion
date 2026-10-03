@@ -19,6 +19,7 @@
   "criterios": [
     {
       "id": "diseno",
+      "corto": "diseño",
       "nombre": "Diseño experimental",
       "peso": 0.2,
       "escala": [
@@ -42,6 +43,7 @@
     },
     {
       "id": "datos",
+      "corto": "datos",
       "nombre": "Toma de datos",
       "peso": 0.3,
       "escala": [
@@ -66,6 +68,7 @@
     },
     {
       "id": "analisis",
+      "corto": "análisis",
       "nombre": "Análisis",
       "peso": 0.5,
       "escala": [

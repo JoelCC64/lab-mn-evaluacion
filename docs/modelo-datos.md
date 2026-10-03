@@ -37,16 +37,27 @@ Claves entre corchetes: compuestas. Todas las tablas de registro llevan `fecha` 
 | `revision_preparatorio` | `evento` | `revisada` | «Revisión hecha: todos cumplieron» | `prep_review` |
 | `novedades_preparatorio` | `[evento+estudiante]` | `nivel` (1 incompleto · 0 no lo hizo · `null` en SQI), `no_ingresa`, `observacion` | Solo las excepciones de la revisión en la puerta | `prep_novedades` |
 | `ajustes` | `[evento+estudiante]` | `valor` (0–1), `motivo` (obligatorio) | Ajuste individual explícito de la nota del evento | `overrides` |
+| `retroalimentaciones` | `[evento+grupo]` | `dada` | Retroalimentación de la práctica anterior dada en el taller (`evento` = el taller; `grupo` = el de la práctica). Desde la versión 2 de la base (Fase 4) | (nuevo) |
 | `cambios_evento` | `evento` | `estado` (`sin_clase` · `normal`), `motivo` | Cambios manuales del calendario (clase suspendida, semana 1 sin clase) | `events.estado` |
 | `importaciones` | autoincremental | `tipo` (`excel_semestre` · `asistencia_semana1` · `respaldo`), `archivo`, `resumen` (solo conteos) | Historial de lecturas del Excel y de restauraciones | (nuevo) |
 | `meta` | `clave` | `valor` | Datos sueltos: último respaldo, versión del modelo | (nuevo) |
 
 El motor de notas ya sabe leer `trabajos_casa`, `recuperaciones` y `plic` si existen; sus pantallas y tablas llegan en las fases siguientes.
 
-Fases siguientes (se agregan con una nueva versión de la base, sin perder datos):
+**Versiones de la base** (`VERSION_BASE` en `src/db.js`). Una versión nueva solo agrega tablas o índices; Dexie actualiza la base del dispositivo al abrirla, sin perder datos. Una prueba lo comprueba.
+- 1: Fases 1 a 3.
+- 2: Fase 4, con la tabla `retroalimentaciones`.
+
+Fases siguientes:
 - `trabajos_casa` (Fase 5).
 - `plic` y `recuperaciones` (Fase 6).
-- `escrituras_excel` (Fase 3).
+
+**Lo último que se escribió en el Excel** (`excel_writes` en el §4) no va en la base: va en la hoja oculta «_app» del propio Excel (ver `docs/excel.md`). Así viaja con el archivo y no se pierde cuando la Mac importa un respaldo del iPhone, que reemplaza toda la base.
+
+**Datos solo de este dispositivo** (base aparte `lab-mn-2026B-local`, que no va en el respaldo):
+- La carpeta del Excel elegida en Chrome.
+- El último respaldo importado.
+- El registro de escrituras en el Excel (solo conteos).
 
 ## Reglas del modelo
 
@@ -76,7 +87,7 @@ La instantánea se crea la primera vez que se registra algo de grupo en el event
   "version": 1,
   "semestre": "2026B",
   "creado": "2026-10-05T11:02:00.000Z",
-  "app": "0.3.0",
+  "app": "0.5.0",
   "config": "4dd857fec9e1",
   "tablas": { "estudiantes": [ … ], "asistencia": [ … ], … }
 }
@@ -84,5 +95,6 @@ La instantánea se crea la primera vez que se registra algo de grupo en el event
 
 - Contiene todas las tablas y es el archivo que pasa del iPhone a la Mac.
 - Restaurar **reemplaza todo** lo del dispositivo, previa confirmación.
+- Un respaldo de una versión anterior de la app (sin alguna tabla nueva) se puede restaurar: la tabla que falta queda vacía. Uno de una versión más nueva, con tablas que esta versión no conoce, se rechaza.
 - Nombre del archivo: `respaldo-lab-mn-2026B-AAAA-MM-DD-HHMM.json`.
 - Tiene datos de estudiantes: el `.gitignore` impide que entre al repositorio.

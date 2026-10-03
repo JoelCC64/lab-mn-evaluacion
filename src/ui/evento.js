@@ -1,4 +1,4 @@
-// Evento: encabezado, pestañas de la clase (Puerta · Control · Grupos · Resumen) y avisos de estado.
+// Evento: encabezado, pestañas de la clase (Puerta · Control · [Retro] · Grupos · Resumen) y avisos de estado.
 import { useMemo } from '../vendor/preact-htm.js';
 import { html, useApp, Pantalla, Aviso, Cargando, enlace } from './base.js';
 import { useCurso, textoBimestre } from './curso-datos.js';
@@ -6,6 +6,8 @@ import { Puerta } from './puerta.js';
 import { Control } from './control.js';
 import { Grupos } from './grupos.js';
 import { Resumen } from './resumen.js';
+import { Retro } from './retro.js';
+import { retroDelTaller } from '../nucleo/retro.js';
 import { estadoEvento } from '../nucleo/estado-evento.js';
 import { fechaCorta } from '../nucleo/util.js';
 
@@ -30,9 +32,11 @@ export function pestanasDe(cfg, evento) {
   if (!evento.sesion || evento.estado !== 'normal') return [];
   const conPuerta = cfg.preparatorio.aplica_a.includes(evento.tipo);
   const conControl = cfg.controlOral.sesiones.includes(evento.tipo);
+  const conRetro = Boolean(evento.config && cfg.actividades[evento.config]?.retro_practica_anterior);
   return [
     conPuerta && { id: 'puerta', texto: 'Puerta' },
     conControl && { id: 'control', texto: 'Control' },
+    conRetro && { id: 'retro', texto: 'Retro' },
     { id: 'grupos', texto: 'Grupos' },
     { id: 'resumen', texto: 'Resumen' },
   ].filter(Boolean);
@@ -65,6 +69,10 @@ export function Evento({ id, pestana }) {
     if (p.id === 'puerta') return ctx.revisionPrep.get(evento.id)?.revisada ? 'ok' : null;
     if (p.id === 'control') return ctx.reg.controles.some((c) => c.evento === evento.id) ? 'ok' : null;
     if (p.id === 'grupos') return ctx.pases.get(evento.id)?.cerrado ? 'ok' : null;
+    if (p.id === 'retro') {
+      const r = retroDelTaller(ctx, evento);
+      return r.grupos.length && r.grupos.every((g) => g.dada) ? 'ok' : null;
+    }
     return null;
   };
   const barra = pestanas.length > 1 && html`
@@ -78,6 +86,7 @@ export function Evento({ id, pestana }) {
       <${AvisoDeEstado} evento=${evento} estado=${est} eventos=${eventos} />
       ${activa === 'puerta' && html`<${Puerta} ctx=${ctx} evento=${evento} />`}
       ${activa === 'control' && html`<${Control} ctx=${ctx} evento=${evento} />`}
+      ${activa === 'retro' && html`<${Retro} ctx=${ctx} evento=${evento} />`}
       ${activa === 'grupos' && html`<${Grupos} ctx=${ctx} evento=${evento} />`}
       ${activa === 'resumen' && html`<${Resumen} ctx=${ctx} evento=${evento} />`}
     <//>`;

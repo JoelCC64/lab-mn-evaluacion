@@ -20,6 +20,12 @@
   "pendiente_prefijo": "Pendiente",
   "hojas_ignoradas": ["Resumen", "Correos", "Observaciones"],
   "hojas_app": ["Asistencia (app)", "Detalle (app)", "Coordinación B1", "Coordinación B2", "_app"],
+  "escritura": {
+    "hoja_asistencia": "Asistencia (app)",
+    "hoja_detalle": "Detalle (app)",
+    "hoja_control": "_app",
+    "texto_zona": "lo llena la app"
+  },
   "asistencia_semana1": {
     "actividad": "INTRO",
     "valores": [

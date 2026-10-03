@@ -3,7 +3,7 @@
   "$id": "excel.schema.json",
   "title": "Estructura del Excel del semestre (Anexo J)",
   "type": "object",
-  "required": ["id", "buscar_encabezados_hasta_fila", "columnas", "obligatorias", "columnas_que_no_se_leen", "metodologia_texto", "pendiente_prefijo", "hojas_ignoradas", "hojas_app"],
+  "required": ["id", "buscar_encabezados_hasta_fila", "columnas", "obligatorias", "columnas_que_no_se_leen", "metodologia_texto", "pendiente_prefijo", "hojas_ignoradas", "hojas_app", "escritura"],
   "additionalProperties": false,
   "properties": {
     "id": { "const": "excel" },
@@ -22,6 +22,15 @@
     "pendiente_prefijo": { "type": "string" },
     "hojas_ignoradas": { "type": "array", "items": { "type": "string" } },
     "hojas_app": { "type": "array", "items": { "type": "string" } },
+    "escritura": {
+      "type": "object", "required": ["hoja_asistencia", "hoja_detalle", "hoja_control", "texto_zona"], "additionalProperties": false,
+      "properties": {
+        "hoja_asistencia": { "type": "string", "minLength": 1 },
+        "hoja_detalle": { "type": "string", "minLength": 1 },
+        "hoja_control": { "type": "string", "minLength": 1 },
+        "texto_zona": { "type": "string", "minLength": 1 }
+      }
+    },
     "asistencia_semana1": {
       "type": "object", "required": ["actividad", "valores"], "additionalProperties": false,
       "properties": {

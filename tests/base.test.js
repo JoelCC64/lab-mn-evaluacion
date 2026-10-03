@@ -5,7 +5,7 @@ import assert from 'node:assert/strict';
 import { randomUUID } from 'node:crypto';
 import ExcelJS from 'exceljs';
 
-import { abrirBase } from '../src/db.js';
+import { Dexie, TABLAS, abrirBase } from '../src/db.js';
 import { leerAsistenciaSemana1, leerExcelSemestre } from '../src/nucleo/excel-lectura.js';
 import { aplicarAsistenciaSemana1, aplicarExcelSemestre, planificarImportacion } from '../src/datos/importar.js';
 import { borrarTodo, exportarRespaldo, restaurarRespaldo, validarRespaldo } from '../src/datos/respaldo.js';
@@ -139,6 +139,7 @@ test('respaldo: exportar, borrar todo, restaurar y obtener datos idénticos', as
   await db.revision_preparatorio.put({ evento: ev, revisada: true, fecha: AHORA });
   await db.novedades_preparatorio.put({ evento: ev, estudiante: e.id, nivel: 1, no_ingresa: false, observacion: null, fecha: AHORA });
   await db.ajustes.put({ evento: ev, estudiante: e.id, valor: 0.5, motivo: 'prueba', fecha: AHORA });
+  await db.retroalimentaciones.put({ evento: 'GR2QB:T1', grupo: '1', dada: true, fecha: AHORA });
   await db.meta.put({ clave: 'prueba', valor: 1 });
 
   const opciones = { semestre: '2026B', app: 'prueba', config: cfg.version, ahora: AHORA };
@@ -163,4 +164,29 @@ test('el respaldo rechaza archivos de otro formato, versión o semestre', async 
   const base = { formato: 'lab-mn-respaldo', version: 1, semestre: '2027A', tablas: {} };
   assert.ok(validarRespaldo(base, db, { semestre: '2026B' }).some((e) => e.includes('2027A')));
   assert.ok(validarRespaldo({ ...base, semestre: '2026B', tablas: { inventada: [] } }, db, { semestre: '2026B' }).some((e) => e.includes('inventada')));
+});
+
+test('una base de la versión 1 (Fases 1–3) se actualiza al abrirla, sin perder datos', async () => {
+  const nombre = `prueba-v1-${randomUUID()}`;
+  const v1 = new Dexie(nombre);
+  const { retroalimentaciones, ...tablasV1 } = TABLAS;
+  v1.version(1).stores(tablasV1);
+  await v1.estudiantes.put({ id: '199900001', codigo: '199900001', nombre: 'RUIZ ANA', curso: 'GR2QB', estado: 'nomina' });
+  await v1.asistencia.put({ evento: 'GR2QB:P1', estudiante: '199900001', estado: 'presente', motivo: null, observacion: null, fecha: AHORA });
+  v1.close();
+
+  const db = abrirBase(nombre);
+  await db.open();
+  assert.equal(await db.estudiantes.count(), 1);
+  assert.equal((await db.asistencia.get(['GR2QB:P1', '199900001'])).estado, 'presente');
+  assert.equal(await db.retroalimentaciones.count(), 0, 'la tabla nueva existe y está vacía');
+});
+
+test('un respaldo hecho con la versión anterior (sin la tabla de retroalimentaciones) se puede restaurar', async () => {
+  const db = await baseConEjemplo();
+  const viejo = await exportarRespaldo(db, { semestre: '2026B', app: '0.3.0', config: cfg.version, ahora: AHORA });
+  delete viejo.tablas.retroalimentaciones;
+  assert.deepEqual(validarRespaldo(viejo, db, { semestre: '2026B' }), []);
+  await restaurarRespaldo(db, viejo);
+  assert.equal(await db.estudiantes.count(), 196);
 });

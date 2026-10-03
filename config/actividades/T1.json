@@ -24,6 +24,7 @@
       1,
       2
     ],
+    "descripcion": "Preguntas u observaciones del docente, ejecución de las actividades y tareas. No exige que el grupo termine el taller.",
     "incluye": [
       "preguntas_y_observaciones_del_docente",
       "ejecucion",

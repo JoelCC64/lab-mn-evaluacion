@@ -18,6 +18,7 @@ export const TABLAS = {
   revision_preparatorio: 'evento',
   novedades_preparatorio: '[evento+estudiante], evento, estudiante',
   ajustes: '[evento+estudiante], evento, estudiante',
+  retroalimentaciones: '[evento+grupo], evento',
   cambios_evento: 'evento',
   importaciones: '++id, fecha',
   meta: 'clave',
@@ -30,9 +31,16 @@ export function nombreBase(semestre, { demo = false } = {}) {
   return `lab-mn-${semestre}${demo ? '-demo' : ''}`;
 }
 
+/**
+ * Versiones de la base. Una versión nueva solo agrega tablas o índices: Dexie actualiza la base del
+ * dispositivo al abrirla, sin perder datos.
+ * 1 (Fases 1–3) · 2 (Fase 4): retroalimentaciones.
+ */
+export const VERSION_BASE = 2;
+
 export function abrirBase(nombre) {
   const db = new Dexie(nombre);
-  db.version(1).stores(TABLAS);
+  db.version(VERSION_BASE).stores(TABLAS);
   return db;
 }
 

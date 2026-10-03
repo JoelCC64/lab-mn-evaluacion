@@ -1,10 +1,11 @@
 // Datos: leer el Excel del semestre (con vista previa), asistencia de la semana 1, respaldo y restauración.
 import { useState } from '../vendor/preact-htm.js';
-import { html, useApp, useVivo, Pantalla, Aviso, Hoja, Chip } from './base.js';
+import { html, useApp, useVivo, Pantalla, Aviso, Hoja, Chip, enlace } from './base.js';
 import { leerAsistenciaSemana1, leerExcelSemestre } from '../nucleo/excel-lectura.js';
 import { aplicarAsistenciaSemana1, aplicarExcelSemestre, planificarImportacion } from '../datos/importar.js';
 import { borrarTodo, contarRespaldo, exportarRespaldo, nombreArchivoRespaldo, restaurarRespaldo, validarRespaldo } from '../datos/respaldo.js';
 import { conteoTablas } from '../datos/consultas.js';
+import { guardarLocal } from '../datos/local.js';
 import {
   ACEPTA_EXCEL, ACEPTA_JSON, abrirLibro, compartirODescargar, elegirArchivo, guardarUltimoRespaldo, leerUltimoRespaldo,
 } from './archivos.js';
@@ -82,6 +83,11 @@ export function Datos() {
         <button class="boton primario grande" disabled=${!!ocupado} onClick=${() => leerSemestre(delDispositivo)}>Elegir el Excel del semestre</button>
         ${demo && html`<button class="boton ancho" disabled=${!!ocupado} onClick=${() => leerSemestre(deEjemplo(ARCHIVO_DEMO))}>Usar el Excel ficticio</button>`}
       </div>
+
+      <a class="tarjeta" href=${enlace('excel')}>
+        <div class="separado"><h2>Escribir las notas en el Excel</h2><span class="flecha">›</span></div>
+        <p class="tenue pequeno">En la Mac, con Chrome: importa el respaldo del iPhone y escribe la asistencia y las notas en el Excel, solo en las columnas y hojas de la app.</p>
+      </a>
 
       <div class="tarjeta">
         <h2>Asistencia de la semana 1 <span class="tenue pequeno">(opcional)</span></h2>
@@ -203,12 +209,13 @@ function VistaSemana1({ vista, cerrar }) {
     <//>`;
 }
 
-function VistaRespaldo({ vista, cerrar }) {
+export function VistaRespaldo({ vista, cerrar }) {
   const { db, avisar } = useApp();
   const { obj, errores, nombre } = vista;
   const conteo = errores.length ? {} : contarRespaldo(obj);
   const restaurar = async () => {
     await restaurarRespaldo(db, obj);
+    await guardarLocal(db, 'respaldo_importado', { creado: obj.creado, app: obj.app, archivo: nombre, importado: new Date().toISOString() });
     cerrar();
     avisar('Respaldo restaurado.', 'ok');
   };
