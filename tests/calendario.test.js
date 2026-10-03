@@ -97,7 +97,8 @@ test('sesiones con control oral en el 1.er bimestre: GR2QB tiene 5 (pierde el T2
 
 test('evento sugerido: la sesión de la semana o la próxima', () => {
   const eventos = eventosDe('GR2QB');
-  assert.equal(eventoSugerido(cfg, eventos, '2026-10-03').codigo, 'INTRO'); // sábado de la semana 1
+  assert.equal(eventoSugerido(cfg, eventos, '2026-10-02').codigo, 'INTRO'); // viernes de la semana 1
+  assert.equal(eventoSugerido(cfg, eventos, '2026-10-03').codigo, 'P1');    // sábado: la próxima
   assert.equal(eventoSugerido(cfg, eventos, '2026-10-05').codigo, 'P1');
   assert.equal(eventoSugerido(cfg, eventos, '2026-10-08').codigo, 'P1');   // jueves de la semana 2
   assert.equal(eventoSugerido(cfg, eventos, '2026-12-30').codigo, 'T6');   // receso → la próxima

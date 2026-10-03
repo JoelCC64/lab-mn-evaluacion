@@ -1,0 +1,92 @@
+// Curso: el evento de esta semana, todos los eventos por bimestre (con su estado) y los estudiantes.
+import { useState } from '../vendor/preact-htm.js';
+import { html, useApp, Pantalla, Chip, ChipMetodologia, Aviso, Cargando, enlace, Persona } from './base.js';
+import { useCurso, textoBimestre, horario } from './curso-datos.js';
+import { eventoSugerido, semanaDeFecha } from '../nucleo/calendario.js';
+import { estadoEvento } from '../nucleo/estado-evento.js';
+import { avanceEvaluacion } from '../nucleo/motor-vista.js';
+import { fechaCorta, hoyLocal, compararGrupos } from '../nucleo/util.js';
+import { nombreMetodologia } from '../nucleo/config.js';
+
+export function Curso({ paralelo }) {
+  const { cfg } = useApp();
+  const { curso, reg, eventos, cargando } = useCurso(paralelo);
+  if (!curso) return html`<${Pantalla} titulo="Curso desconocido" atras="#/"><${Aviso} tono="mal">No existe el curso ${paralelo}.<//><//>`;
+  const subtitulo = `${nombreMetodologia(cfg, curso.metodologia)} · Cronograma ${curso.cronograma} · ${horario(curso, true)}`;
+  if (cargando || !eventos) return html`<${Pantalla} titulo=${paralelo} subtitulo=${subtitulo} atras="#/"><${Cargando} /><//>`;
+
+  const hoy = hoyLocal();
+  const sugerido = eventoSugerido(cfg, eventos, hoy);
+  const activos = reg.estudiantes.filter((e) => e.estado !== 'baja');
+  const porBimestre = [1, 2].map((b) => ({ b, eventos: eventos.filter((e) => e.bimestre === b) }));
+
+  return html`
+    <${Pantalla} titulo=${paralelo} subtitulo=${subtitulo} atras="#/">
+      ${activos.length === 0 && html`
+        <${Aviso} tono="aviso" titulo="Este curso aún no tiene estudiantes">
+          Carga el Excel del semestre en <a class="negrita" href=${enlace('datos')}>Datos</a>.
+        <//>`}
+      ${sugerido && html`
+        <a class="tarjeta destacada" href=${enlace('evento', sugerido.id)}>
+          <div class="separado">
+            <span class="tenue pequeno negrita">${etiquetaSugerido(cfg, sugerido, hoy)} · ${fechaCorta(sugerido.fecha)}</span>
+            <${EstadoChip} evento=${sugerido} reg=${reg} eventos=${eventos} />
+          </div>
+          <h2>${sugerido.codigo} · ${sugerido.titulo}</h2>
+          <div class="tenue pequeno">Semana ${sugerido.semana} · ${sugerido.lugar === 'lab' ? 'laboratorio' : 'aula'} · ${textoBimestre(sugerido.bimestre)}</div>
+        </a>`}
+      ${porBimestre.map(({ b, eventos: lista }) => html`
+        <div class="seccion-titulo">${textoBimestre(b)}</div>
+        <div class="lista">${lista.map((e) => html`<${FilaEvento} evento=${e} reg=${reg} eventos=${eventos} />`)}</div>`)}
+      <${Estudiantes} estudiantes=${reg.estudiantes} />
+    <//>`;
+}
+
+function etiquetaSugerido(cfg, evento, hoy) {
+  if (evento.fecha === hoy) return 'HOY';
+  if (evento.fecha > hoy) return 'PRÓXIMA SESIÓN';
+  return evento.semana === semanaDeFecha(cfg, hoy) ? 'ESTA SEMANA' : 'ÚLTIMA SESIÓN';
+}
+
+function EstadoChip({ evento, reg, eventos }) {
+  const { cfg } = useApp();
+  const e = estadoEvento(evento, reg, avanceEvaluacion(cfg, evento, eventos, reg));
+  return html`<${Chip} tono=${e.tono} titulo=${e.detalle}>${e.texto}<//>`;
+}
+
+function FilaEvento({ evento, reg, eventos }) {
+  const { cfg } = useApp();
+  const est = estadoEvento(evento, reg, avanceEvaluacion(cfg, evento, eventos, reg));
+  const secundaria = evento.tipo === 'sin_nota' || evento.tipo === 'trabajo_casa' || evento.tipo === 'plic';
+  const lugar = evento.lugar ? (evento.lugar === 'lab' ? 'lab.' : 'aula') : '';
+  const detalle = [fechaCorta(evento.fecha), lugar, evento.con_nota ? null : 'sin nota'].filter(Boolean).join(' · ');
+  return html`
+    <a class=${`fila ${secundaria ? 'atenuada' : ''} ${evento.tipo === 'trabajo_casa' ? 'sangria' : ''}`} href=${enlace('evento', evento.id)}>
+      ${evento.tipo === 'trabajo_casa' ? null : html`<span class="semana"><b>${evento.semana}</b>sem</span>`}
+      <div class="principal">
+        <div class="linea1">${evento.codigo === 'INTRO' || evento.codigo === 'REFUERZO' || evento.codigo === 'REVISION' ? evento.titulo : html`${evento.codigo} · ${evento.titulo}`}</div>
+        <div class="linea2">${detalle}${est.detalle ? ` · ${est.detalle}` : ''}</div>
+      </div>
+      <${Chip} tono=${est.tono}>${est.texto}<//>
+    </a>`;
+}
+
+function Estudiantes({ estudiantes }) {
+  const [abierto, setAbierto] = useState(false);
+  const activos = estudiantes.filter((e) => e.estado !== 'baja');
+  const bajas = estudiantes.filter((e) => e.estado === 'baja');
+  const orden = [...activos].sort((a, b) => compararGrupos(a.grupo_excel ?? '999', b.grupo_excel ?? '999') || a.nombre.localeCompare(b.nombre, 'es'));
+  return html`
+    <div class="seccion-titulo">
+      <span>Estudiantes · ${activos.length}${bajas.length ? ` (+${bajas.length} de baja)` : ''}</span>
+      <button class="boton chico" onClick=${() => setAbierto(!abierto)}>${abierto ? 'Ocultar' : 'Ver'}</button>
+    </div>
+    ${abierto && html`
+      <div class="lista">
+        ${[...orden, ...bajas].map((e) => html`
+          <div class="fila">
+            <${Persona} estudiante=${e} detalle=${e.grupo_excel ? html`<span>· grupo del Excel ${e.grupo_excel}</span>` : html`<span>· sin grupo en el Excel</span>`} />
+          </div>`)}
+      </div>
+      <p class="tenue pequeno">Los grupos del Excel solo sirven para el primer evento; después mandan los grupos de la app.</p>`}`;
+}

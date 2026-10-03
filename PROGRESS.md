@@ -7,7 +7,7 @@ Plan: [PROYECTO_LABORATORIOS_v4.md](PROYECTO_LABORATORIOS_v4.md). Al empezar una
 | Fase | Estado | Fecha |
 |---|---|---|
 | 0. Preparación y configuración del semestre | ✅ Completa | 3-oct-2026 |
-| 1. Lectura del Excel, navegación y respaldo | ⏳ | |
+| 1. Lectura del Excel, navegación y respaldo | ✅ Completa | 3-oct-2026 |
 | 2. La clase: prácticas, control oral, asistencia y preparatorio | ⏳ | |
 | 3. Escritura en el Excel (Mac, Chrome) | — | |
 | 4–9 | — | |
@@ -52,9 +52,54 @@ Plan: [PROYECTO_LABORATORIOS_v4.md](PROYECTO_LABORATORIOS_v4.md). Al empezar una
 - **Planificación y conocimiento.** Su JSON incluye `valor: 1.5`. Los esquemas PLIC del B2 llevan `items: { PLIC: 1 }` para enlazar la actividad.
 - **El plan se movió a la raíz de este repositorio** (Anexo E).
 
+## Fase 1 (3-oct-2026) · versión 0.2.0
+
+**Hecho**
+- **Base local** (Dexie, una base por semestre: `lab-mn-2026B`) con el modelo de `docs/modelo-datos.md`.
+- **Lectura del Excel del semestre** (`src/nucleo/excel-lectura.js`):
+  - Busca los encabezados por su texto, en cualquier fila y orden.
+  - No lee la columna de correo y quita cualquier correo colado en el nombre o la observación.
+  - Reporta errores: filas sin código y códigos repetidos.
+  - Avisa de hojas desconocidas, columnas faltantes y diferencias de cronograma o metodología.
+- **Importación con vista previa** antes de guardar (nuevos, actualizados, bajas, por curso). Al volver a leer:
+  - Agrega a los nuevos.
+  - Marca «baja» a quien ya no está, sin borrar sus evaluaciones.
+  - Reactiva a quien vuelve.
+  - Si una hoja falta, no da de baja a nadie de ese curso.
+- **Asistencia de la semana 1** (opcional): presente/no vino en la Introducción, con el pase cerrado. Los cursos sin clase (GR2QB) quedan «sin clase».
+- **Navegación** Curso → Evento → Grupo:
+  - Metodología y cronograma visibles.
+  - Estado de cada evento: pendiente, en curso, pase hecho, evaluado, feriado o sin clase.
+  - Sesión sugerida: la de la semana; el fin de semana, la próxima.
+- **Grupos por evento** (`src/nucleo/grupos.js`): instantánea propia → evento anterior → Excel. El TC usa los de su práctica.
+- **Respaldo JSON:**
+  - Exportar (en el iPhone, hoja de compartir para AirDrop; en la Mac, descarga).
+  - Restaurar con validación (formato, versión, semestre) y confirmación «Reemplazar todo».
+- **PWA:**
+  - Manifiesto, íconos (péndulo) y service worker generado por `npm run build` con todos los archivos.
+  - Sin conexión: en localhost primero la red; publicada, primero la caché.
+  - Una versión nueva se instala solo cuando Joel toca «Actualizar».
+- **Demostración** (`?demo=1`): una base aparte con el Excel ficticio, para probar sin tocar los datos reales.
+- **Pruebas** (44 en total):
+  - Lector del Excel.
+  - Importación y relectura.
+  - Ningún «@» guardado.
+  - Respaldo: exportar → borrar → restaurar → idéntico.
+  - Grupos.
+  - PWA al día.
+
+**Verificado en el navegador** (375 px):
+- Se lee el Excel ficticio y se navega por cursos, eventos y grupos.
+- La asistencia de la semana 1 queda registrada.
+- Los datos persisten al recargar.
+- Con el servidor apagado, la app abre desde la caché con sus datos.
+
+**Notas**
+- El panel de vista previa no pudo lanzar el servidor (el proceso quedaba detenido antes de arrancar, probablemente por un permiso de macOS). Se usa `npm run servidor` desde la terminal y el panel se conecta a http://localhost:8765.
+- Para instalar la app en el iPhone hace falta publicarla con HTTPS (por ejemplo GitHub Pages). Sin eso, el service worker no se registra fuera de localhost.
+
 ## Pendiente
 
-- Fase 1: base local, lectura del Excel, navegación, PWA y respaldo.
 - Fase 2: motor de notas, control oral, evaluación por grupo, pase final y revisión del preparatorio.
 - Antes de la Fase 6: nombre del profesor para la columna PROFESOR de las hojas de coordinación.
 - Publicación con HTTPS (por ejemplo GitHub Pages) para instalar la app en el iPhone. Lo decide Joel.

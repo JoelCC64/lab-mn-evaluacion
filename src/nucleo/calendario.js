@@ -3,7 +3,7 @@
 // Los eventos se calculan siempre desde la configuración; la base de datos solo guarda lo registrado
 // y, si hace falta, cambios manuales de estado (por ejemplo, una clase suspendida).
 
-import { DIAS, diasEntre, sumarDias } from './util.js';
+import { DIAS, diaDeFecha, diasEntre, sumarDias } from './util.js';
 import { bimestreDeActividad, configActividad, cronogramaDe, tituloActividad } from './config.js';
 
 export const TIPOS_SESION = ['practica', 'taller', 'sin_nota'];
@@ -112,14 +112,16 @@ export function seRealiza(evento) {
 }
 
 /**
- * Evento que la app propone para hoy: la sesión de esta semana; si esta semana no hay,
- * la próxima sesión; si el semestre terminó, la última.
+ * Evento que la app propone para hoy: de lunes a viernes, la sesión de esta semana (aunque ya haya
+ * pasado, para terminar de cargarla); el fin de semana, o si esta semana no hay clase, la próxima
+ * sesión; si el semestre terminó, la última.
  */
 export function eventoSugerido(cfg, eventos, hoy) {
   const sesiones = eventos.filter((e) => e.sesion);
   if (!sesiones.length) return null;
+  const finDeSemana = ['sabado', 'domingo'].includes(diaDeFecha(hoy));
   const semana = semanaDeFecha(cfg, hoy);
   const deEstaSemana = sesiones.find((e) => e.semana === semana);
-  if (deEstaSemana) return deEstaSemana;
+  if (deEstaSemana && !finDeSemana) return deEstaSemana;
   return sesiones.find((e) => e.fecha >= hoy) ?? sesiones[sesiones.length - 1];
 }

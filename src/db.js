@@ -1,0 +1,40 @@
+// Base local (IndexedDB con Dexie). El modelo está documentado en docs/modelo-datos.md.
+import Dexie from './vendor/dexie.js';
+import { TABLAS_REGISTRO } from './nucleo/tablas.js';
+
+export { Dexie };
+
+/** Tablas y claves (la primera entrada es la clave primaria; las demás, índices). */
+export const TABLAS = {
+  estudiantes: 'id, curso, estado',
+  grupos_evento: '[evento+estudiante], evento, estudiante',
+  asistencia: '[evento+estudiante], evento, estudiante',
+  pases: 'evento',
+  revisiones_grupo: '[evento+grupo], evento',
+  puntajes: '[evento+grupo+aspecto], evento, [evento+grupo]',
+  etiquetas: '[evento+grupo+etiqueta], evento, [evento+grupo]',
+  notas: '[evento+unidad+unidad_id], evento',
+  controles: '[evento+estudiante], evento, estudiante',
+  revision_preparatorio: 'evento',
+  novedades_preparatorio: '[evento+estudiante], evento, estudiante',
+  ajustes: '[evento+estudiante], evento, estudiante',
+  cambios_evento: 'evento',
+  importaciones: '++id, fecha',
+  meta: 'clave',
+};
+
+/** Tablas cuyas filas pertenecen a un evento (clave o índice «evento» = «PARALELO:CÓDIGO»). */
+export const TABLAS_DE_EVENTO = [...TABLAS_REGISTRO, 'cambios_evento'];
+
+export function nombreBase(semestre, { demo = false } = {}) {
+  return `lab-mn-${semestre}${demo ? '-demo' : ''}`;
+}
+
+export function abrirBase(nombre) {
+  const db = new Dexie(nombre);
+  db.version(1).stores(TABLAS);
+  return db;
+}
+
+/** Momento actual como texto ISO (inyectable en pruebas). */
+export const ahoraISO = () => new Date().toISOString();

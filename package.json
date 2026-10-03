@@ -1,6 +1,6 @@
 {
   "name": "app-evaluacion-lab-mn",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "private": true,
   "description": "App de evaluación y calificaciones de los laboratorios de Mecánica Newtoniana (EPN, 2026B)",
   "type": "module",
@@ -14,7 +14,9 @@
     "config": "node scripts/config.mjs",
     "vendor": "node scripts/copiar-vendor.mjs",
     "ejemplo": ".venv/bin/python scripts/generar_excel_ejemplo.py",
-    "servidor": "node scripts/servidor.mjs"
+    "servidor": "node scripts/servidor.mjs",
+    "build": "node scripts/config.mjs && node scripts/precache.mjs",
+    "iconos": ".venv/bin/python scripts/generar_iconos.py"
   },
   "dependencies": {
     "dexie": "4.4.6",
