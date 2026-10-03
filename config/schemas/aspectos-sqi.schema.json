@@ -1,0 +1,19 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "aspectos-sqi.schema.json",
+  "title": "Catálogo de aspectos de las prácticas SQI",
+  "type": "object",
+  "minProperties": 1,
+  "propertyNames": { "$ref": "comun.schema.json#/$defs/id" },
+  "additionalProperties": {
+    "type": "object",
+    "required": ["nombre", "tipo", "escala", "descriptores"],
+    "additionalProperties": false,
+    "properties": {
+      "nombre": { "$ref": "comun.schema.json#/$defs/texto" },
+      "tipo": { "enum": ["objetiva", "subjetiva"] },
+      "escala": { "$ref": "comun.schema.json#/$defs/escala" },
+      "descriptores": { "$ref": "comun.schema.json#/$defs/descriptores" }
+    }
+  }
+}

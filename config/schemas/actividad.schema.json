@@ -1,0 +1,158 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "actividad.schema.json",
+  "title": "Actividad evaluable (práctica, taller o trabajo en casa)",
+  "type": "object",
+  "required": ["id", "codigo", "tipo", "metodologia", "bimestre"],
+  "properties": {
+    "id": { "type": "string", "pattern": "^[A-Z][A-Z0-9]*(-(TRAD|SQI))?$" },
+    "codigo": { "$ref": "comun.schema.json#/$defs/codigo_actividad" },
+    "fuente": { "type": "string" },
+    "tipo": { "enum": ["practica", "taller", "trabajo_casa"] },
+    "metodologia": {
+      "oneOf": [
+        { "$ref": "comun.schema.json#/$defs/metodologia" },
+        { "type": "array", "minItems": 1, "uniqueItems": true, "items": { "$ref": "comun.schema.json#/$defs/metodologia" } }
+      ]
+    },
+    "bimestre": { "enum": [1, 2] },
+    "etiquetas": { "type": "array", "items": { "$ref": "comun.schema.json#/$defs/etiqueta" } },
+    "preguntas_discusion": { "type": "array", "items": { "$ref": "comun.schema.json#/$defs/texto" } }
+  },
+  "allOf": [
+    {
+      "if": { "properties": { "tipo": { "const": "practica" }, "metodologia": { "const": "TRAD" } } },
+      "then": {
+        "required": ["componente", "unidad_calificacion", "criterios"],
+        "additionalProperties": false,
+        "properties": {
+          "id": true, "codigo": true, "fuente": true, "tipo": true, "metodologia": true, "bimestre": true,
+          "etiquetas": true, "preguntas_discusion": true,
+          "componente": { "const": "diseno_datos_analisis" },
+          "unidad_calificacion": { "const": "grupo" },
+          "individual": { "type": "array", "items": { "enum": ["trabajo_preparatorio", "control_oral"] } },
+          "asistencia": { "const": "pase_final_por_grupo" },
+          "cierre": { "type": "array", "items": { "enum": ["trabajo_firmado"] } },
+          "penalizacion_total": { "type": "string" },
+          "criterios": {
+            "type": "array", "minItems": 1,
+            "items": {
+              "type": "object",
+              "required": ["id", "nombre", "peso", "escala", "niveles"],
+              "additionalProperties": false,
+              "properties": {
+                "id": { "$ref": "comun.schema.json#/$defs/id" },
+                "nombre": { "$ref": "comun.schema.json#/$defs/texto" },
+                "peso": { "$ref": "comun.schema.json#/$defs/peso" },
+                "escala": { "$ref": "comun.schema.json#/$defs/escala" },
+                "indicadores": { "type": "array", "items": { "$ref": "comun.schema.json#/$defs/texto" } },
+                "niveles": { "$ref": "comun.schema.json#/$defs/descriptores" }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": { "properties": { "tipo": { "const": "practica" }, "metodologia": { "const": "SQI" } } },
+      "then": {
+        "required": ["unidad_calificacion", "aspectos_aplicables"],
+        "additionalProperties": false,
+        "properties": {
+          "id": true, "codigo": true, "fuente": true, "tipo": true, "metodologia": true, "bimestre": true,
+          "etiquetas": true, "preguntas_discusion": true,
+          "unidad_calificacion": { "const": "grupo" },
+          "aspectos_aplicables": { "type": "array", "minItems": 1, "uniqueItems": true, "items": { "$ref": "comun.schema.json#/$defs/id" } },
+          "individual": { "type": "array", "items": { "enum": ["control_oral_sin_nota"] } },
+          "asistencia": { "const": "pase_final_por_grupo" },
+          "cierre": { "type": "array", "items": { "enum": ["trabajo_firmado"] } },
+          "penalizacion_total": { "type": "string" },
+          "indicadores": {
+            "type": "object",
+            "additionalProperties": { "type": "array", "items": { "$ref": "comun.schema.json#/$defs/texto" } }
+          }
+        }
+      }
+    },
+    {
+      "if": { "properties": { "tipo": { "const": "taller" } } },
+      "then": {
+        "required": ["pesos", "asistencia_permanencia", "evaluacion_integral"],
+        "additionalProperties": false,
+        "properties": {
+          "id": true, "codigo": true, "fuente": true, "tipo": true, "metodologia": true, "bimestre": true,
+          "etiquetas": true, "preguntas_discusion": true,
+          "pesos": {
+            "type": "object", "required": ["asistencia_permanencia", "evaluacion_integral"], "additionalProperties": false,
+            "properties": { "asistencia_permanencia": { "$ref": "comun.schema.json#/$defs/peso" }, "evaluacion_integral": { "$ref": "comun.schema.json#/$defs/peso" } }
+          },
+          "asistencia_permanencia": {
+            "type": "object", "required": ["unidad", "fuente", "se_retiro_antes"], "additionalProperties": false,
+            "properties": {
+              "unidad": { "const": "estudiante" },
+              "fuente": { "const": "pase_final_por_grupo" },
+              "se_retiro_antes": { "type": "number", "minimum": 0, "maximum": 1 }
+            }
+          },
+          "evaluacion_integral": {
+            "type": "object", "required": ["unidad", "escala"], "additionalProperties": false,
+            "properties": {
+              "unidad": { "const": "grupo" },
+              "escala": { "$ref": "comun.schema.json#/$defs/escala" },
+              "incluye": { "type": "array", "items": { "type": "string" } },
+              "exige_terminar_taller": { "type": "boolean" }
+            }
+          },
+          "individual": {
+            "type": "object", "additionalProperties": false,
+            "properties": {
+              "TRAD": { "type": "array", "items": { "enum": ["trabajo_preparatorio", "control_oral"] } },
+              "SQI": { "type": "array", "items": { "enum": ["control_oral_sin_nota"] } }
+            }
+          },
+          "retro_practica_anterior": { "type": "boolean" },
+          "cierre": { "type": "array", "items": { "enum": ["trabajo_firmado"] } },
+          "tareas": {
+            "type": "array",
+            "items": { "type": "object", "required": ["id", "texto"], "additionalProperties": false,
+              "properties": { "id": { "$ref": "comun.schema.json#/$defs/id" }, "texto": { "$ref": "comun.schema.json#/$defs/texto" } } }
+          }
+        }
+      }
+    },
+    {
+      "if": { "properties": { "tipo": { "const": "trabajo_casa" } } },
+      "then": {
+        "required": ["practica"],
+        "additionalProperties": false,
+        "properties": {
+          "id": true, "codigo": true, "fuente": true, "tipo": true, "metodologia": true, "bimestre": true,
+          "etiquetas": true, "preguntas_discusion": true,
+          "practica": { "$ref": "comun.schema.json#/$defs/codigo_actividad" },
+          "ponderacion": { "$ref": "comun.schema.json#/$defs/peso" },
+          "sin_nota": { "type": "boolean" },
+          "nota": { "type": "string" },
+          "unidad_calificacion": { "enum": ["grupo", "estudiante"] },
+          "solo_presentes_en_la_practica": { "type": "boolean" },
+          "escala_total": { "type": "number", "exclusiveMinimum": 0 },
+          "registro": { "const": "por_pregunta" },
+          "entrega_tardia": { "enum": ["sin_penalizacion"] },
+          "preguntas": {
+            "type": "array", "minItems": 1,
+            "items": {
+              "type": "object", "required": ["id", "texto", "puntajes"], "additionalProperties": false,
+              "properties": {
+                "id": { "type": "string", "minLength": 1 },
+                "texto": { "$ref": "comun.schema.json#/$defs/texto" },
+                "puntajes": { "type": "array", "minItems": 2, "uniqueItems": true, "items": { "type": "number", "minimum": 0 } }
+              }
+            }
+          }
+        },
+        "if": { "properties": { "sin_nota": { "const": true } }, "required": ["sin_nota"] },
+        "then": {},
+        "else": { "required": ["ponderacion", "unidad_calificacion", "escala_total", "registro", "preguntas"] }
+      }
+    }
+  ]
+}

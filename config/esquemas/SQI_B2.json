@@ -1,0 +1,13 @@
+{
+  "id": "SQI_B2", "metodologia": "SQI", "bimestre": 2, "total": 6,
+  "fuente": "Lineamientos estudiantes SQI",
+  "componentes": [
+    { "id": "practicas", "nombre": "Prácticas", "valor": 3.0, "unidad": "grupo",
+      "items": { "P4": 0.20, "P5": 0.20, "P6": 0.20, "P7": 0.40 } },
+    { "id": "trabajos_casa", "nombre": "Trabajos en casa", "valor": 1.5, "unidad": "grupo", "escala": 10, "registro": "por_pregunta",
+      "solo_presentes_en_la_practica": true,
+      "items": { "TC4": 0.20, "TC5": 0.30, "TC7": 0.50 }, "sin_nota": ["TC6"] },
+    { "id": "talleres", "nombre": "Talleres", "valor": 1.0, "items": { "T4": 1, "T5": 1, "T6": 1, "T7": 1 } },
+    { "id": "plic", "nombre": "PLIC", "valor": 0.5, "tipo": "binario", "items": { "PLIC": 1 } }
+  ]
+}

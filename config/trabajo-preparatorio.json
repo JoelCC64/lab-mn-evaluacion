@@ -1,0 +1,23 @@
+{
+  "id": "trabajo_preparatorio",
+  "fuente": "Lineamientos (ambos); decisiones de Joel (2 y 3-oct-2026)",
+  "descripcion": "Resumen del material, breve investigación, etc.",
+  "requisito_ingreso": { "TRAD": true, "SQI": true },
+  "califica": { "TRAD": true, "SQI": false },
+  "aplica_a": ["practica", "taller"],
+  "unidad": "estudiante",
+  "escala": [0, 1, 2],
+  "revision": "solo se verifica que hicieron el resumen",
+  "descriptores": {
+    "2": "Presentó el resumen completo.",
+    "1": "Resumen incompleto o muy superficial.",
+    "0": "No lo presentó o no corresponde a la práctica."
+  },
+  "registro": "revision_en_puerta",
+  "por_defecto_presentes": 2,
+  "novedades": [1, 0],
+  "nombres_novedad": { "1": "Incompleto", "0": "No lo hizo" },
+  "motivo_no_ingresa": "sin preparatorio",
+  "si_no_vino": 0,
+  "sin_revision": "pendiente"
+}

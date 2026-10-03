@@ -1,0 +1,31 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "cronograma.schema.json",
+  "title": "Cronograma (actividad y lugar por semana)",
+  "type": "object",
+  "required": ["id", "cronograma", "metodologia", "semanas"],
+  "additionalProperties": false,
+  "properties": {
+    "id": { "type": "string", "pattern": "^[AB]-(TRAD|SQI)$" },
+    "cronograma": { "enum": ["A", "B"] },
+    "metodologia": { "$ref": "comun.schema.json#/$defs/metodologia" },
+    "fuente": { "type": "string" },
+    "semanas": {
+      "type": "array", "minItems": 1,
+      "items": {
+        "oneOf": [
+          { "type": "object", "required": ["semana", "lugar", "actividades"], "additionalProperties": false,
+            "properties": {
+              "semana": { "type": "integer", "minimum": 1 },
+              "lugar": { "enum": ["lab", "aula"] },
+              "actividades": { "type": "array", "minItems": 1, "uniqueItems": true,
+                "items": { "$ref": "comun.schema.json#/$defs/codigo_actividad" } } } },
+          { "type": "object", "required": ["semana", "sin_clase"], "additionalProperties": false,
+            "properties": {
+              "semana": { "type": "integer", "minimum": 1 },
+              "sin_clase": { "$ref": "comun.schema.json#/$defs/texto" } } }
+        ]
+      }
+    }
+  }
+}

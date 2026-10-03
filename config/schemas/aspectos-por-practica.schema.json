@@ -1,0 +1,8 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "aspectos-por-practica.schema.json",
+  "title": "Aspectos SQI que aplican en cada práctica",
+  "type": "object",
+  "propertyNames": { "pattern": "^P[0-9]+$" },
+  "additionalProperties": { "type": "array", "minItems": 1, "uniqueItems": true, "items": { "$ref": "comun.schema.json#/$defs/id" } }
+}

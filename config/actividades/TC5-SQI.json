@@ -1,0 +1,76 @@
+{
+  "id": "TC5-SQI",
+  "codigo": "TC5",
+  "fuente": "Lineamientos estudiantes SQI, Tabla 8",
+  "tipo": "trabajo_casa",
+  "metodologia": "SQI",
+  "bimestre": 2,
+  "practica": "P5",
+  "ponderacion": 0.3,
+  "unidad_calificacion": "grupo",
+  "solo_presentes_en_la_practica": true,
+  "escala_total": 10,
+  "registro": "por_pregunta",
+  "entrega_tardia": "sin_penalizacion",
+  "preguntas": [
+    {
+      "id": "PI",
+      "texto": "Dos preguntas comprobables para el proyecto (una sola = 1)",
+      "puntajes": [
+        2,
+        1,
+        0
+      ]
+    },
+    {
+      "id": "1",
+      "texto": "Justificación del interés por investigarlas",
+      "puntajes": [
+        1.5,
+        0
+      ]
+    },
+    {
+      "id": "2",
+      "texto": "Relación con los resultados del semestre",
+      "puntajes": [
+        1.5,
+        0
+      ]
+    },
+    {
+      "id": "3",
+      "texto": "Una buena práctica de trabajo en grupo que funcionó",
+      "puntajes": [
+        1,
+        0
+      ]
+    },
+    {
+      "id": "4",
+      "texto": "Por qué fue efectiva",
+      "puntajes": [
+        1,
+        0
+      ]
+    },
+    {
+      "id": "5",
+      "texto": "Una práctica de grupo por mejorar",
+      "puntajes": [
+        1,
+        0
+      ]
+    },
+    {
+      "id": "6",
+      "texto": "Plan de mejora concreto para las prácticas finales",
+      "puntajes": [
+        2,
+        1,
+        0
+      ]
+    }
+  ],
+  "etiquetas": []
+}

@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "planificacion-conocimiento.schema.json",
+  "title": "Planificación y conocimiento (Clásica)",
+  "type": "object",
+  "required": ["id", "metodologia", "valor", "pesos", "control_varios", "sin_control"],
+  "additionalProperties": false,
+  "properties": {
+    "id": { "const": "planificacion_conocimiento" },
+    "metodologia": { "const": "TRAD" },
+    "unidad_calificacion": { "const": "estudiante" },
+    "fuente": { "type": "string" },
+    "valor": { "type": "number", "exclusiveMinimum": 0 },
+    "pesos": { "type": "object", "required": ["trabajo_preparatorio", "control_oral"], "additionalProperties": false,
+      "properties": { "trabajo_preparatorio": { "$ref": "comun.schema.json#/$defs/peso" }, "control_oral": { "$ref": "comun.schema.json#/$defs/peso" } } },
+    "control_varios": { "const": "promedio" },
+    "sin_control": { "type": "string" },
+    "trabajo_preparatorio": { "type": "object", "additionalProperties": false,
+      "properties": { "escala": { "$ref": "comun.schema.json#/$defs/escala" }, "descriptores": { "$ref": "comun.schema.json#/$defs/descriptores" } } },
+    "control_oral": { "type": "object", "additionalProperties": false,
+      "properties": { "escala_pregunta": { "$ref": "comun.schema.json#/$defs/escala" }, "descriptores": { "$ref": "comun.schema.json#/$defs/descriptores" } } }
+  }
+}

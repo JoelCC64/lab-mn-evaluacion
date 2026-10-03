@@ -1,0 +1,27 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "catalogo.schema.json",
+  "title": "Catálogo de actividades (código → tipo y título)",
+  "type": "object",
+  "minProperties": 1,
+  "propertyNames": { "$ref": "comun.schema.json#/$defs/codigo_actividad" },
+  "additionalProperties": {
+    "type": "object",
+    "required": ["tipo", "titulo"],
+    "additionalProperties": false,
+    "properties": {
+      "tipo": { "enum": ["practica", "taller", "trabajo_casa", "plic", "sin_nota"] },
+      "titulo": {
+        "oneOf": [
+          { "$ref": "comun.schema.json#/$defs/texto" },
+          { "type": "object", "required": ["TRAD", "SQI"], "additionalProperties": false,
+            "properties": { "TRAD": { "$ref": "comun.schema.json#/$defs/texto" }, "SQI": { "$ref": "comun.schema.json#/$defs/texto" } } }
+        ]
+      },
+      "practica": { "$ref": "comun.schema.json#/$defs/codigo_actividad" },
+      "sin_nota": { "type": "boolean" }
+    },
+    "if": { "properties": { "tipo": { "const": "trabajo_casa" } } },
+    "then": { "required": ["practica"] }
+  }
+}

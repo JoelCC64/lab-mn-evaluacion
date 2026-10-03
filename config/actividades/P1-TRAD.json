@@ -1,0 +1,193 @@
+{
+  "id": "P1-TRAD",
+  "codigo": "P1",
+  "fuente": "Guía P01; Lineamientos estudiantes VF; decisiones de Joel (3-oct-2026)",
+  "tipo": "practica",
+  "metodologia": "TRAD",
+  "bimestre": 1,
+  "componente": "diseno_datos_analisis",
+  "unidad_calificacion": "grupo",
+  "individual": [
+    "trabajo_preparatorio",
+    "control_oral"
+  ],
+  "asistencia": "pase_final_por_grupo",
+  "cierre": [
+    "trabajo_firmado"
+  ],
+  "penalizacion_total": "equipo_no_ordenado",
+  "criterios": [
+    {
+      "id": "diseno",
+      "nombre": "Diseño experimental",
+      "peso": 0.2,
+      "escala": [
+        0,
+        1,
+        2,
+        3,
+        4
+      ],
+      "indicadores": [
+        "Base de soporte al borde de la mesa y caída libre hasta el piso",
+        "Alturas h1 a h4 verificadas con cinta métrica desde el piso hasta la varilla de 10 cm",
+        "Protocolo de cronometraje definido (quién dispara, quién detiene)",
+        "Error instrumental δ_inst identificado antes de medir"
+      ],
+      "niveles": {
+        "4": "Montaje correcto a la primera, alturas verificadas, protocolo definido y δ_inst identificado.",
+        "2": "Montaje funcional con correcciones tras observación; protocolo improvisado o δ_inst omitido.",
+        "0": "Montaje incorrecto o depende totalmente del profesor."
+      }
+    },
+    {
+      "id": "datos",
+      "nombre": "Toma de datos",
+      "peso": 0.3,
+      "escala": [
+        0,
+        1,
+        2,
+        3,
+        4
+      ],
+      "indicadores": [
+        "10 mediciones por altura completas (40 en total)",
+        "Registro ordenado en la Tabla 1.1 con unidades y cifras coherentes con el cronómetro",
+        "Condiciones constantes (posición de salida, cronometrista)",
+        "Reparto de roles con participación de todos",
+        "Descarte de datos con criterio"
+      ],
+      "niveles": {
+        "4": "Tabla completa, ordenada, con unidades; datos consistentes y trabajo repartido.",
+        "2": "Tabla completa pero con desorden, unidades faltantes o condiciones variables.",
+        "0": "Datos incompletos o no registrados."
+      }
+    },
+    {
+      "id": "analisis",
+      "nombre": "Análisis",
+      "peso": 0.5,
+      "escala": [
+        0,
+        1,
+        2,
+        3,
+        4
+      ],
+      "indicadores": [
+        "Media, σ_m, δt_total y ε_exp correctos por altura",
+        "Decisión razonada sobre errores dependientes o independientes",
+        "h_exp = g·t²/2 con propagación de incertidumbre",
+        "ε_abs y ε_rel respecto a h1",
+        "Distingue error sistemático de aleatorio con ejemplos de la práctica",
+        "Interpreta si h_exp es compatible con h1 dentro de la incertidumbre",
+        "Explica por qué domina el error de reacción"
+      ],
+      "niveles": {
+        "4": "Cálculos e incertidumbres correctos, decisiones justificadas y discusión con datos propios y física correcta.",
+        "2": "Cálculos correctos pero incertidumbres mal combinadas o sin justificar, o discusión memorizada sin conexión con sus datos.",
+        "0": "Sin tratamiento de incertidumbres ni discusión de los resultados."
+      }
+    }
+  ],
+  "etiquetas": [
+    {
+      "id": "montaje_ok",
+      "criterio": "diseno",
+      "signo": "+",
+      "texto": "Montaje correcto y alturas verificadas"
+    },
+    {
+      "id": "h_mal_medida",
+      "criterio": "diseno",
+      "signo": "-",
+      "texto": "Medida de h desde un punto equivocado"
+    },
+    {
+      "id": "sin_protocolo",
+      "criterio": "diseno",
+      "signo": "-",
+      "texto": "Sin protocolo de cronometraje"
+    },
+    {
+      "id": "sin_dinst",
+      "criterio": "diseno",
+      "signo": "-",
+      "texto": "No identificó δ_inst antes de medir"
+    },
+    {
+      "id": "tabla_ok",
+      "criterio": "datos",
+      "signo": "+",
+      "texto": "Tabla ordenada y con unidades"
+    },
+    {
+      "id": "condiciones_var",
+      "criterio": "datos",
+      "signo": "-",
+      "texto": "Condiciones variables entre mediciones"
+    },
+    {
+      "id": "cifras_incoh",
+      "criterio": "datos",
+      "signo": "-",
+      "texto": "Cifras incoherentes con el cronómetro"
+    },
+    {
+      "id": "borra_datos",
+      "criterio": "datos",
+      "signo": "-",
+      "texto": "Descartó datos sin justificar"
+    },
+    {
+      "id": "un_solo_integrante",
+      "criterio": "datos",
+      "signo": "-",
+      "texto": "Solo un integrante trabaja"
+    },
+    {
+      "id": "distingue_errores",
+      "criterio": "analisis",
+      "signo": "+",
+      "texto": "Distingue error sistemático y aleatorio con ejemplos propios"
+    },
+    {
+      "id": "confunde_reaccion",
+      "criterio": "analisis",
+      "signo": "-",
+      "texto": "Confunde error de reacción con aleatorio puro"
+    },
+    {
+      "id": "sin_dep_indep",
+      "criterio": "analisis",
+      "signo": "-",
+      "texto": "No justifica errores dependientes o independientes"
+    },
+    {
+      "id": "propagacion_mal",
+      "criterio": "analisis",
+      "signo": "-",
+      "texto": "Propagación de incertidumbre incorrecta en h_exp"
+    },
+    {
+      "id": "sin_comparar",
+      "criterio": "analisis",
+      "signo": "-",
+      "texto": "No compara h_exp con h1 dentro de la incertidumbre"
+    },
+    {
+      "id": "memorizado",
+      "criterio": "analisis",
+      "signo": "-",
+      "texto": "Respuesta memorizada, sin conexión con sus datos"
+    }
+  ],
+  "preguntas_discusion": [
+    "¿El tiempo de reacción de 0.2 s es un error sistemático o aleatorio? ¿Se cancela al arrancar y parar el cronómetro?",
+    "¿Por qué eligieron errores dependientes (o independientes) para δt_total?",
+    "¿Qué le pasaría a ε_rel si cronometrara alguien más rápido?",
+    "¿Qué indica que h_exp caiga dentro o fuera del intervalo de incertidumbre?",
+    "¿Qué error sistemático quedaría aunque repitieran la medición 1000 veces?"
+  ]
+}

@@ -1,0 +1,25 @@
+{
+  "id": "A-TRAD", "cronograma": "A", "metodologia": "TRAD",
+  "fuente": "2026B_Introducción_Lab_MN_T (cronograma A)",
+  "semanas": [
+    { "semana": 1,  "lugar": "aula", "actividades": ["INTRO"] },
+    { "semana": 2,  "lugar": "lab",  "actividades": ["P1"] },
+    { "semana": 3,  "lugar": "aula", "actividades": ["REFUERZO"] },
+    { "semana": 4,  "lugar": "aula", "actividades": ["T1"] },
+    { "semana": 5,  "lugar": "lab",  "actividades": ["P2"] },
+    { "semana": 6,  "lugar": "aula", "actividades": ["T2"] },
+    { "semana": 7,  "lugar": "lab",  "actividades": ["P3"] },
+    { "semana": 8,  "lugar": "aula", "actividades": ["T3"] },
+    { "semana": 9,  "lugar": "lab",  "actividades": ["P4"] },
+    { "semana": 10, "lugar": "aula", "actividades": ["T4"] },
+    { "semana": 11, "lugar": "lab",  "actividades": ["P5"] },
+    { "semana": 12, "lugar": "aula", "actividades": ["T5"] },
+    { "semana": 13, "lugar": "lab",  "actividades": ["P6"] },
+    { "semana": 14, "sin_clase": "Receso" },
+    { "semana": 15, "lugar": "aula", "actividades": ["T6"] },
+    { "semana": 16, "lugar": "lab",  "actividades": ["P7"] },
+    { "semana": 17, "lugar": "aula", "actividades": ["T7", "PLIC"] },
+    { "semana": 18, "lugar": "lab",  "actividades": ["REVISION"] },
+    { "semana": 19, "sin_clase": "Sin clases" }
+  ]
+}

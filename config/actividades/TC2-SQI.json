@@ -1,0 +1,51 @@
+{
+  "id": "TC2-SQI",
+  "codigo": "TC2",
+  "fuente": "Lineamientos estudiantes SQI, Tabla 5",
+  "tipo": "trabajo_casa",
+  "metodologia": "SQI",
+  "bimestre": 1,
+  "practica": "P2",
+  "ponderacion": 0.25,
+  "unidad_calificacion": "grupo",
+  "solo_presentes_en_la_practica": true,
+  "escala_total": 10,
+  "registro": "por_pregunta",
+  "entrega_tardia": "sin_penalizacion",
+  "preguntas": [
+    {
+      "id": "1",
+      "texto": "Comparación cuantitativa del período del péndulo a 10° y 20°",
+      "puntajes": [
+        4,
+        2,
+        0
+      ]
+    },
+    {
+      "id": "2a-i",
+      "texto": "Cómo una expectativa previa puede ser productiva en un experimento",
+      "puntajes": [
+        1.5,
+        0
+      ]
+    },
+    {
+      "id": "2a-ii",
+      "texto": "Cómo puede ser contraproducente",
+      "puntajes": [
+        1.5,
+        0
+      ]
+    },
+    {
+      "id": "2b",
+      "texto": "Prácticas concretas para reducir el efecto de expectativas y sesgos",
+      "puntajes": [
+        3,
+        0
+      ]
+    }
+  ],
+  "etiquetas": []
+}

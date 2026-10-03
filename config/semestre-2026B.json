@@ -1,0 +1,24 @@
+{
+  "semestre": "2026B",
+  "inicio": "2026-09-28",
+  "semanas": 19,
+  "metodologias": { "TRAD": "Clásica", "SQI": "SQI" },
+  "feriados": [
+    { "fecha": "2026-10-09", "motivo": "Independencia de Guayaquil" },
+    { "desde": "2026-10-13", "hasta": "2026-10-16", "motivo": "Integración Politécnica",
+      "franjas_con_clase": ["07:00-09:00", "14:00-16:00"] },
+    { "fecha": "2026-11-02", "motivo": "Día de los Difuntos" },
+    { "fecha": "2026-11-03", "motivo": "Independencia de Cuenca" },
+    { "fecha": "2026-12-07", "motivo": "Fundación de Quito" },
+    { "fecha": "2026-12-24", "motivo": "Navidad" },
+    { "fecha": "2026-12-25", "motivo": "Navidad" }
+  ],
+  "receso": { "desde": "2026-12-28", "hasta": "2027-01-01" },
+  "fin_bimestre_1": "2026-11-26",
+  "ultimo_dia_clases": "2027-01-28",
+  "envio_notas": { "1": "2026-12-01", "2": "2027-01-29" },
+  "registro_saew": { "1": "2026-12-04", "2": "2027-02-04" },
+  "plic": { "fecha": "2027-01-21", "inicio": "11:00", "fin": "13:00", "semana": 17 },
+  "formato_coordinacion": ["APELLIDOS Y NOMBRES", "NÚMERO ÚNICO", "NOTA(/6)", "PROFESOR"],
+  "redondeo_decimales": 2
+}

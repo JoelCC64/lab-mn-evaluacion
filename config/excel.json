@@ -1,0 +1,31 @@
+{
+  "id": "excel",
+  "fuente": "Anexo J del plan; estructura de Cursos_Lab_MN_2026B.xlsx (generar.py)",
+  "archivo_semestre": "Cursos_Lab_MN_2026B.xlsx",
+  "archivo_asistencia_semana1": "Asistencia_Semana1_Lab_MN_2026B.xlsx",
+  "buscar_encabezados_hasta_fila": 10,
+  "columnas": {
+    "numero": ["N°"],
+    "codigo": ["Código único"],
+    "nombre": ["Apellidos y nombres"],
+    "cronograma": ["Grupo A/B"],
+    "metodologia": ["Metodología"],
+    "grupo": ["Grupo de trabajo"],
+    "observacion": ["Observación"],
+    "asistencia": ["Asistencia"]
+  },
+  "obligatorias": ["codigo", "nombre"],
+  "columnas_que_no_se_leen": ["Correo institucional", "Correo", "E-mail"],
+  "metodologia_texto": { "Clásica": "TRAD", "Clasica": "TRAD", "TRAD": "TRAD", "SQI": "SQI" },
+  "pendiente_prefijo": "Pendiente",
+  "hojas_ignoradas": ["Resumen", "Correos", "Observaciones"],
+  "hojas_app": ["Asistencia (app)", "Detalle (app)", "Coordinación B1", "Coordinación B2", "_app"],
+  "asistencia_semana1": {
+    "actividad": "INTRO",
+    "valores": [
+      { "empieza": "Asistió", "estado": "presente" },
+      { "empieza": "No asistió", "estado": "no_vino" },
+      { "empieza": "Sin clase", "estado": "sin_clase" }
+    ]
+  }
+}

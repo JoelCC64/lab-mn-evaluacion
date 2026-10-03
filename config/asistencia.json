@@ -1,0 +1,23 @@
+{
+  "id": "asistencia",
+  "fuente": "Lineamientos (ambos) §3; decisiones de Joel (2 y 3-oct-2026)",
+  "registro": "pase_final_por_grupo",
+  "tolerancia_min": 10,
+  "estados": {
+    "presente":        { "texto": "Presente",        "abrev": "P", "falta": false },
+    "no_vino":         { "texto": "No vino",         "abrev": "F", "falta": true },
+    "salio":           { "texto": "Salió",           "abrev": "F", "falta": true },
+    "se_retiro_antes": { "texto": "Se retiró antes", "abrev": "R", "falta": false }
+  },
+  "motivos": {
+    "sin_preparatorio": "sin preparatorio",
+    "control": "no preparado en el control",
+    "sin_grupo": "sin grupo al cerrar el pase"
+  },
+  "frases_observacion": [
+    "Está pero no trabaja",
+    "Llegó tarde",
+    "Participa poco",
+    "Trabajo destacado"
+  ]
+}

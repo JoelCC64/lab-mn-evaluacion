@@ -1,0 +1,17 @@
+# Entorno local (se recrea con scripts/crear-entorno.sh)
+.venv/
+node_modules/
+
+# Datos reales de estudiantes: NUNCA al repositorio
+*.xlsx
+!datos-ejemplo/*.xlsx
+~$*
+*.psv
+respaldo*.json
+*.respaldo.json
+
+# Sistema
+.DS_Store
+
+# Herramientas locales del editor
+.claude/

@@ -1,0 +1,24 @@
+{
+  "id": "planificacion_conocimiento", "metodologia": "TRAD", "unidad_calificacion": "estudiante",
+  "fuente": "Lineamientos estudiantes VF; decisión de Joel (3-oct-2026)",
+  "valor": 1.5,
+  "pesos": { "trabajo_preparatorio": 0.40, "control_oral": 0.60 },
+  "control_varios": "promedio",
+  "sin_control": "avisar; si se cierra asi, solo_trabajo_preparatorio",
+  "trabajo_preparatorio": {
+    "escala": [0, 1, 2],
+    "descriptores": {
+      "2": "Presentó el resumen completo.",
+      "1": "Resumen incompleto o muy superficial.",
+      "0": "No lo presentó o no corresponde a la práctica."
+    }
+  },
+  "control_oral": {
+    "escala_pregunta": [0, 1, 2],
+    "descriptores": {
+      "2": "Responde correctamente y justifica.",
+      "1": "Responde parcialmente, con errores menores o con ayuda.",
+      "0": "Respuesta incorrecta o no responde."
+    }
+  }
+}

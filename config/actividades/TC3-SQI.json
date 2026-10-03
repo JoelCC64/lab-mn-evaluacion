@@ -1,0 +1,61 @@
+{
+  "id": "TC3-SQI",
+  "codigo": "TC3",
+  "fuente": "Lineamientos estudiantes SQI, Tabla 6",
+  "tipo": "trabajo_casa",
+  "metodologia": "SQI",
+  "bimestre": 1,
+  "practica": "P3",
+  "ponderacion": 0.35,
+  "unidad_calificacion": "grupo",
+  "solo_presentes_en_la_practica": true,
+  "escala_total": 10,
+  "registro": "por_pregunta",
+  "entrega_tardia": "sin_penalizacion",
+  "preguntas": [
+    {
+      "id": "1a",
+      "texto": "Al menos una pregunta nueva y comprobable",
+      "puntajes": [
+        1,
+        0
+      ]
+    },
+    {
+      "id": "1b",
+      "texto": "Reflexión sobre cómo gestionó expectativas y sesgos (los tres aspectos pedidos)",
+      "puntajes": [
+        2,
+        0
+      ]
+    },
+    {
+      "id": "2a",
+      "texto": "Si el objeto alcanza una velocidad terminal, justificado con los datos",
+      "puntajes": [
+        2,
+        1,
+        0
+      ]
+    },
+    {
+      "id": "2b",
+      "texto": "Aceleración en el intervalo en que acelera (procedimiento, resultado y unidades)",
+      "puntajes": [
+        3,
+        1.5,
+        0
+      ]
+    },
+    {
+      "id": "2c",
+      "texto": "Comparación cuantitativa con la gravedad en Quito",
+      "puntajes": [
+        2,
+        1,
+        0
+      ]
+    }
+  ],
+  "etiquetas": []
+}

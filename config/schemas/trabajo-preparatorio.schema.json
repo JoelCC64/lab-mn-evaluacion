@@ -1,0 +1,29 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "trabajo-preparatorio.schema.json",
+  "title": "Trabajo preparatorio (revisión en la puerta)",
+  "type": "object",
+  "required": ["id", "requisito_ingreso", "califica", "aplica_a", "escala", "registro", "por_defecto_presentes", "novedades", "nombres_novedad", "motivo_no_ingresa", "si_no_vino", "sin_revision"],
+  "additionalProperties": false,
+  "properties": {
+    "id": { "const": "trabajo_preparatorio" },
+    "fuente": { "type": "string" },
+    "descripcion": { "type": "string" },
+    "requisito_ingreso": { "type": "object", "required": ["TRAD", "SQI"], "additionalProperties": false,
+      "properties": { "TRAD": { "type": "boolean" }, "SQI": { "type": "boolean" } } },
+    "califica": { "type": "object", "required": ["TRAD", "SQI"], "additionalProperties": false,
+      "properties": { "TRAD": { "type": "boolean" }, "SQI": { "type": "boolean" } } },
+    "aplica_a": { "type": "array", "items": { "enum": ["practica", "taller"] }, "minItems": 1 },
+    "unidad": { "const": "estudiante" },
+    "escala": { "$ref": "comun.schema.json#/$defs/escala" },
+    "revision": { "type": "string" },
+    "descriptores": { "$ref": "comun.schema.json#/$defs/descriptores" },
+    "registro": { "const": "revision_en_puerta" },
+    "por_defecto_presentes": { "type": "number", "minimum": 0 },
+    "novedades": { "type": "array", "items": { "type": "number", "minimum": 0 }, "minItems": 1 },
+    "nombres_novedad": { "$ref": "comun.schema.json#/$defs/descriptores" },
+    "motivo_no_ingresa": { "type": "string" },
+    "si_no_vino": { "type": "number", "minimum": 0 },
+    "sin_revision": { "const": "pendiente" }
+  }
+}

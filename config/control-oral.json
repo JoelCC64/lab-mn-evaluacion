@@ -1,0 +1,22 @@
+{
+  "id": "control_oral",
+  "fuente": "Lineamientos profesores VF §18; decisiones de Joel (2-oct-2026)",
+  "seleccion": "aleatoria",
+  "estudiantes_por_sesion": [3, 4],
+  "aviso_si_sugerido_mayor_que": 4,
+  "meta": "todos_al_menos_una_vez_por_bimestre",
+  "prioridad": "sin_control_en_el_bimestre",
+  "sesiones": ["practica", "taller"],
+  "max_preguntas_por_estudiante": 3,
+  "escala_pregunta": [0, 1, 2],
+  "califica": { "TRAD": true, "SQI": false },
+  "registro_sin_nota": ["aprobado", "no_aprobado"],
+  "puede_pedir_salir": true,
+  "salio": { "cuenta_como_control": true, "nota": 0, "motivo_falta": "no preparado en el control" },
+  "nota_control": "suma de puntajes / (2 × preguntas realizadas)",
+  "descriptores": {
+    "2": "Responde correctamente y justifica.",
+    "1": "Responde parcialmente, con errores menores o con ayuda.",
+    "0": "Respuesta incorrecta o no responde."
+  }
+}

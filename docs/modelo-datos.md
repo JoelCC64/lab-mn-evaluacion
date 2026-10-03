@@ -1,0 +1,83 @@
+# Modelo de datos
+
+Ajuste del modelo sugerido en el §4 del plan. Rige desde la Fase 1.
+
+## Qué se guarda y qué se calcula
+
+| Qué | Dónde vive | Notas |
+|---|---|---|
+| Cursos, calendario, feriados, esquemas de nota, rúbricas, etiquetas, preguntas | `/config` (viaja con la app) | Nunca en el código ni en la base de datos. Se valida con `npm run config`. |
+| Eventos (una actividad de un curso) | **Se calculan** desde la configuración (`src/nucleo/calendario.js`) | Id estable `PARALELO:CÓDIGO`: `GR2QB:P1`, `GR1AA:TC1`, `GR2QB:INTRO`, `GR2QB:PLIC`. Solo se guardan sus cambios manuales (`cambios_evento`). |
+| Estudiantes | Base local (IndexedDB) | Se leen del Excel del semestre. |
+| Todo lo registrado en clase o fuera de ella | Base local (IndexedDB, con Dexie) | Una base por semestre: `lab-mn-2026B`. |
+| Notas | **Se calculan** con el motor (`src/nucleo/motor.js`) | Nunca se guardan notas derivadas; así un cambio (un pase corregido, un ajuste) se refleja en todo. |
+
+Cambios respecto al §4:
+- **Eventos calculados.** Antes eran una tabla `events`; así no hay que mantenerla sincronizada con el calendario. Los cambios manuales de estado van en `cambios_evento`.
+- **Cursos en la configuración.** Antes eran una tabla `courses`.
+- **Nombre completo en un solo campo.** `apellidos` y `nombres` desaparecen por la decisión de Joel de no separarlos.
+- **Control oral en una fila por estudiante y evento,** con la lista de puntajes de las preguntas (hasta 3).
+- **Pase cerrado.** Se agregó la tabla `pases` para saber si el pase del evento se cerró.
+
+## Tablas
+
+Claves entre corchetes: compuestas. Todas las tablas de registro llevan `fecha` (ISO, momento del último cambio).
+
+| Tabla | Clave | Campos | Para qué | En el plan (§4) |
+|---|---|---|---|---|
+| `estudiantes` | `id` (= código único) | `codigo`, `nombre` (apellidos y nombres, sin separar), `curso`, `estado` (`nomina` · `pendiente` · `baja`), `grupo_excel`, `observacion_excel` (solo lectura), `numero` (N° en el Excel), `actualizado` | Lista de cada curso | `students` |
+| `grupos_evento` | `[evento+estudiante]` | `grupo` (texto, o `null` = sin grupo) | Grupos del evento (ver abajo) | `event_groups` |
+| `asistencia` | `[evento+estudiante]` | `estado` (`presente` · `no_vino` · `salio` · `se_retiro_antes`), `motivo`, `observacion` | Pase final por grupo, observaciones por estudiante y faltas anotadas antes del pase (no ingresa, salió) | `attendance` |
+| `pases` | `evento` | `cerrado`, `cerrado_en` | Pase cerrado: sin pase cerrado no se calculan notas | (nuevo) |
+| `revisiones_grupo` | `[evento+grupo]` | `verificado` (integrantes revisados), `trabajo_firmado`, `penalizacion_total`, `motivo_penalizacion` | Cierre del trabajo de cada grupo | `group_checks` |
+| `puntajes` | `[evento+grupo+aspecto]` | `valor` | Un puntaje por grupo, evento y aspecto o criterio (formato largo) | `group_scores` |
+| `etiquetas` | `[evento+grupo+etiqueta]` | | Etiquetas rápidas marcadas a un grupo | `tags_applied` |
+| `notas` | `[evento+unidad+unidad_id]` | `unidad` (`grupo` · `estudiante`), `texto` | Nota del profesor, escrita o dictada | `notes` |
+| `controles` | `[evento+estudiante]` | `estado` (`sorteado` · `respondio` · `no_esta` · `salio`), `puntajes` (lista 0/1/2, Clásica), `aprobado` (SQI), `orden`, `manual` | Control oral | `oral_control` |
+| `revision_preparatorio` | `evento` | `revisada` | «Revisión hecha: todos cumplieron» | `prep_review` |
+| `novedades_preparatorio` | `[evento+estudiante]` | `nivel` (1 incompleto · 0 no lo hizo · `null` en SQI), `no_ingresa`, `observacion` | Solo las excepciones de la revisión en la puerta | `prep_novedades` |
+| `ajustes` | `[evento+estudiante]` | `valor` (0–1), `motivo` (obligatorio) | Ajuste individual explícito de la nota del evento | `overrides` |
+| `cambios_evento` | `evento` | `estado` (`sin_clase` · `normal`), `motivo` | Cambios manuales del calendario (clase suspendida, semana 1 sin clase) | `events.estado` |
+| `importaciones` | autoincremental | `tipo` (`excel_semestre` · `asistencia_semana1` · `respaldo`), `archivo`, `resumen` (solo conteos) | Historial de lecturas del Excel y de restauraciones | (nuevo) |
+| `meta` | `clave` | `valor` | Datos sueltos: último respaldo, versión del modelo | (nuevo) |
+
+Fases siguientes (se agregan con una nueva versión de la base, sin perder datos):
+- `trabajos_casa` (Fase 5).
+- `plic` y `recuperaciones` (Fase 6).
+- `escrituras_excel` (Fase 3).
+
+## Reglas del modelo
+
+- **Todo se enlaza por el código único.** El nombre solo se muestra y se exporta; quitarlo más adelante no rompe nada.
+- **Nunca se guardan correos.** El lector del Excel no lee la columna de correo. Una prueba automática recorre toda la base y comprueba que ningún valor contenga «@».
+- **Guardado inmediato:** cada toque escribe su fila. No hay botón «guardar».
+- **Faltas registradas antes del pase.** «No ingresa» (preparatorio) y «salió» (control) se escriben en `asistencia` en el momento. El pase final las muestra ya marcadas.
+- **Asistencia por defecto.** Con el pase cerrado, quien está en un grupo y no tiene registro en `asistencia` cuenta como presente. Quien no quedó en ningún grupo cuenta como «no vino»; al cerrar, la app lo confirma y escribe la falta con el motivo «sin grupo al cerrar el pase».
+
+**Grupos de un evento:**
+- Si el evento tiene instantánea en `grupos_evento`, se usa esa.
+- Si no, se toma la del evento anterior más cercano del curso que la tenga.
+- Si no hay ninguna, se usan los grupos del Excel (`grupo_excel`).
+
+La instantánea se crea la primera vez que se registra algo de grupo en el evento: un puntaje, el pase de un grupo o un cambio de grupo. Desde ahí las notas de ese evento ya no cambian si después se mueven estudiantes en otro evento. Un cambio de grupo pasa a los eventos siguientes que aún no tienen instantánea.
+
+**Trabajos en casa:** usan los grupos y la asistencia de su práctica (`evento.practica`).
+
+## Respaldo (archivo JSON)
+
+```json
+{
+  "formato": "lab-mn-respaldo",
+  "version": 1,
+  "semestre": "2026B",
+  "creado": "2026-10-05T11:02:00.000Z",
+  "app": "0.3.0",
+  "config": "4dd857fec9e1",
+  "tablas": { "estudiantes": [ … ], "asistencia": [ … ], … }
+}
+```
+
+- Contiene todas las tablas y es el archivo que pasa del iPhone a la Mac.
+- Restaurar **reemplaza todo** lo del dispositivo, previa confirmación.
+- Nombre del archivo: `respaldo-lab-mn-2026B-AAAA-MM-DD-HHMM.json`.
+- Tiene datos de estudiantes: el `.gitignore` impide que entre al repositorio.

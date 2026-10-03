@@ -1,0 +1,45 @@
+{
+  "id": "TC7-SQI",
+  "codigo": "TC7",
+  "fuente": "Lineamientos estudiantes SQI, Tabla 9",
+  "tipo": "trabajo_casa",
+  "metodologia": "SQI",
+  "bimestre": 2,
+  "practica": "P7",
+  "ponderacion": 0.5,
+  "unidad_calificacion": "grupo",
+  "solo_presentes_en_la_practica": true,
+  "escala_total": 10,
+  "registro": "por_pregunta",
+  "entrega_tardia": "sin_penalizacion",
+  "preguntas": [
+    {
+      "id": "1a",
+      "texto": "Similitudes y diferencias entre el curso y las mediciones de la constante de estructura fina (lectura)",
+      "puntajes": [
+        4,
+        2,
+        0
+      ]
+    },
+    {
+      "id": "1b-i",
+      "texto": "Referencia completa del artículo elegido (título, autor, fuente)",
+      "puntajes": [
+        2,
+        1,
+        0
+      ]
+    },
+    {
+      "id": "1b-ii",
+      "texto": "Descripción del diseño experimental o del proceso de medición del artículo, con la extensión pedida",
+      "puntajes": [
+        4,
+        2,
+        0
+      ]
+    }
+  ],
+  "etiquetas": []
+}

@@ -1,0 +1,25 @@
+{
+  "id": "B-SQI", "cronograma": "B", "metodologia": "SQI",
+  "fuente": "2026B_Introducción_Lab_MN_SQI (cronograma B)",
+  "semanas": [
+    { "semana": 1,  "lugar": "lab",  "actividades": ["INTRO"] },
+    { "semana": 2,  "lugar": "aula", "actividades": ["T1"] },
+    { "semana": 3,  "lugar": "lab",  "actividades": ["REFUERZO"] },
+    { "semana": 4,  "lugar": "lab",  "actividades": ["P1", "TC1"] },
+    { "semana": 5,  "lugar": "aula", "actividades": ["T2"] },
+    { "semana": 6,  "lugar": "lab",  "actividades": ["P2", "TC2"] },
+    { "semana": 7,  "lugar": "aula", "actividades": ["T3"] },
+    { "semana": 8,  "lugar": "lab",  "actividades": ["P3", "TC3"] },
+    { "semana": 9,  "lugar": "aula", "actividades": ["T4"] },
+    { "semana": 10, "lugar": "lab",  "actividades": ["P4", "TC4"] },
+    { "semana": 11, "lugar": "aula", "actividades": ["T5"] },
+    { "semana": 12, "lugar": "lab",  "actividades": ["P5", "TC5"] },
+    { "semana": 13, "lugar": "aula", "actividades": ["T6"] },
+    { "semana": 14, "sin_clase": "Receso" },
+    { "semana": 15, "lugar": "lab",  "actividades": ["P6", "TC6"] },
+    { "semana": 16, "lugar": "aula", "actividades": ["P7", "TC7"] },
+    { "semana": 17, "lugar": "lab",  "actividades": ["T7", "PLIC"] },
+    { "semana": 18, "lugar": "aula", "actividades": ["REVISION"] },
+    { "semana": 19, "sin_clase": "Sin clases" }
+  ]
+}

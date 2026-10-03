@@ -1,0 +1,48 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "semestre.schema.json",
+  "title": "Semestre: calendario, feriados y fechas",
+  "type": "object",
+  "required": ["semestre", "inicio", "semanas", "metodologias", "feriados", "fin_bimestre_1", "envio_notas", "plic", "formato_coordinacion", "redondeo_decimales"],
+  "additionalProperties": false,
+  "properties": {
+    "semestre": { "type": "string", "pattern": "^\\d{4}[AB]$" },
+    "inicio": { "$ref": "comun.schema.json#/$defs/fecha" },
+    "semanas": { "type": "integer", "minimum": 1, "maximum": 30 },
+    "metodologias": {
+      "type": "object", "required": ["TRAD", "SQI"], "additionalProperties": false,
+      "properties": { "TRAD": { "type": "string" }, "SQI": { "type": "string" } }
+    },
+    "feriados": {
+      "type": "array",
+      "items": {
+        "oneOf": [
+          { "type": "object", "required": ["fecha", "motivo"], "additionalProperties": false,
+            "properties": { "fecha": { "$ref": "comun.schema.json#/$defs/fecha" }, "motivo": { "$ref": "comun.schema.json#/$defs/texto" } } },
+          { "type": "object", "required": ["desde", "hasta", "motivo"], "additionalProperties": false,
+            "properties": {
+              "desde": { "$ref": "comun.schema.json#/$defs/fecha" },
+              "hasta": { "$ref": "comun.schema.json#/$defs/fecha" },
+              "motivo": { "$ref": "comun.schema.json#/$defs/texto" },
+              "franjas_con_clase": { "type": "array", "items": { "$ref": "comun.schema.json#/$defs/franja" } } } }
+        ]
+      }
+    },
+    "receso": { "type": "object", "required": ["desde", "hasta"], "additionalProperties": false,
+      "properties": { "desde": { "$ref": "comun.schema.json#/$defs/fecha" }, "hasta": { "$ref": "comun.schema.json#/$defs/fecha" } } },
+    "fin_bimestre_1": { "$ref": "comun.schema.json#/$defs/fecha" },
+    "ultimo_dia_clases": { "$ref": "comun.schema.json#/$defs/fecha" },
+    "envio_notas": { "type": "object", "required": ["1", "2"], "additionalProperties": false,
+      "properties": { "1": { "$ref": "comun.schema.json#/$defs/fecha" }, "2": { "$ref": "comun.schema.json#/$defs/fecha" } } },
+    "registro_saew": { "type": "object", "additionalProperties": false,
+      "properties": { "1": { "$ref": "comun.schema.json#/$defs/fecha" }, "2": { "$ref": "comun.schema.json#/$defs/fecha" } } },
+    "plic": { "type": "object", "required": ["fecha", "inicio", "fin", "semana"], "additionalProperties": false,
+      "properties": {
+        "fecha": { "$ref": "comun.schema.json#/$defs/fecha" },
+        "inicio": { "$ref": "comun.schema.json#/$defs/hora" },
+        "fin": { "$ref": "comun.schema.json#/$defs/hora" },
+        "semana": { "type": "integer", "minimum": 1 } } },
+    "formato_coordinacion": { "type": "array", "items": { "type": "string" }, "minItems": 1 },
+    "redondeo_decimales": { "type": "integer", "minimum": 0, "maximum": 4 }
+  }
+}

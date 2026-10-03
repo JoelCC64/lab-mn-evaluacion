@@ -1,0 +1,27 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "asistencia.schema.json",
+  "title": "Asistencia (pase final por grupo)",
+  "type": "object",
+  "required": ["id", "registro", "estados", "motivos", "frases_observacion"],
+  "additionalProperties": false,
+  "properties": {
+    "id": { "const": "asistencia" },
+    "fuente": { "type": "string" },
+    "registro": { "const": "pase_final_por_grupo" },
+    "tolerancia_min": { "type": "integer", "minimum": 0 },
+    "estados": {
+      "type": "object",
+      "required": ["presente", "no_vino", "salio", "se_retiro_antes"],
+      "additionalProperties": false,
+      "patternProperties": {
+        "^(presente|no_vino|salio|se_retiro_antes)$": {
+          "type": "object", "required": ["texto", "abrev", "falta"], "additionalProperties": false,
+          "properties": { "texto": { "type": "string" }, "abrev": { "type": "string", "maxLength": 2 }, "falta": { "type": "boolean" } }
+        }
+      }
+    },
+    "motivos": { "type": "object", "additionalProperties": { "type": "string" } },
+    "frases_observacion": { "type": "array", "items": { "$ref": "comun.schema.json#/$defs/texto" } }
+  }
+}

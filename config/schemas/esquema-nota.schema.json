@@ -1,0 +1,44 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "esquema-nota.schema.json",
+  "title": "Esquema de nota de un bimestre",
+  "type": "object",
+  "required": ["id", "metodologia", "bimestre", "total", "componentes"],
+  "additionalProperties": false,
+  "properties": {
+    "id": { "type": "string", "pattern": "^(TRAD|SQI)_B[12]$" },
+    "metodologia": { "$ref": "comun.schema.json#/$defs/metodologia" },
+    "bimestre": { "enum": [1, 2] },
+    "total": { "type": "number", "exclusiveMinimum": 0 },
+    "fuente": { "type": "string" },
+    "componentes": {
+      "type": "array", "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["id", "nombre", "valor"],
+        "additionalProperties": false,
+        "properties": {
+          "id": { "enum": ["planificacion_conocimiento", "diseno_datos_analisis", "practicas", "trabajos_casa", "talleres", "plic"] },
+          "nombre": { "$ref": "comun.schema.json#/$defs/texto" },
+          "valor": { "type": "number", "minimum": 0 },
+          "unidad": { "enum": ["estudiante", "grupo"] },
+          "items": {
+            "type": "object", "minProperties": 1,
+            "additionalProperties": { "type": "number", "exclusiveMinimum": 0 }
+          },
+          "secciones": {
+            "type": "object", "minProperties": 1,
+            "additionalProperties": { "$ref": "comun.schema.json#/$defs/peso" }
+          },
+          "control_varios": { "enum": ["promedio"] },
+          "sin_control": { "type": "string" },
+          "tipo": { "enum": ["binario"] },
+          "escala": { "type": "number", "exclusiveMinimum": 0 },
+          "registro": { "enum": ["por_pregunta"] },
+          "solo_presentes_en_la_practica": { "type": "boolean" },
+          "sin_nota": { "type": "array", "items": { "$ref": "comun.schema.json#/$defs/codigo_actividad" } }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,112 @@
+{
+  "id": "TC1-SQI",
+  "codigo": "TC1",
+  "fuente": "Lineamientos estudiantes SQI, Tabla 4; hoja del TC de P1 SQI",
+  "tipo": "trabajo_casa",
+  "metodologia": "SQI",
+  "bimestre": 1,
+  "practica": "P1",
+  "ponderacion": 0.4,
+  "unidad_calificacion": "grupo",
+  "solo_presentes_en_la_practica": true,
+  "escala_total": 10,
+  "registro": "por_pregunta",
+  "entrega_tardia": "sin_penalizacion",
+  "preguntas": [
+    {
+      "id": "1a",
+      "texto": "Objetivos del curso frente a sus expectativas de un laboratorio tradicional",
+      "puntajes": [
+        1,
+        0
+      ]
+    },
+    {
+      "id": "1b",
+      "texto": "Los cinco objetivos de aprendizaje aplicados a sus intereses profesionales",
+      "puntajes": [
+        2,
+        0
+      ]
+    },
+    {
+      "id": "2a-i",
+      "texto": "Incertidumbre de las mediciones individuales, posición más alta",
+      "puntajes": [
+        1,
+        0.5,
+        0
+      ]
+    },
+    {
+      "id": "2a-ii",
+      "texto": "Incertidumbre de las mediciones individuales, posición más baja",
+      "puntajes": [
+        1,
+        0.5,
+        0
+      ]
+    },
+    {
+      "id": "2b-i",
+      "texto": "Incertidumbre de la media, posición más alta",
+      "puntajes": [
+        1,
+        0.5,
+        0
+      ]
+    },
+    {
+      "id": "2b-ii",
+      "texto": "Incertidumbre de la media, posición más baja",
+      "puntajes": [
+        1,
+        0.5,
+        0
+      ]
+    },
+    {
+      "id": "2c",
+      "texto": "Diferencia entre la incertidumbre individual y la de la media",
+      "puntajes": [
+        1,
+        0
+      ]
+    },
+    {
+      "id": "2d",
+      "texto": "Método de medición más confiable, justificado con los resultados",
+      "puntajes": [
+        2,
+        1,
+        0
+      ]
+    }
+  ],
+  "etiquetas": [
+    {
+      "id": "inc_individual_ok",
+      "pregunta": "2a-i",
+      "signo": "+",
+      "texto": "Calcula bien la incertidumbre de mediciones individuales"
+    },
+    {
+      "id": "confunde_inc_media",
+      "pregunta": "2c",
+      "signo": "-",
+      "texto": "Confunde la incertidumbre individual con la incertidumbre de la media"
+    },
+    {
+      "id": "conclusion_sin_datos",
+      "pregunta": "2d",
+      "signo": "-",
+      "texto": "Concluye cuál medición es más confiable sin apoyarse en sus datos"
+    },
+    {
+      "id": "relaciona_objetivos",
+      "pregunta": "1b",
+      "signo": "+",
+      "texto": "Relaciona los objetivos del curso con sus intereses profesionales con ejemplos"
+    }
+  ]
+}

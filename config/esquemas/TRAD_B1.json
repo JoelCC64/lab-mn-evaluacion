@@ -1,0 +1,14 @@
+{
+  "id": "TRAD_B1", "metodologia": "TRAD", "bimestre": 1, "total": 6,
+  "fuente": "Lineamientos estudiantes VF; decisiones de Joel (3-oct-2026)",
+  "componentes": [
+    { "id": "planificacion_conocimiento", "nombre": "Planificación y conocimiento", "valor": 1.5, "unidad": "estudiante",
+      "items": { "trabajo_preparatorio": 0.40, "control_oral": 0.60 },
+      "control_varios": "promedio", "sin_control": "avisar; si se cierra asi, solo_trabajo_preparatorio" },
+    { "id": "diseno_datos_analisis", "nombre": "Diseño, datos y análisis", "valor": 3.5, "unidad": "grupo",
+      "secciones": { "diseno": 0.20, "datos": 0.30, "analisis": 0.50 },
+      "items": { "P1": 1, "P2": 1, "P3": 1 } },
+    { "id": "talleres", "nombre": "Talleres", "valor": 1.0, "items": { "T1": 1, "T2": 1, "T3": 1 } },
+    { "id": "plic", "nombre": "PLIC", "valor": 0.0 }
+  ]
+}

@@ -1,0 +1,62 @@
+{
+  "id": "TC4-SQI",
+  "codigo": "TC4",
+  "fuente": "Lineamientos estudiantes SQI, Tabla 7",
+  "tipo": "trabajo_casa",
+  "metodologia": "SQI",
+  "bimestre": 2,
+  "practica": "P4",
+  "ponderacion": 0.2,
+  "unidad_calificacion": "grupo",
+  "solo_presentes_en_la_practica": true,
+  "escala_total": 10,
+  "registro": "por_pregunta",
+  "entrega_tardia": "sin_penalizacion",
+  "preguntas": [
+    {
+      "id": "1a",
+      "texto": "Sistema elástico concreto y pregunta comprobable para la siguiente práctica",
+      "puntajes": [
+        2,
+        1,
+        0
+      ]
+    },
+    {
+      "id": "1b",
+      "texto": "Justificación del interés de la propuesta",
+      "puntajes": [
+        1,
+        0
+      ]
+    },
+    {
+      "id": "1c",
+      "texto": "Predicción: cuándo la ley de Hooke es un modelo adecuado",
+      "puntajes": [
+        2,
+        1,
+        0
+      ]
+    },
+    {
+      "id": "1d",
+      "texto": "Predicción: cuándo no lo es",
+      "puntajes": [
+        2,
+        1,
+        0
+      ]
+    },
+    {
+      "id": "1e",
+      "texto": "Plan de comprobación realizable (mediciones, variables y criterios)",
+      "puntajes": [
+        3,
+        1.5,
+        0
+      ]
+    }
+  ],
+  "etiquetas": []
+}

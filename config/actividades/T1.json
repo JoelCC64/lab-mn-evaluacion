@@ -1,0 +1,113 @@
+{
+  "id": "T1",
+  "codigo": "T1",
+  "fuente": "Guía T01; Introducción T y SQI; Lineamientos profesores §19",
+  "tipo": "taller",
+  "metodologia": [
+    "TRAD",
+    "SQI"
+  ],
+  "bimestre": 1,
+  "pesos": {
+    "asistencia_permanencia": 0.5,
+    "evaluacion_integral": 0.5
+  },
+  "asistencia_permanencia": {
+    "unidad": "estudiante",
+    "fuente": "pase_final_por_grupo",
+    "se_retiro_antes": 0.5
+  },
+  "evaluacion_integral": {
+    "unidad": "grupo",
+    "escala": [
+      0,
+      1,
+      2
+    ],
+    "incluye": [
+      "preguntas_y_observaciones_del_docente",
+      "ejecucion",
+      "tareas"
+    ],
+    "exige_terminar_taller": false
+  },
+  "individual": {
+    "TRAD": [
+      "trabajo_preparatorio",
+      "control_oral"
+    ],
+    "SQI": [
+      "control_oral_sin_nota"
+    ]
+  },
+  "retro_practica_anterior": true,
+  "cierre": [
+    "trabajo_firmado"
+  ],
+  "tareas": [
+    {
+      "id": "exactitud_precision",
+      "texto": "Tiro al blanco: x̄, s_x y σ_m; analizar exactitud o precisión; tipos de errores"
+    },
+    {
+      "id": "sistematicos_aleatorios",
+      "texto": "Mediciones con distintas reglas en formato x ± δx; discutir errores sistemáticos y aleatorios; influencia de la precisión"
+    },
+    {
+      "id": "indirectas_dependientes",
+      "texto": "Longitud total por tramos con suma lineal de errores; cómo crece la incertidumbre"
+    },
+    {
+      "id": "indirectas_independientes",
+      "texto": "Magnitud indirecta (área o volumen) con suma en cuadratura; comparar con el valor esperado"
+    },
+    {
+      "id": "absoluto_relativo",
+      "texto": "Error absoluto y relativo porcentual respecto a una referencia; ¿es aceptable?"
+    }
+  ],
+  "preguntas_discusion": [
+    "¿Sus tiros fueron más exactos o más precisos? ¿Qué evidencia numérica lo muestra?",
+    "¿Qué error sistemático introdujo la regla mal impresa? ¿Desaparece si promedian más mediciones?",
+    "¿Por qué las incertidumbres de medidas dependientes se suman linealmente y las independientes en cuadratura?",
+    "Si midieran el pasillo con 10 tramos en vez de 5, ¿cómo cambiaría la incertidumbre total?",
+    "¿Qué error relativo consideran aceptable para este experimento y por qué?"
+  ],
+  "etiquetas": [
+    {
+      "id": "distingue_exac_prec",
+      "signo": "+",
+      "texto": "Distingue exactitud de precisión con datos propios"
+    },
+    {
+      "id": "disena_procedimiento",
+      "signo": "+",
+      "texto": "Diseña su propio procedimiento y justifica sus decisiones"
+    },
+    {
+      "id": "registra_x_dx",
+      "signo": "+",
+      "texto": "Registra mediciones como x ± δx con unidades"
+    },
+    {
+      "id": "confunde_exac_prec",
+      "signo": "-",
+      "texto": "Confunde exactitud con precisión"
+    },
+    {
+      "id": "sin_dep_indep",
+      "signo": "-",
+      "texto": "Aplica la misma regla de propagación sin distinguir dependientes de independientes"
+    },
+    {
+      "id": "sin_referencia",
+      "signo": "-",
+      "texto": "No compara con el valor de referencia"
+    },
+    {
+      "id": "sigue_guia_sin_decidir",
+      "signo": "-",
+      "texto": "Sigue el ejemplo sugerido sin justificar decisiones"
+    }
+  ]
+}

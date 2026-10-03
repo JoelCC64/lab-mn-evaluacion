@@ -1,0 +1,94 @@
+{
+  "id": "P1-SQI",
+  "codigo": "P1",
+  "fuente": "Guía P1 SQI; guía del instructor (Unit 0); Lineamientos estudiantes SQI",
+  "tipo": "practica",
+  "metodologia": "SQI",
+  "bimestre": 1,
+  "unidad_calificacion": "grupo",
+  "aspectos_aplicables": [
+    "resp_pred_plan",
+    "ejec_registro",
+    "discusion"
+  ],
+  "individual": [
+    "control_oral_sin_nota"
+  ],
+  "asistencia": "pase_final_por_grupo",
+  "cierre": [
+    "trabajo_firmado"
+  ],
+  "penalizacion_total": "equipo_no_ordenado",
+  "indicadores": {
+    "resp_pred_plan": [
+      "Responde la pregunta de confiabilidad (opciones a a d) y explica su razonamiento en el diario",
+      "Sus decisiones sobre cómo medir están justificadas"
+    ],
+    "ejec_registro": [
+      "Mide por su cuenta el período desde la posición más alta y desde la más baja",
+      "Registra datos con unidades y observaciones en el diario",
+      "Registra los datos de la clase en una tabla (Tabla 1.1)"
+    ],
+    "discusion": [
+      "Participa en la discusión grupal sobre qué es la física experimental y anota las ideas",
+      "Participa en la discusión dirigida sobre las mediciones"
+    ]
+  },
+  "etiquetas": [
+    {
+      "id": "mide_ambas",
+      "aspecto": "ejec_registro",
+      "signo": "+",
+      "texto": "Mide y registra ambas posiciones por cuenta propia"
+    },
+    {
+      "id": "registro_incompleto",
+      "aspecto": "ejec_registro",
+      "signo": "-",
+      "texto": "Registro sin unidades o incompleto"
+    },
+    {
+      "id": "sin_datos_clase",
+      "aspecto": "ejec_registro",
+      "signo": "-",
+      "texto": "No registra los datos de la clase"
+    },
+    {
+      "id": "justifica_eleccion",
+      "aspecto": "resp_pred_plan",
+      "signo": "+",
+      "texto": "Justifica con razonamiento su elección de la medición más confiable"
+    },
+    {
+      "id": "sin_razonamiento",
+      "aspecto": "resp_pred_plan",
+      "signo": "-",
+      "texto": "Responde sin explicar su razonamiento"
+    },
+    {
+      "id": "participa_discusion",
+      "aspecto": "discusion",
+      "signo": "+",
+      "texto": "Participa en la discusión y anota las ideas"
+    },
+    {
+      "id": "no_anota_ideas",
+      "aspecto": "discusion",
+      "signo": "-",
+      "texto": "No anota las ideas de la discusión"
+    },
+    {
+      "id": "hace_preguntas",
+      "aspecto": "discusion",
+      "signo": "+",
+      "texto": "Plantea preguntas o dudas sobre la medición"
+    }
+  ],
+  "preguntas_discusion": [
+    "¿Qué diferencia esperas entre medir desde la posición más alta y desde la más baja? ¿Por qué?",
+    "¿Por qué tu medición difiere de la de tus compañeros?",
+    "¿Cómo decidirías si una diferencia entre dos medidas es significativa?",
+    "¿Qué harías para reducir la incertidumbre de tu medición?",
+    "¿Qué es para ti la física experimental?"
+  ]
+}

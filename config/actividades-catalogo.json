@@ -1,0 +1,31 @@
+{
+  "INTRO":    { "tipo": "sin_nota", "titulo": { "TRAD": "Introducción", "SQI": "Introducción y creación de grupos" } },
+  "REFUERZO": { "tipo": "sin_nota", "titulo": "Refuerzo de errores" },
+  "REVISION": { "tipo": "sin_nota", "titulo": "Revisión de notas" },
+
+  "P1": { "tipo": "practica", "titulo": { "TRAD": "Errores en las medidas", "SQI": "Introducción" } },
+  "P2": { "tipo": "practica", "titulo": { "TRAD": "Velocidad media y MRUV", "SQI": "Introducción a la comprobación de modelos" } },
+  "P3": { "tipo": "practica", "titulo": { "TRAD": "Poleas y polipastos", "SQI": "Comprobación de modelos y ética" } },
+  "P4": { "tipo": "practica", "titulo": { "TRAD": "Segunda ley de Newton", "SQI": "Comprobación y ampliación de modelos (parte 1)" } },
+  "P5": { "tipo": "practica", "titulo": { "TRAD": "Trabajo y energía", "SQI": "Comprobación y ampliación de modelos (parte 2)" } },
+  "P6": { "tipo": "practica", "titulo": { "TRAD": "Impulso y momento lineal", "SQI": "Proyecto (parte 1)" } },
+  "P7": { "tipo": "practica", "titulo": { "TRAD": "MAS", "SQI": "Proyecto (parte 2) y presentación grupal" } },
+
+  "T1": { "tipo": "taller", "titulo": "Errores en las medidas" },
+  "T2": { "tipo": "taller", "titulo": "Presentación de gráficas" },
+  "T3": { "tipo": "taller", "titulo": "Leyes de Newton" },
+  "T4": { "tipo": "taller", "titulo": "Segunda ley de Newton" },
+  "T5": { "tipo": "taller", "titulo": "Trabajo y energía" },
+  "T6": { "tipo": "taller", "titulo": "Impulso y momento lineal" },
+  "T7": { "tipo": "taller", "titulo": "MAS" },
+
+  "TC1": { "tipo": "trabajo_casa", "titulo": "Introducción", "practica": "P1" },
+  "TC2": { "tipo": "trabajo_casa", "titulo": "Introducción a la comprobación de modelos", "practica": "P2" },
+  "TC3": { "tipo": "trabajo_casa", "titulo": "Comprobación de modelos y ética", "practica": "P3" },
+  "TC4": { "tipo": "trabajo_casa", "titulo": "Comprobación y ampliación de modelos", "practica": "P4" },
+  "TC5": { "tipo": "trabajo_casa", "titulo": "Comprobación y ampliación de modelos, parte 2", "practica": "P5" },
+  "TC6": { "tipo": "trabajo_casa", "titulo": "Preparación de la presentación grupal de P7", "practica": "P6", "sin_nota": true },
+  "TC7": { "tipo": "trabajo_casa", "titulo": "Proyecto, parte 2", "practica": "P7" },
+
+  "PLIC": { "tipo": "plic", "titulo": "PLIC (Inventario de Pensamiento Crítico en Laboratorios de Física)" }
+}

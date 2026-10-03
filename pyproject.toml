@@ -1,0 +1,15 @@
+[project]
+name = "app-evaluacion-lab-mn"
+version = "0.0.0"
+description = "Entorno de desarrollo de la app de evaluación del Lab. MN (EPN). La app es web (JavaScript); este entorno aporta Node (nodeenv) y herramientas de Python (openpyxl)."
+requires-python = ">=3.12"
+dependencies = []
+
+[dependency-groups]
+dev = [
+    "nodeenv>=1.9",
+    "openpyxl>=3.1",
+]
+
+[tool.uv]
+package = false

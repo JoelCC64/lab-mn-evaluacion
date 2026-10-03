@@ -1,0 +1,38 @@
+{
+  "aviso": "Generado por «npm run config». No editar a mano.",
+  "version": "4dd857fec9e1",
+  "semestre": "semestre-2026B.json",
+  "cursos": "cursos-2026B.json",
+  "catalogo": "actividades-catalogo.json",
+  "cronogramas": [
+    "cronogramas/A-SQI.json",
+    "cronogramas/A-TRAD.json",
+    "cronogramas/B-SQI.json",
+    "cronogramas/B-TRAD.json"
+  ],
+  "esquemas": [
+    "esquemas/SQI_B1.json",
+    "esquemas/SQI_B2.json",
+    "esquemas/TRAD_B1.json",
+    "esquemas/TRAD_B2.json"
+  ],
+  "actividades": [
+    "actividades/P1-SQI.json",
+    "actividades/P1-TRAD.json",
+    "actividades/T1.json",
+    "actividades/TC1-SQI.json",
+    "actividades/TC2-SQI.json",
+    "actividades/TC3-SQI.json",
+    "actividades/TC4-SQI.json",
+    "actividades/TC5-SQI.json",
+    "actividades/TC6-SQI.json",
+    "actividades/TC7-SQI.json"
+  ],
+  "sqi_aspectos": "sqi/aspectos.json",
+  "sqi_aspectos_por_practica": "sqi/aspectos-por-practica.json",
+  "control_oral": "control-oral.json",
+  "trabajo_preparatorio": "trabajo-preparatorio.json",
+  "planificacion_conocimiento": "planificacion-conocimiento.json",
+  "asistencia": "asistencia.json",
+  "excel": "excel.json"
+}
