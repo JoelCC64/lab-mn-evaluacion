@@ -10,7 +10,7 @@ import { nombreMetodologia } from '../nucleo/config.js';
 
 export function Curso({ paralelo }) {
   const { cfg } = useApp();
-  const { curso, reg, eventos, cargando } = useCurso(paralelo);
+  const { curso, reg, eventos, ctx, cargando } = useCurso(paralelo);
   if (!curso) return html`<${Pantalla} titulo="Curso desconocido" atras="#/"><${Aviso} tono="mal">No existe el curso ${paralelo}.<//><//>`;
   const subtitulo = `${nombreMetodologia(cfg, curso.metodologia)} · Cronograma ${curso.cronograma} · ${horario(curso, true)}`;
   if (cargando || !eventos) return html`<${Pantalla} titulo=${paralelo} subtitulo=${subtitulo} atras="#/"><${Cargando} /><//>`;
@@ -30,14 +30,14 @@ export function Curso({ paralelo }) {
         <a class="tarjeta destacada" href=${enlace('evento', sugerido.id)}>
           <div class="separado">
             <span class="tenue pequeno negrita">${etiquetaSugerido(cfg, sugerido, hoy)} · ${fechaCorta(sugerido.fecha)}</span>
-            <${EstadoChip} evento=${sugerido} reg=${reg} eventos=${eventos} />
+            <${EstadoChip} evento=${sugerido} ctx=${ctx} />
           </div>
           <h2>${sugerido.codigo} · ${sugerido.titulo}</h2>
           <div class="tenue pequeno">Semana ${sugerido.semana} · ${sugerido.lugar === 'lab' ? 'laboratorio' : 'aula'} · ${textoBimestre(sugerido.bimestre)}</div>
         </a>`}
       ${porBimestre.map(({ b, eventos: lista }) => html`
         <div class="seccion-titulo">${textoBimestre(b)}</div>
-        <div class="lista">${lista.map((e) => html`<${FilaEvento} evento=${e} reg=${reg} eventos=${eventos} />`)}</div>`)}
+        <div class="lista">${lista.map((e) => html`<${FilaEvento} evento=${e} ctx=${ctx} />`)}</div>`)}
       <${Estudiantes} estudiantes=${reg.estudiantes} />
     <//>`;
 }
@@ -48,15 +48,13 @@ function etiquetaSugerido(cfg, evento, hoy) {
   return evento.semana === semanaDeFecha(cfg, hoy) ? 'ESTA SEMANA' : 'ÚLTIMA SESIÓN';
 }
 
-function EstadoChip({ evento, reg, eventos }) {
-  const { cfg } = useApp();
-  const e = estadoEvento(evento, reg, avanceEvaluacion(cfg, evento, eventos, reg));
+function EstadoChip({ evento, ctx }) {
+  const e = estadoEvento(evento, ctx.reg, avanceEvaluacion(ctx, evento));
   return html`<${Chip} tono=${e.tono} titulo=${e.detalle}>${e.texto}<//>`;
 }
 
-function FilaEvento({ evento, reg, eventos }) {
-  const { cfg } = useApp();
-  const est = estadoEvento(evento, reg, avanceEvaluacion(cfg, evento, eventos, reg));
+function FilaEvento({ evento, ctx }) {
+  const est = estadoEvento(evento, ctx.reg, avanceEvaluacion(ctx, evento));
   const secundaria = evento.tipo === 'sin_nota' || evento.tipo === 'trabajo_casa' || evento.tipo === 'plic';
   const lugar = evento.lugar ? (evento.lugar === 'lab' ? 'lab.' : 'aula') : '';
   const detalle = [fechaCorta(evento.fecha), lugar, evento.con_nota ? null : 'sin nota'].filter(Boolean).join(' · ');

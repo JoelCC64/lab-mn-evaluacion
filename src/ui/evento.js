@@ -1,7 +1,11 @@
-// Evento: encabezado común y lista de grupos (navegación Curso → Evento → Grupo).
-import { html, useApp, Pantalla, Chip, Aviso, Cargando, enlace } from './base.js';
+// Evento: encabezado, pestañas de la clase (Puerta · Control · Grupos · Resumen) y avisos de estado.
+import { useMemo } from '../vendor/preact-htm.js';
+import { html, useApp, Pantalla, Aviso, Cargando, enlace } from './base.js';
 import { useCurso, textoBimestre } from './curso-datos.js';
-import { gruposDelEvento, listaDeGrupos } from '../nucleo/grupos.js';
+import { Puerta } from './puerta.js';
+import { Control } from './control.js';
+import { Grupos } from './grupos.js';
+import { Resumen } from './resumen.js';
 import { estadoEvento } from '../nucleo/estado-evento.js';
 import { fechaCorta } from '../nucleo/util.js';
 
@@ -13,7 +17,7 @@ export function subtituloEvento(evento) {
   return `${evento.curso} · ${fechaCorta(evento.fecha)} · semana ${evento.semana}${evento.con_nota ? ` · ${textoBimestre(evento.bimestre)}` : ''}`;
 }
 
-/** Carga el curso y el evento; muestra «Cargando» o un error si hace falta. */
+/** Carga el curso y el evento (con el contexto del motor de notas). */
 export function useEvento(id) {
   const paralelo = String(id).split(':')[0];
   const datos = useCurso(paralelo);
@@ -21,17 +25,61 @@ export function useEvento(id) {
   return { ...datos, evento };
 }
 
-export function Evento({ id }) {
-  const { curso, reg, eventos, evento, cargando } = useEvento(id);
+/** Pestañas que aplican al evento. */
+export function pestanasDe(cfg, evento) {
+  if (!evento.sesion || evento.estado !== 'normal') return [];
+  const conPuerta = cfg.preparatorio.aplica_a.includes(evento.tipo);
+  const conControl = cfg.controlOral.sesiones.includes(evento.tipo);
+  return [
+    conPuerta && { id: 'puerta', texto: 'Puerta' },
+    conControl && { id: 'control', texto: 'Control' },
+    { id: 'grupos', texto: 'Grupos' },
+    { id: 'resumen', texto: 'Resumen' },
+  ].filter(Boolean);
+}
+
+/** Primera pestaña con algo por hacer: puerta → control → grupos; con el pase cerrado, resumen. */
+function pestanaPorDefecto(ctx, evento, pestanas) {
+  const ids = pestanas.map((p) => p.id);
+  if (ctx.pases.get(evento.id)?.cerrado) return 'resumen';
+  if (ids.includes('puerta') && !ctx.revisionPrep.get(evento.id)?.revisada) return 'puerta';
+  if (ids.includes('control') && !ctx.reg.controles.some((c) => c.evento === evento.id)) return 'control';
+  return 'grupos';
+}
+
+export function Evento({ id, pestana }) {
+  const { cfg } = useApp();
+  const { curso, ctx, eventos, evento, cargando } = useEvento(id);
+  // La pestaña por defecto se elige una sola vez al abrir el evento (no salta mientras se registra).
+  const listo = Boolean(ctx && evento);
+  const porDefecto = useMemo(() => (listo ? pestanaPorDefecto(ctx, evento, pestanasDe(cfg, evento)) : null), [id, listo]);
   if (!curso || (!cargando && eventos && !evento)) {
     return html`<${Pantalla} titulo="Evento desconocido" atras="#/"><${Aviso} tono="mal">No existe el evento ${id}.<//><//>`;
   }
-  if (cargando || !evento) return html`<${Pantalla} titulo=${id} atras=${enlace('curso', curso.paralelo)}><${Cargando} /><//>`;
-  const est = estadoEvento(evento, reg);
+  if (cargando || !evento || !ctx) return html`<${Pantalla} titulo=${id} atras=${enlace('curso', curso.paralelo)}><${Cargando} /><//>`;
+
+  const est = estadoEvento(evento, ctx.reg);
+  const pestanas = pestanasDe(cfg, evento);
+  const activa = pestanas.some((p) => p.id === pestana) ? pestana : (pestanas.length ? porDefecto : null);
+  const punto = (p) => {
+    if (p.id === 'puerta') return ctx.revisionPrep.get(evento.id)?.revisada ? 'ok' : null;
+    if (p.id === 'control') return ctx.reg.controles.some((c) => c.evento === evento.id) ? 'ok' : null;
+    if (p.id === 'grupos') return ctx.pases.get(evento.id)?.cerrado ? 'ok' : null;
+    return null;
+  };
+  const barra = pestanas.length > 1 && html`
+    <nav class="pestanas">
+      ${pestanas.map((p) => html`
+        <a class=${p.id === activa ? 'activa' : ''} href=${enlace('evento', evento.id, p.id)}>${p.texto}${punto(p) ? html`<span class=${`punto ${punto(p)}`}></span>` : null}</a>`)}
+    </nav>`;
+
   return html`
-    <${Pantalla} titulo=${nombreEvento(evento)} subtitulo=${subtituloEvento(evento)} atras=${enlace('curso', curso.paralelo)}>
+    <${Pantalla} titulo=${nombreEvento(evento)} subtitulo=${subtituloEvento(evento)} atras=${enlace('curso', curso.paralelo)} pestanas=${barra}>
       <${AvisoDeEstado} evento=${evento} estado=${est} eventos=${eventos} />
-      ${evento.sesion && html`<${ListaGrupos} evento=${evento} eventos=${eventos} reg=${reg} />`}
+      ${activa === 'puerta' && html`<${Puerta} ctx=${ctx} evento=${evento} />`}
+      ${activa === 'control' && html`<${Control} ctx=${ctx} evento=${evento} />`}
+      ${activa === 'grupos' && html`<${Grupos} ctx=${ctx} evento=${evento} />`}
+      ${activa === 'resumen' && html`<${Resumen} ctx=${ctx} evento=${evento} />`}
     <//>`;
 }
 
@@ -45,32 +93,6 @@ export function AvisoDeEstado({ evento, estado, eventos }) {
     <//>`;
   }
   if (evento.tipo === 'plic') return html`<${Aviso} titulo="PLIC (Fase 6)">Examen presencial controlado por un profesor; vale 0.5 si se completa de forma válida.<//>`;
+  if (evento.tipo === 'sin_nota') return html`<${Aviso}>Sesión sin nota: solo se registra la asistencia (pase por grupo).<//>`;
   return null;
-}
-
-export function ListaGrupos({ evento, eventos, reg }) {
-  const { porEstudiante, fuente } = gruposDelEvento(evento, eventos, reg);
-  const { grupos, sinGrupo } = listaDeGrupos(porEstudiante, reg.estudiantes);
-  const origen = fuente.tipo === 'excel' ? 'grupos del Excel' : fuente.tipo === 'anterior' ? `grupos de ${fuente.evento.split(':')[1]}` : 'grupos de este evento';
-  if (!grupos.length && !sinGrupo.length) {
-    return html`<${Aviso} tono="aviso">Este curso no tiene estudiantes. Carga el Excel del semestre en <a class="negrita" href=${enlace('datos')}>Datos</a>.<//>`;
-  }
-  return html`
-    <div class="seccion-titulo"><span>Grupos · ${grupos.length}</span><span class="pequeno">${origen}</span></div>
-    <div class="lista">
-      ${grupos.map((g) => html`
-        <a class="fila" href=${enlace('evento', evento.id, 'grupo', g.grupo)}>
-          <span class="grupo-num">${g.grupo}</span>
-          <div class="principal">
-            <div class="linea1">${g.integrantes.map((e) => e.nombre.split(' ')[0]).join(' · ')}</div>
-            <div class="linea2">${g.integrantes.length} integrantes${g.integrantes.some((e) => e.estado === 'pendiente') ? ' · con pendiente' : ''}</div>
-          </div>
-          <span class="flecha">›</span>
-        </a>`)}
-    </div>
-    ${sinGrupo.length > 0 && html`
-      <div class="seccion-titulo">Sin grupo · ${sinGrupo.length}</div>
-      <div class="lista">
-        ${sinGrupo.map((e) => html`<div class="fila"><span class="grupo-num vacio">–</span><div class="principal"><div class="linea1">${e.nombre}</div><div class="linea2">${e.codigo}${e.estado === 'pendiente' ? ' · pendiente' : ''}</div></div></div>`)}
-      </div>`}`;
 }

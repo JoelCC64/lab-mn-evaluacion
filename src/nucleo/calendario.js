@@ -41,7 +41,7 @@ export function motivoSinClase(cfg, fecha, curso) {
 
 /**
  * Lista ordenada de eventos de un curso.
- * `cambios`: cambios manuales de estado guardados en la app, [{ event_id, estado, motivo }].
+ * `cambios`: cambios manuales de estado guardados en la app (tabla cambios_evento), [{ evento, estado, motivo }].
  */
 export function generarEventos(cfg, curso, cambios = []) {
   const crono = cronogramaDe(cfg, curso);
@@ -87,7 +87,7 @@ export function generarEventos(cfg, curso, cambios = []) {
 
   const porId = new Map(eventos.map((e) => [e.id, e]));
   for (const c of cambios) {
-    const e = porId.get(c.event_id);
+    const e = porId.get(c.evento);
     if (!e) continue;
     e.estado = c.estado;
     e.motivo = c.motivo ?? null;

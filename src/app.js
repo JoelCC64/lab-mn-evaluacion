@@ -19,6 +19,8 @@ async function iniciar() {
   // Pedir almacenamiento persistente: el navegador no borrará los datos por falta de espacio.
   navigator.storage?.persist?.().catch(() => {});
   document.title = demo ? 'Lab MN · Demostración' : 'Lab MN · Evaluación';
+  // Solo en desarrollo (localhost): acceso a la configuración y a la base desde la consola.
+  if (['localhost', '127.0.0.1'].includes(location.hostname)) window.__labmn = { cfg, db };
   const raiz = document.getElementById('app');
   raiz.textContent = '';
   render(html`<${App} cfg=${cfg} db=${db} demo=${demo} />`, raiz);

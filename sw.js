@@ -2,7 +2,7 @@
 // Guarda todos los archivos de la app para que funcione sin conexión.
 // En localhost usa primero la red (desarrollo); publicada, usa primero lo guardado (rápido y sin conexión).
 
-const VERSION = '0.2.0-714de70d73';
+const VERSION = '0.3.0-15834e2f72';
 const CACHE = `lab-mn-${VERSION}`;
 const ARCHIVOS = [
   "./",
@@ -13,6 +13,7 @@ const ARCHIVOS = [
   "icons/icono-512.png",
   "icons/icono-maskable-512.png",
   "src/app.js",
+  "src/datos/acciones.js",
   "src/datos/consultas.js",
   "src/datos/importar.js",
   "src/datos/respaldo.js",
@@ -24,21 +25,31 @@ const ARCHIVOS = [
   "src/nucleo/excel-lectura.js",
   "src/nucleo/grupos.js",
   "src/nucleo/motor-vista.js",
+  "src/nucleo/motor.js",
+  "src/nucleo/sorteo.js",
   "src/nucleo/tablas.js",
   "src/nucleo/util.js",
   "src/ui/app.js",
   "src/ui/archivos.js",
   "src/ui/base.js",
+  "src/ui/buscar.js",
+  "src/ui/control.js",
   "src/ui/curso-datos.js",
   "src/ui/curso.js",
   "src/ui/datos.js",
   "src/ui/evento.js",
   "src/ui/grupo.js",
+  "src/ui/grupos.js",
   "src/ui/inicio.js",
+  "src/ui/puerta.js",
   "src/ui/pwa.js",
+  "src/ui/resumen.js",
   "src/vendor/dexie.js",
   "src/vendor/exceljs.min.js",
+  "src/vendor/htm.js",
+  "src/vendor/preact-hooks.js",
   "src/vendor/preact-htm.js",
+  "src/vendor/preact.js",
   "src/version.js",
   "config/actividades/P1-SQI.json",
   "config/actividades/P1-TRAD.json",

@@ -62,7 +62,7 @@ test('motivos de los feriados y franjas de la Integración Politécnica', () => 
 
 test('el TC sigue a su práctica: si la práctica se pierde, el TC tampoco cuenta', () => {
   const curso = cfg.cursoPorId.GR1AA;
-  const eventos = generarEventos(cfg, curso, [{ event_id: 'GR1AA:P2', estado: 'sin_clase', motivo: 'Clase suspendida' }]);
+  const eventos = generarEventos(cfg, curso, [{ evento: 'GR1AA:P2', estado: 'sin_clase', motivo: 'Clase suspendida' }]);
   const tc2 = eventos.find((e) => e.codigo === 'TC2');
   assert.equal(tc2.estado, 'sin_clase');
   assert.match(tc2.motivo, /P2/);

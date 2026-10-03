@@ -8,7 +8,7 @@ Plan: [PROYECTO_LABORATORIOS_v4.md](PROYECTO_LABORATORIOS_v4.md). Al empezar una
 |---|---|---|
 | 0. Preparación y configuración del semestre | ✅ Completa | 3-oct-2026 |
 | 1. Lectura del Excel, navegación y respaldo | ✅ Completa | 3-oct-2026 |
-| 2. La clase: prácticas, control oral, asistencia y preparatorio | ⏳ | |
+| 2. La clase: prácticas, control oral, asistencia y preparatorio | ✅ Completa | 3-oct-2026 |
 | 3. Escritura en el Excel (Mac, Chrome) | — | |
 | 4–9 | — | |
 
@@ -98,8 +98,57 @@ Plan: [PROYECTO_LABORATORIOS_v4.md](PROYECTO_LABORATORIOS_v4.md). Al empezar una
 - El panel de vista previa no pudo lanzar el servidor (el proceso quedaba detenido antes de arrancar, probablemente por un permiso de macOS). Se usa `npm run servidor` desde la terminal y el panel se conecta a http://localhost:8765.
 - Para instalar la app en el iPhone hace falta publicarla con HTTPS (por ejemplo GitHub Pages). Sin eso, el service worker no se registra fuera de localhost.
 
+## Fase 2 (3-oct-2026) · versión 0.3.0
+
+**Hecho**
+- **Motor de notas** (`src/nucleo/motor.js`), funciones puras con desglose de cada nota:
+  - Nota de actividad (Clásica, SQI, taller y TC).
+  - Elegibilidad según el pase. La falta deja 0 en la actividad, en el preparatorio y, en SQI, en el TC de esa práctica.
+  - Replicación de la nota del grupo a sus integrantes presentes.
+  - Exclusión por feriado con renormalización, y recuperación.
+  - Penalización total y ajuste individual con motivo.
+  - Preparatorio derivado de la revisión en la puerta.
+  - Control oral y Planificación y conocimiento.
+  - Componentes del bimestre: nota acumulada y proyectada, sin mezclarlas.
+- **Sorteo del control oral** (`src/nucleo/sorteo.js`):
+  - Prioridad a quien no tiene control en el bimestre.
+  - Cobertura «faltan N; quedan M sesiones; conviene K», con aviso si K pasa de 4.
+  - Excluye a quien no ingresó, faltó o ya fue sorteado.
+  - Sorteo con el generador criptográfico.
+- **Acciones** (`src/datos/acciones.js`): cada toque se guarda de inmediato. La primera escritura de grupo del evento crea su instantánea de grupos.
+- **Pantallas del evento:**
+  - **Puerta:** «Revisión hecha: todos cumplieron» y novedades buscando por apellido. Clásica: «incompleto», «no lo hizo» o «no lo hizo y no ingresa»; SQI: «no ingresa».
+  - **Control:** indicador de cobertura, Sortear 3/4/+1 o elegir a mano. Hasta 3 preguntas con 0/1/2 (Clásica) o aprobado/no aprobado (SQI). «No está» sortea un reemplazo y «Salió» queda como falta.
+  - **Grupos:** estado de cada grupo (nota, pase, firmado, faltas), estudiantes sin grupo y cierre del pase con avisos.
+  - **Resumen:** nota de cada estudiante con el motivo de cada 0 o pendiente, y detalle con ajuste individual.
+- **Pantalla del grupo:**
+  - Rúbrica configurada: Clásica con 3 secciones 0–4; SQI solo con los aspectos que aplican. Guía con indicadores y descriptores.
+  - Etiquetas rápidas y nota del profesor dictable.
+  - Pase de los integrantes (presente por defecto, no vino, se retiró), observaciones con frases rápidas y mover de grupo o agregar.
+  - Trabajo firmado y penalización total con motivo.
+  - «Listo · siguiente grupo».
+- **Interfaz:** Preact 10.29.8 + htm. El paquete «standalone» de htm traía un Preact antiguo que reordenaba elementos en pantalla.
+- **Pruebas** (76):
+  - Los 15 casos mínimos del §4.
+  - Sorteo: GR2QB pide 5, 5, 4, 4, 4 y cubre a los 22.
+  - Una clase completa de P1 contra la base (ausentes, «salió», pendiente de nómina, estudiante movido, penalización y ajuste).
+
+**Verificado en el navegador** (375 px, demostración con datos ficticios), clase de P1 en GR2QB:
+- Revisión en la puerta con dos novedades.
+- Control: 4 sorteados, preguntas, «no está» y «salió».
+- 6 grupos evaluados: cada uno con 3 toques más «Listo».
+- Observación con frase rápida, firmado y cierre del pase.
+- El resumen coincide con el cálculo manual.
+- También SQI (GR1AA): aspectos de P1, revisión sin nota y control aprobado/no aprobado.
+
+**Decisiones de implementación**
+- **Tocar un nivel siempre lo elige.** Un doble toque accidental no borra la nota; para quitar puntajes hay «Borrar los puntajes de este grupo», con confirmación.
+- **Pestaña inicial del evento:** la primera con algo por hacer (puerta → control → grupos; con el pase cerrado, resumen). Se elige una sola vez al abrir el evento.
+- **Taller:** la puerta, el control y el pase ya sirven. La evaluación integral del grupo queda para la Fase 4, como dice el plan.
+- **«Se retiró antes» en una práctica:** conserva la nota del grupo; Joel puede registrar un ajuste.
+
 ## Pendiente
 
-- Fase 2: motor de notas, control oral, evaluación por grupo, pase final y revisión del preparatorio.
+- Fase 3: escritura en el Excel desde la Mac (Chrome), con la prueba de ida y vuelta sobre el Excel ficticio.
 - Antes de la Fase 6: nombre del profesor para la columna PROFESOR de las hojas de coordinación.
 - Publicación con HTTPS (por ejemplo GitHub Pages) para instalar la app en el iPhone. Lo decide Joel.

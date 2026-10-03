@@ -3,6 +3,7 @@ import { useMemo } from '../vendor/preact-htm.js';
 import { useApp, useVivo } from './base.js';
 import { registrosDelCurso } from '../datos/consultas.js';
 import { generarEventos } from '../nucleo/calendario.js';
+import { crearContexto } from '../nucleo/motor.js';
 import { DIAS_TEXTO } from '../nucleo/util.js';
 
 export function useCurso(paralelo) {
@@ -13,7 +14,9 @@ export function useCurso(paralelo) {
     () => (curso && reg ? generarEventos(cfg, curso, reg.cambios_evento) : null),
     [curso, reg],
   );
-  return { curso, reg, eventos, cargando: reg === undefined };
+  // Contexto del motor de notas (índices de lo registrado); se rehace cuando cambia algo del curso.
+  const ctx = useMemo(() => (eventos ? crearContexto(cfg, curso, eventos, reg) : null), [eventos]);
+  return { curso, reg, eventos, ctx, cargando: reg === undefined };
 }
 
 export function textoBimestre(b) {

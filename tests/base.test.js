@@ -10,6 +10,7 @@ import { leerAsistenciaSemana1, leerExcelSemestre } from '../src/nucleo/excel-le
 import { aplicarAsistenciaSemana1, aplicarExcelSemestre, planificarImportacion } from '../src/datos/importar.js';
 import { borrarTodo, exportarRespaldo, restaurarRespaldo, validarRespaldo } from '../src/datos/respaldo.js';
 import { registrosDelCurso } from '../src/datos/consultas.js';
+import { generarEventos } from '../src/nucleo/calendario.js';
 import { ASISTENCIA_EJEMPLO, EXCEL_EJEMPLO, configReal } from './ayudas.js';
 
 const cfg = configReal();
@@ -111,6 +112,10 @@ test('asistencia de la semana 1: presente/no vino con pase cerrado; GR2QB sin cl
   assert.equal(resumen.sin_clase, 1);
   assert.equal(resumen.desconocidos, 0);
   assert.deepEqual(await db.cambios_evento.get('GR2QB:INTRO'), { evento: 'GR2QB:INTRO', estado: 'sin_clase', motivo: 'permiso de las autoridades', fecha: AHORA });
+  // El calendario del curso aplica el cambio guardado: la Introducción de GR2QB queda «sin clase».
+  const regGR2QB = await registrosDelCurso(db, 'GR2QB');
+  const intro = generarEventos(cfg, cfg.cursoPorId.GR2QB, regGR2QB.cambios_evento).find((e) => e.codigo === 'INTRO');
+  assert.deepEqual([intro.estado, intro.motivo], ['sin_clase', 'permiso de las autoridades']);
   const reg = await registrosDelCurso(db, 'GR9EB');
   assert.equal(reg.asistencia.length, 19);
   assert.equal(reg.asistencia.filter((a) => a.estado === 'no_vino').length, 3);

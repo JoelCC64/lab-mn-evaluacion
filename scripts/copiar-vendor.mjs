@@ -13,40 +13,42 @@ mkdirSync(licencias, { recursive: true });
 const version = (pkg) => JSON.parse(readFileSync(nm(pkg, 'package.json'), 'utf8')).version;
 
 const archivos = [
-  // Preact 10 + hooks + htm en un solo módulo ES (sin import maps).
-  { de: nm('htm', 'preact', 'standalone.module.js'), a: 'preact-htm.js', pkg: 'htm' },
+  // Preact 10 + hooks + htm como módulos ES (los hooks importan «preact»: se reescribe a la ruta local).
+  { de: nm('preact', 'dist', 'preact.module.js'), a: 'preact.js', pkg: 'preact' },
+  { de: nm('preact', 'hooks', 'dist', 'hooks.module.js'), a: 'preact-hooks.js', pkg: 'preact', reemplazos: [['from"preact"', 'from"./preact.js"']] },
+  { de: nm('htm', 'dist', 'htm.module.js'), a: 'htm.js', pkg: 'htm' },
   { de: nm('dexie', 'dist', 'dexie.mjs'), a: 'dexie.js', pkg: 'dexie' },
   // ExcelJS se carga como script clásico (global ExcelJS) solo al leer o escribir un Excel.
   { de: nm('exceljs', 'dist', 'exceljs.min.js'), a: 'exceljs.min.js', pkg: 'exceljs' },
 ];
 
-for (const f of archivos) copyFileSync(f.de, path.join(destino, f.a));
-for (const pkg of ['htm', 'dexie', 'exceljs']) copyFileSync(nm(pkg, 'LICENSE'), path.join(licencias, `${pkg}.txt`));
+for (const f of archivos) {
+  let texto = readFileSync(f.de, 'utf8').replace(/\n?\/\/# sourceMappingURL=.*\s*$/, '\n');
+  for (const [de, a] of f.reemplazos ?? []) {
+    if (!texto.includes(de)) throw new Error(`${f.a}: no se encontró «${de}»`);
+    texto = texto.split(de).join(a);
+  }
+  writeFileSync(path.join(destino, f.a), texto);
+}
+for (const pkg of ['preact', 'htm', 'dexie', 'exceljs']) copyFileSync(nm(pkg, 'LICENSE'), path.join(licencias, `${pkg}.txt`));
 
-writeFileSync(path.join(licencias, 'preact.txt'), `The MIT License (MIT)
+// Punto de entrada único para la interfaz: Preact, sus hooks y `html` (htm).
+writeFileSync(path.join(destino, 'preact-htm.js'), `// Preact + hooks + htm (generado por scripts/copiar-vendor.mjs; no editar a mano).
+import { h, render, createContext, Component, Fragment } from './preact.js';
+import {
+  useState, useReducer, useEffect, useLayoutEffect, useRef, useImperativeHandle, useMemo, useCallback, useContext,
+  useDebugValue, useErrorBoundary,
+} from './preact-hooks.js';
+import htm from './htm.js';
 
-Copyright (c) 2015-present Jason Miller
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
+export const html = htm.bind(h);
+export {
+  h, render, createContext, Component, Fragment, useState, useReducer, useEffect, useLayoutEffect, useRef,
+  useImperativeHandle, useMemo, useCallback, useContext, useDebugValue, useErrorBoundary,
+};
 `);
 
 const lista = archivos.map((f) => `- ${f.a}: ${f.pkg} ${version(f.pkg)}`).join('\n');
 writeFileSync(path.join(destino, 'VERSIONES.md'),
-  `# Librerías incluidas (copiadas por scripts/copiar-vendor.mjs; no editar a mano)\n\n${lista}\n- preact-htm.js incluye Preact 10 (MIT) dentro del paquete htm.\n\nLicencias en LICENCIAS/.\n`);
+  `# Librerías incluidas (copiadas por scripts/copiar-vendor.mjs; no editar a mano)\n\n${lista}\n- preact-htm.js: punto de entrada (Preact + hooks + htm).\n\nLicencias en LICENCIAS/.\n`);
 console.log(`Copiadas a src/vendor:\n${lista}`);

@@ -41,6 +41,8 @@ Claves entre corchetes: compuestas. Todas las tablas de registro llevan `fecha` 
 | `importaciones` | autoincremental | `tipo` (`excel_semestre` · `asistencia_semana1` · `respaldo`), `archivo`, `resumen` (solo conteos) | Historial de lecturas del Excel y de restauraciones | (nuevo) |
 | `meta` | `clave` | `valor` | Datos sueltos: último respaldo, versión del modelo | (nuevo) |
 
+El motor de notas ya sabe leer `trabajos_casa`, `recuperaciones` y `plic` si existen; sus pantallas y tablas llegan en las fases siguientes.
+
 Fases siguientes (se agregan con una nueva versión de la base, sin perder datos):
 - `trabajos_casa` (Fase 5).
 - `plic` y `recuperaciones` (Fase 6).
@@ -52,7 +54,10 @@ Fases siguientes (se agregan con una nueva versión de la base, sin perder datos
 - **Nunca se guardan correos.** El lector del Excel no lee la columna de correo. Una prueba automática recorre toda la base y comprueba que ningún valor contenga «@».
 - **Guardado inmediato:** cada toque escribe su fila. No hay botón «guardar».
 - **Faltas registradas antes del pase.** «No ingresa» (preparatorio) y «salió» (control) se escriben en `asistencia` en el momento. El pase final las muestra ya marcadas.
-- **Asistencia por defecto.** Con el pase cerrado, quien está en un grupo y no tiene registro en `asistencia` cuenta como presente. Quien no quedó en ningún grupo cuenta como «no vino»; al cerrar, la app lo confirma y escribe la falta con el motivo «sin grupo al cerrar el pase».
+- **Pase completo al cerrar.** Mientras el pase está abierto, en `asistencia` solo hay excepciones («no vino», «se retiró antes», «no ingresa», «salió») y observaciones. Al cerrar el pase, la app escribe una fila por estudiante:
+  - Quien está en un grupo y no tiene falta queda presente.
+  - Quien no quedó en ningún grupo queda como «no vino», con el motivo «sin grupo al cerrar el pase»; la app lo confirma antes.
+  Así, un estudiante agregado después, por ejemplo por un cambio de nómina, no recibe notas de un evento al que no consta que asistió: queda «no consta en el pase» hasta que Joel lo registre.
 
 **Grupos de un evento:**
 - Si el evento tiene instantánea en `grupos_evento`, se usa esa.
