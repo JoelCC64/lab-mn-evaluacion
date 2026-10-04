@@ -221,6 +221,31 @@ Detalle en [docs/excel.md](docs/excel.md).
 - **La nota del grupo de un taller se muestra como nivel** («1/2»), no sobre 10: es la mitad grupal de la nota.
 - **El trabajo firmado y la penalización total salen de la configuración** de cada actividad (`cierre`, `penalizacion_total`). Los talleres no tienen penalización total.
 
+## Respaldo del día (3-oct-2026) · versión 0.6.0
+
+Pedido de Joel: un solo archivo por día con todo (notas, asistencia, etc.) para subirlo a Drive, como respaldo por si algo le pasa al celular o a la Mac.
+
+**Hecho**
+- **«Exportar el respaldo del día»** genera un Excel. En el iPhone abre la hoja de compartir (Drive, Archivos o AirDrop); en la Mac lo descarga. El archivo tiene:
+  - «Léeme», con lo registrado ese día.
+  - Una hoja por curso con las notas.
+  - «Asistencia (app)» y «Detalle (app)».
+  - Una hoja muy oculta con los datos completos para restaurar.
+- **«Restaurar un respaldo…»** (en «Datos» y en «Excel del semestre») acepta ese Excel y también el JSON anterior.
+- **Aviso en Inicio** cuando hay registros sin respaldar, con el botón para exportar. Cuando todo está respaldado, muestra «Respaldo al día · hoy a las …».
+- **4 pruebas nuevas** (94 en total):
+  - El Excel guarda exactamente los mismos datos que el JSON y se restaura igual, incluso con emojis, textos largos y espacios en los bordes.
+  - Se puede leer: Léeme, cursos y detalle.
+  - El Excel del semestre no se confunde con un respaldo.
+  - La base avisa cada escritura.
+
+**Verificado en el navegador** (demostración): aviso en Inicio, exportación (0.6 s, 76 KB, 14 hojas), aviso «al día» y restauración desde el mismo Excel.
+
+**Nota técnica**
+- La librería de Excel, cuando corre en Node, comprime el archivo en bloques y puede partir un emoji en dos.
+- En el navegador no pasa (convierte todo el texto de una vez), y nunca afecta letras con tilde.
+- Por eso los datos del respaldo guardan los emojis como escapes de JSON.
+
 ## Publicación
 
 - GitHub CLI (`gh`) se instala **dentro de `.venv`** con `scripts/instalar-gh.sh` (versión fija y suma SHA-256 verificada). Se usa con `scripts/gh.sh`, que guarda su configuración en `.venv/gh`.
@@ -230,9 +255,15 @@ Detalle en [docs/excel.md](docs/excel.md).
 
 ## Pendiente
 
-- **Configuraciones de las próximas actividades** (§8 del plan), a partir de sus guías. Las primeras que hacen falta:
-  - P2 (Clásica y SQI): cronograma A, semana 5, desde el 26-oct.
-  - T2: cronograma B, semana 5; cronograma A, semana 6.
-  - Sin su configuración, el evento no se puede evaluar en la app.
+- **Configuraciones de las próximas actividades** (§8 del plan), a partir de sus guías:
+  - Joel recibe el material de la semana **los viernes** y lo pasa para cargarlo. Cada vez hay que:
+    1. Agregar las configuraciones (`config/actividades/`).
+    2. Correr `npm run build && npm test`.
+    3. Hacer commit y `git push`.
+    4. La app del iPhone ofrece «Actualizar».
+  - Sin su configuración, el evento no se puede evaluar en la app; la puerta, el control y el pase sí funcionan, y la evaluación se puede cargar después.
+  - Las primeras que hacen falta:
+    - P2 (Clásica y SQI): cronograma A, semana 5, desde el 26-oct.
+    - T2: cronograma B, semana 5; cronograma A, semana 6.
 - Antes de la Fase 6: nombre del profesor para la columna PROFESOR de las hojas de coordinación.
 - Fase 5: trabajos en casa (SQI).

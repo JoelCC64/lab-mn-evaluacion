@@ -345,3 +345,8 @@ select.entrada { width: 100%; min-height: 44px; }
 .retro-etiquetas li.pos span { color: var(--ok); }
 .retro-etiquetas li.neg span { color: var(--mal); }
 .retro-nota { margin: 0; padding: 6px 10px; border-left: 3px solid var(--borde); color: var(--tenue); font-size: 14px; font-style: italic; }
+
+/* Respaldo del día */
+.aviso-respaldo { border-color: var(--aviso); background: var(--aviso-suave); }
+.aviso-respaldo .negrita { color: var(--aviso); }
+.texto-aviso { color: var(--aviso); font-weight: 600; }

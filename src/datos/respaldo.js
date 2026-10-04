@@ -12,10 +12,10 @@ export async function exportarRespaldo(db, { semestre, app, config, ahora = ahor
   return { formato: FORMATO, version: VERSION, semestre, creado: ahora, app, config, tablas };
 }
 
-export function nombreArchivoRespaldo(semestre, fecha = new Date()) {
+export function nombreArchivoRespaldo(semestre, fecha = new Date(), extension = 'json') {
   const p = (n) => String(n).padStart(2, '0');
   const f = `${fecha.getFullYear()}-${p(fecha.getMonth() + 1)}-${p(fecha.getDate())}-${p(fecha.getHours())}${p(fecha.getMinutes())}`;
-  return `respaldo-lab-mn-${semestre}-${f}.json`;
+  return `respaldo-lab-mn-${semestre}-${f}.${extension}`;
 }
 
 /** Errores que impiden restaurar (lista vacía si el archivo sirve). */

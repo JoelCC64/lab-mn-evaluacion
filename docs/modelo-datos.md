@@ -79,7 +79,23 @@ La instantánea se crea la primera vez que se registra algo de grupo en el event
 
 **Trabajos en casa:** usan los grupos y la asistencia de su práctica (`evento.practica`).
 
-## Respaldo (archivo JSON)
+## Respaldo del día (archivo Excel) · desde la versión 0.6.0
+
+El respaldo es **un solo archivo Excel** (`respaldo-lab-mn-2026B-AAAA-MM-DD-HHMM.xlsx`) para subir a Drive cada día:
+- **Para leer:**
+  - «Léeme», con lo registrado ese día.
+  - Una hoja por curso con las mismas columnas que la app escribe en el Excel del semestre.
+  - «Asistencia (app)» y «Detalle (app)».
+- **Para restaurar:** la hoja muy oculta `_respaldo` guarda el respaldo completo, que es el mismo JSON de abajo. Va partido en celdas de hasta 30 000 caracteres; los emojis y U+FFFE/U+FFFF se guardan como escapes de JSON.
+
+«Restaurar un respaldo…» acepta este Excel y también el JSON de las versiones anteriores. Una prueba comprueba que el Excel guarda exactamente los mismos datos que el JSON.
+
+La app avisa en Inicio cuando hay registros sin respaldar:
+- Cada escritura en la base anota la hora en el dispositivo, con un middleware de Dexie (`abrirBase(nombre, { alCambiar })`).
+- Exportar el respaldo anota la hora del respaldo.
+- Restaurar también la anota, porque los datos quedan iguales a un archivo de respaldo.
+
+## Respaldo (formato JSON)
 
 ```json
 {
@@ -87,7 +103,7 @@ La instantánea se crea la primera vez que se registra algo de grupo en el event
   "version": 1,
   "semestre": "2026B",
   "creado": "2026-10-05T11:02:00.000Z",
-  "app": "0.5.0",
+  "app": "0.6.0",
   "config": "4dd857fec9e1",
   "tablas": { "estudiantes": [ … ], "asistencia": [ … ], … }
 }

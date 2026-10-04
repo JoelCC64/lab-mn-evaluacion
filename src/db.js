@@ -38,9 +38,26 @@ export function nombreBase(semestre, { demo = false } = {}) {
  */
 export const VERSION_BASE = 2;
 
-export function abrirBase(nombre) {
+/**
+ * Abre la base. `alCambiar(tabla)` (opcional) se llama después de cada escritura que termina bien:
+ * la interfaz lo usa para saber si hay registros sin respaldar.
+ */
+export function abrirBase(nombre, { alCambiar } = {}) {
   const db = new Dexie(nombre);
   db.version(VERSION_BASE).stores(TABLAS);
+  if (alCambiar) {
+    db.use({
+      stack: 'dbcore',
+      name: 'aviso-de-cambios',
+      create: (abajo) => ({
+        ...abajo,
+        table: (tabla) => {
+          const t = abajo.table(tabla);
+          return { ...t, mutate: (req) => t.mutate(req).then((r) => { alCambiar(tabla); return r; }) };
+        },
+      }),
+    });
+  }
   return db;
 }
 

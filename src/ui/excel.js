@@ -5,9 +5,10 @@
 import { useEffect, useState } from '../vendor/preact-htm.js';
 import { html, useApp, useVivo, Pantalla, Aviso, Hoja, Chip, enlace } from './base.js';
 import {
-  ACEPTA_EXCEL, ACEPTA_JSON, abrirLibro, descargar, elegirArchivo, elegirCarpeta, excelAbierto, excelsDeLaCarpeta,
+  ACEPTA_EXCEL, abrirLibro, descargar, elegirArchivo, elegirCarpeta, excelAbierto, excelsDeLaCarpeta,
   permisoCarpeta, puedeGuardarSobreArchivos,
 } from './archivos.js';
+import { ACEPTA_RESPALDO, leerArchivoDeRespaldo } from './respaldo-dia.js';
 import { VistaRespaldo } from './datos.js';
 import { cargarCursos } from '../datos/excel-datos.js';
 import { borrarLocal, guardarLocal, leerLocal, registrarEscritura, ultimaEscritura } from '../datos/local.js';
@@ -80,10 +81,9 @@ export function Excel() {
   };
 
   const importarRespaldo = () => conOcupado('Leyendo el respaldo…', async () => {
-    const f = await elegirArchivo(ACEPTA_JSON);
+    const f = await elegirArchivo(ACEPTA_RESPALDO);
     if (!f) return;
-    let obj;
-    try { obj = JSON.parse(await f.text()); } catch { throw new Error('El archivo no es un JSON válido.'); }
+    const obj = await leerArchivoDeRespaldo(f);
     setVistaRespaldo({ nombre: f.name, obj, errores: validarRespaldo(obj, db, { semestre: cfg.semestre.semestre }) });
   });
 

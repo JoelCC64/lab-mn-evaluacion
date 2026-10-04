@@ -3,12 +3,11 @@ import { useState } from '../vendor/preact-htm.js';
 import { html, useApp, useVivo, Pantalla, Aviso, Hoja, Chip, enlace } from './base.js';
 import { leerAsistenciaSemana1, leerExcelSemestre } from '../nucleo/excel-lectura.js';
 import { aplicarAsistenciaSemana1, aplicarExcelSemestre, planificarImportacion } from '../datos/importar.js';
-import { borrarTodo, contarRespaldo, exportarRespaldo, nombreArchivoRespaldo, restaurarRespaldo, validarRespaldo } from '../datos/respaldo.js';
+import { borrarTodo, contarRespaldo, restaurarRespaldo, validarRespaldo } from '../datos/respaldo.js';
+import { ACEPTA_RESPALDO, exportarRespaldoDelDia, leerArchivoDeRespaldo, marcarRespaldo, useEstadoRespaldo } from './respaldo-dia.js';
 import { conteoTablas } from '../datos/consultas.js';
 import { guardarLocal } from '../datos/local.js';
-import {
-  ACEPTA_EXCEL, ACEPTA_JSON, abrirLibro, compartirODescargar, elegirArchivo, guardarUltimoRespaldo, leerUltimoRespaldo,
-} from './archivos.js';
+import { ACEPTA_EXCEL, abrirLibro, elegirArchivo } from './archivos.js';
 import { VERSION_APP } from '../version.js';
 
 const ARCHIVO_DEMO = 'datos-ejemplo/Cursos_Lab_MN_2026B_EJEMPLO.xlsx';
@@ -19,7 +18,7 @@ export function Datos() {
   const conteo = useVivo(() => conteoTablas(db), []);
   const [vista, setVista] = useState(null);       // vista previa pendiente de confirmar
   const [ocupado, setOcupado] = useState(null);
-  const [ultimo, setUltimo] = useState(() => leerUltimoRespaldo(db.name));
+  const { ultimoRespaldo: ultimo, pendiente } = useEstadoRespaldo(db.name);
 
   async function conOcupado(texto, f) {
     setOcupado(texto);
@@ -52,21 +51,14 @@ export function Datos() {
   };
 
   const exportar = () => conOcupado('Preparando el respaldo…', async () => {
-    const r = await exportarRespaldo(db, { semestre: cfg.semestre.semestre, app: VERSION_APP, config: cfg.version });
-    const nombre = nombreArchivoRespaldo(cfg.semestre.semestre + (demo ? '-demo' : ''));
-    const resultado = await compartirODescargar(nombre, JSON.stringify(r));
-    if (resultado !== 'cancelado') {
-      guardarUltimoRespaldo(db.name, r.creado);
-      setUltimo(r.creado);
-      avisar(resultado === 'compartido' ? 'Respaldo compartido.' : `Respaldo guardado: ${nombre}`, 'ok');
-    }
+    const { resultado, nombre } = await exportarRespaldoDelDia({ cfg, db, demo });
+    if (resultado !== 'cancelado') avisar(resultado === 'compartido' ? 'Respaldo compartido.' : `Respaldo guardado: ${nombre}`, 'ok');
   });
 
   const elegirRespaldo = () => conOcupado('Leyendo el respaldo…', async () => {
-    const f = await elegirArchivo(ACEPTA_JSON);
+    const f = await elegirArchivo(ACEPTA_RESPALDO);
     if (!f) return;
-    let obj;
-    try { obj = JSON.parse(await f.text()); } catch { throw new Error('El archivo no es un JSON válido.'); }
+    const obj = await leerArchivoDeRespaldo(f);
     setVista({ tipo: 'respaldo', nombre: f.name, obj, errores: validarRespaldo(obj, db, { semestre: cfg.semestre.semestre }) });
   });
 
@@ -97,14 +89,17 @@ export function Datos() {
       </div>
 
       <div class="tarjeta">
-        <h2>Respaldo</h2>
+        <h2>Respaldo del día</h2>
         <p class="tenue pequeno">
-          Guarda todo lo registrado en un archivo JSON. En el iPhone se abre la hoja de compartir: envíalo a la Mac por AirDrop.
-          El archivo tiene datos de estudiantes: guárdalo en un lugar seguro.
+          Un solo archivo Excel con todo lo registrado: notas por curso, asistencia y el detalle de cada evento, más los datos
+          para restaurar. Súbelo a Drive al final de cada día (en el iPhone se abre la hoja de compartir: Drive, Archivos o AirDrop a la Mac).
+          Tiene datos de estudiantes: guárdalo en un lugar seguro.
         </p>
-        <p class="pequeno">Último respaldo en este dispositivo: <b>${ultimo ? new Date(ultimo).toLocaleString('es-EC', { dateStyle: 'medium', timeStyle: 'short' }) : 'nunca'}</b></p>
-        <button class="boton primario grande" disabled=${!!ocupado} onClick=${exportar}>Exportar respaldo</button>
+        <p class="pequeno">Último respaldo en este dispositivo: <b>${ultimo ? new Date(ultimo).toLocaleString('es-EC', { dateStyle: 'medium', timeStyle: 'short' }) : 'nunca'}</b>
+          ${pendiente ? html` · <span class="texto-aviso">hay registros sin respaldar</span>` : ''}</p>
+        <button class="boton primario grande" disabled=${!!ocupado} onClick=${exportar}>Exportar el respaldo del día</button>
         <button class="boton ancho" disabled=${!!ocupado} onClick=${elegirRespaldo}>Restaurar un respaldo…</button>
+        <p class="tenue pequeno">Para recuperar todo en otro dispositivo, abre la app ahí y restaura el último respaldo (Excel, o JSON de versiones anteriores).</p>
       </div>
 
       <div class="tarjeta">
@@ -216,6 +211,7 @@ export function VistaRespaldo({ vista, cerrar }) {
   const restaurar = async () => {
     await restaurarRespaldo(db, obj);
     await guardarLocal(db, 'respaldo_importado', { creado: obj.creado, app: obj.app, archivo: nombre, importado: new Date().toISOString() });
+    marcarRespaldo(db.name);   // los datos quedaron iguales a un archivo de respaldo
     cerrar();
     avisar('Respaldo restaurado.', 'ok');
   };

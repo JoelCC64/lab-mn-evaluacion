@@ -4,6 +4,7 @@ import { cargarConfig } from './nucleo/config.js';
 import { abrirBase, nombreBase } from './db.js';
 import { App } from './ui/app.js';
 import { registrarServiceWorker } from './ui/pwa.js';
+import { marcarCambio } from './ui/respaldo-dia.js';
 
 async function leerConfig(ruta) {
   const r = await fetch(`config/${ruta}`);
@@ -14,7 +15,9 @@ async function leerConfig(ruta) {
 async function iniciar() {
   const demo = new URLSearchParams(location.search).has('demo');
   const cfg = await cargarConfig(leerConfig);
-  const db = abrirBase(nombreBase(cfg.semestre.semestre, { demo }));
+  const nombre = nombreBase(cfg.semestre.semestre, { demo });
+  // Cada escritura anota que hay registros sin respaldar (aviso en Inicio).
+  const db = abrirBase(nombre, { alCambiar: () => marcarCambio(nombre) });
   await db.open();
   // Pedir almacenamiento persistente: el navegador no borrará los datos por falta de espacio.
   navigator.storage?.persist?.().catch(() => {});

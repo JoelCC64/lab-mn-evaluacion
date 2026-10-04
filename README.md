@@ -5,6 +5,7 @@ App web para el celular (PWA, funciona sin conexión). Sirve para evaluar en el 
 - **App publicada:** https://joelcc64.github.io/lab-mn-evaluacion/ (en el iPhone: Safari › Compartir › «Agregar a inicio»).
 - **Demostración con datos ficticios:** la misma dirección con `?demo=1`, que usa una base aparte.
 - **En clase:** todo ocurre en el iPhone, sin conexión. Para pasar las notas al Excel: respaldo por AirDrop a la Mac y, en Chrome, «Datos › Escribir las notas en el Excel» (ver [docs/excel.md](docs/excel.md)).
+- **Respaldo del día:** «Exportar el respaldo del día» crea un solo Excel con todo (para leer y para restaurar). Súbelo a Drive cada día; la app avisa en Inicio si hay registros sin respaldar.
 
 ## Entorno (aislado; nada se instala de forma global)
 
