@@ -2,7 +2,7 @@
 // Guarda todos los archivos de la app para que funcione sin conexión.
 // En localhost usa primero la red (desarrollo); publicada, usa primero lo guardado (rápido y sin conexión).
 
-const VERSION = '0.8.1-4878e47172';
+const VERSION = '0.9.0-a9f451ef15';
 const CACHE = `lab-mn-${VERSION}`;
 const ARCHIVOS = [
   "./",
@@ -27,6 +27,7 @@ const ARCHIVOS = [
   "src/nucleo/estado-evento.js",
   "src/nucleo/excel-escritura.js",
   "src/nucleo/excel-lectura.js",
+  "src/nucleo/feedback.js",
   "src/nucleo/grupos.js",
   "src/nucleo/motor-vista.js",
   "src/nucleo/motor.js",
@@ -49,6 +50,7 @@ const ARCHIVOS = [
   "src/ui/dispositivo.js",
   "src/ui/evento.js",
   "src/ui/excel.js",
+  "src/ui/feedback.js",
   "src/ui/grupo.js",
   "src/ui/grupos.js",
   "src/ui/inicio.js",
@@ -60,6 +62,7 @@ const ARCHIVOS = [
   "src/ui/respaldo-dia.js",
   "src/ui/resumen.js",
   "src/ui/retro.js",
+  "src/ui/revision.js",
   "src/ui/trabajos.js",
   "src/ui/visitantes.js",
   "src/vendor/dexie.js",
@@ -92,6 +95,7 @@ const ARCHIVOS = [
   "config/esquemas/TRAD_B1.json",
   "config/esquemas/TRAD_B2.json",
   "config/excel.json",
+  "config/feedback.json",
   "config/manifest.json",
   "config/planificacion-conocimiento.json",
   "config/semestre-2026B.json",

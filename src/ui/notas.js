@@ -13,7 +13,7 @@ import { sobreDiez } from '../nucleo/motor-vista.js';
 import { fechaCorta, fechaLarga, hoyLocal, redondear } from '../nucleo/util.js';
 
 /** Puntos con 2 decimales («1.22»), o «—». */
-const dos = (x) => (x === null || x === undefined ? '—' : redondear(x, 2).toFixed(2));
+export const dos = (x) => (x === null || x === undefined ? '—' : redondear(x, 2).toFixed(2));
 const apellidos = (n) => String(n).split(' ').filter(Boolean).slice(0, 2).join(' ');
 const nombres = (n) => String(n).split(' ').filter(Boolean).slice(2).join(' ');
 
@@ -84,6 +84,10 @@ export function Notas({ paralelo }) {
         </table>
       </div>
       <p class="tenue pequeno">${comps.map((c) => `${c.corto ?? c.nombre}: ${c.nombre} (/${c.valor})`).join(' · ')}. ✓ nota completa · p = pendiente de nómina. Toca una fila para ver el desglose.</p>
+      <a class="tarjeta" href=${enlace('curso', paralelo, 'revision')}>
+        <div class="separado"><h2>Revisión de notas</h2><span class="flecha">›</span></div>
+        <p class="tenue pequeno">Para mostrar en clase (semana 18): el desglose de un estudiante a la vez, sin las notas de los demás.</p>
+      </a>
       ${detalle && html`<${HojaDesglose} ctx=${ctx} fila=${filas.find((f) => f.e.id === detalle)} bimestre=${bimestre} esquema=${esquema} cerrar=${() => setDetalle(null)} />`}
     <//>`;
 }
@@ -110,7 +114,8 @@ function HojaDesglose({ ctx, fila, bimestre, esquema, cerrar }) {
     <//>`;
 }
 
-function Componente({ c, pesos }) {
+/** Un componente del bimestre con su desglose (también en la revisión de notas). */
+export function Componente({ c, pesos }) {
   const pct = (x) => `${Math.round((x ?? 0) * 100)} %`;
   const validos = (c.items ?? []).filter((i) => i.estado !== 'excluido' && i.estado !== 'sin_nota');
   const pesoTotal = validos.reduce((s, i) => s + i.peso, 0);

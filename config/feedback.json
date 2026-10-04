@@ -1,0 +1,105 @@
+{
+  "id": "feedback",
+  "fuente": "Plan v4, Fase 7; enfoque de SQI según la guía del instructor (Unit 0), §1.6 del plan",
+  "umbral_bajo": 0.5,
+  "maximo": { "mejor": 3, "sugerencia": 2 },
+  "tono": {
+    "TRAD": {
+      "descripcion": "Concreto y correctivo: qué corregir y cómo.",
+      "titulos": { "mejor": "Lo mejor", "mejorar": "A mejorar", "sugerencia": "Sugerencia" },
+      "sin_mejorar": "Nada que corregir en lo registrado: mantengan el mismo cuidado.",
+      "sugerencia_general": "Antes de entregar, revisen su trabajo con los indicadores de la rúbrica de la guía."
+    },
+    "SQI": {
+      "descripcion": "Invita a preguntar y dudar: confiabilidad de los datos, puesta a prueba del modelo, iteración y extensión.",
+      "titulos": { "mejor": "Lo mejor", "mejorar": "A mejorar", "sugerencia": "Para explorar" },
+      "sin_mejorar": "Nada que corregir en lo registrado.",
+      "sugerencia_general": "¿Qué parte de sus datos les genera más dudas? ¿Qué medirían para salir de ella?"
+    }
+  },
+  "partes": {
+    "TRAD": {
+      "diseno": {
+        "mejor": "Diseño experimental correcto desde el inicio.",
+        "mejorar": "El diseño experimental necesitó correcciones (montaje, protocolo de medición o errores identificados antes de medir).",
+        "sugerencia": "Antes de medir, definan el montaje, el protocolo (quién mide y cómo) y el error instrumental, y compárenlos con los indicadores de la guía.",
+        "reforzar": "Planificar el montaje y el protocolo antes de medir."
+      },
+      "datos": {
+        "mejor": "Datos completos, ordenados y con unidades.",
+        "mejorar": "La toma de datos quedó incompleta o desordenada (tabla, unidades o condiciones de medición).",
+        "sugerencia": "Registren todas las mediciones en la tabla, con unidades y con las cifras que da el instrumento, y mantengan constantes las condiciones.",
+        "reforzar": "Registro ordenado de los datos, con unidades y cifras coherentes con el instrumento."
+      },
+      "analisis": {
+        "mejor": "Análisis correcto, con incertidumbres y una discusión basada en sus datos.",
+        "mejorar": "El análisis tuvo errores en los cálculos, en las incertidumbres o en la discusión de los resultados.",
+        "sugerencia": "Revisen la propagación de las incertidumbres y discutan el resultado con sus propios datos, comparándolo con el valor esperado.",
+        "reforzar": "Propagación de incertidumbres y discusión de los resultados con los datos propios."
+      },
+      "integral": {
+        "mejor": "Buen trabajo en las tareas y en las preguntas del taller.",
+        "mejorar": "Quedaron tareas o preguntas del taller sin resolver o con errores.",
+        "sugerencia": "Completen las tareas pendientes y revisen las preguntas de discusión con sus propios datos.",
+        "reforzar": "Tareas y preguntas del taller."
+      }
+    },
+    "SQI": {
+      "resp_pred_plan": {
+        "mejor": "Predicciones y decisiones experimentales justificadas.",
+        "mejorar": "Las respuestas, predicciones o decisiones experimentales quedaron incompletas o sin justificar.",
+        "sugerencia": "¿Qué esperaban observar antes de medir y por qué? ¿Qué resultado los habría hecho cambiar de idea?",
+        "reforzar": "Escribir predicciones justificadas antes de medir."
+      },
+      "ejec_registro": {
+        "mejor": "Procedimiento adecuado y registro claro de los datos.",
+        "mejorar": "El registro de los datos quedó incompleto o poco claro (unidades, observaciones o fuentes de incertidumbre).",
+        "sugerencia": "Si otro grupo leyera solo su diario, ¿podría repetir sus mediciones y llegar a los mismos datos? ¿Qué le faltaría?",
+        "reforzar": "Registro completo en el diario: datos con unidades, observaciones y fuentes de incertidumbre."
+      },
+      "analisis": {
+        "mejor": "Análisis e interpretación coherentes con sus resultados.",
+        "mejorar": "El análisis quedó parcial o las conclusiones no se apoyan en sus datos.",
+        "sugerencia": "¿Sus datos son compatibles con el modelo dentro de la incertidumbre? ¿Qué medirían a continuación para decidirlo?",
+        "reforzar": "Comparar datos y modelo teniendo en cuenta la incertidumbre."
+      },
+      "discusion": {
+        "mejor": "Participaron en la discusión y la registraron.",
+        "mejorar": "No quedó registrada la discusión o la reflexión solicitada.",
+        "sugerencia": "¿Qué idea de la discusión cambió su forma de ver la medición? Anótenla en el diario.",
+        "reforzar": "Registrar en el diario la discusión y la reflexión."
+      },
+      "comunicacion": {
+        "mejor": "Buena comunicación de los resultados y trabajo en grupo.",
+        "mejorar": "No hubo evidencia suficiente de la presentación o del trabajo en grupo.",
+        "sugerencia": "¿Cómo explicarían su resultado principal a otro grupo en un minuto, con un dato que lo respalde?",
+        "reforzar": "Comunicar los resultados con evidencia y repartir el trabajo del grupo."
+      },
+      "integral": {
+        "mejor": "Buen trabajo en las tareas y en las preguntas del taller.",
+        "mejorar": "Quedaron tareas o preguntas del taller sin resolver o con errores.",
+        "sugerencia": "¿Cuál de las preguntas del taller les dejó más dudas? Tráiganla a la próxima sesión con una propuesta para resolverla.",
+        "reforzar": "Tareas y preguntas del taller."
+      }
+    }
+  },
+  "control": {
+    "TRAD": {
+      "mejor": "En el control oral, las respuestas fueron correctas y justificadas.",
+      "mejorar": "En el control oral hubo respuestas incompletas o incorrectas sobre la guía y el coloquio.",
+      "sugerencia": "Preparen la guía y el coloquio antes de cada práctica: el control oral pregunta por ellos.",
+      "reforzar": "Preparación de la guía y del coloquio (control oral)."
+    },
+    "SQI": {
+      "mejor": "En el control oral mostraron que prepararon la guía.",
+      "mejorar": "En el control oral hubo dudas sobre la guía.",
+      "sugerencia": "Antes de la próxima práctica, ¿qué pregunta de la guía todavía no sabrían responder?",
+      "reforzar": "Preparación de la guía (control oral)."
+    }
+  },
+  "trabajo_casa": {
+    "SQI": {
+      "sugerencia": "¿Qué evidencia de su diario respalda esa respuesta? ¿Qué agregarían para que otro lector la acepte?"
+    }
+  }
+}

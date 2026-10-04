@@ -108,5 +108,65 @@
       "signo": "+",
       "texto": "Relaciona los objetivos del curso con sus intereses profesionales con ejemplos"
     }
-  ]
+  ],
+  "feedback": {
+    "partes": {
+      "1a": {
+        "mejorar": "Faltó comparar los objetivos del curso con lo que esperaban de un laboratorio tradicional (1a).",
+        "sugerencia": "¿Qué esperaban hacer en un laboratorio y qué cambia si el objetivo es decidir qué datos son confiables?"
+      },
+      "1b": {
+        "mejorar": "Faltó relacionar los objetivos de aprendizaje con sus intereses profesionales (1b).",
+        "sugerencia": "¿En qué situación de su futura carrera tendrán que decidir si un dato es confiable?"
+      },
+      "2a-i": {
+        "mejorar": "La incertidumbre de las mediciones individuales desde la posición más alta no quedó bien calculada (2a-i).",
+        "sugerencia": "¿Qué tan dispersas están sus mediciones individuales? ¿Qué número describe esa dispersión?",
+        "reforzar": "Incertidumbre de una medición individual (dispersión de los datos)."
+      },
+      "2a-ii": {
+        "mejorar": "La incertidumbre de las mediciones individuales desde la posición más baja no quedó bien calculada (2a-ii).",
+        "sugerencia": "¿Qué tan dispersas están sus mediciones individuales? ¿Qué número describe esa dispersión?",
+        "reforzar": "Incertidumbre de una medición individual (dispersión de los datos)."
+      },
+      "2b-i": {
+        "mejorar": "La incertidumbre de la media desde la posición más alta no quedó bien calculada (2b-i).",
+        "sugerencia": "¿Cómo cambia la incertidumbre de la media si duplican el número de mediciones?",
+        "reforzar": "Incertidumbre de la media."
+      },
+      "2b-ii": {
+        "mejorar": "La incertidumbre de la media desde la posición más baja no quedó bien calculada (2b-ii).",
+        "sugerencia": "¿Cómo cambia la incertidumbre de la media si duplican el número de mediciones?",
+        "reforzar": "Incertidumbre de la media."
+      },
+      "2c": {
+        "mejorar": "Faltó explicar la diferencia entre la incertidumbre individual y la de la media (2c).",
+        "sugerencia": "Si midieran 100 veces, ¿cuál de las dos incertidumbres se reduciría y cuál no? ¿Por qué?",
+        "reforzar": "Diferencia entre la incertidumbre individual y la de la media."
+      },
+      "2d": {
+        "mejorar": "La elección del método más confiable no se justificó con sus resultados (2d).",
+        "sugerencia": "¿Qué número de sus resultados usarían para convencer a otro grupo de que su método es el más confiable?",
+        "reforzar": "Justificar las conclusiones con los resultados."
+      }
+    },
+    "etiquetas": {
+      "inc_individual_ok": {
+        "mejor": "Calcularon bien la incertidumbre de las mediciones individuales."
+      },
+      "confunde_inc_media": {
+        "mejorar": "Confundieron la incertidumbre individual con la de la media.",
+        "sugerencia": "Si midieran 100 veces, ¿cuál de las dos incertidumbres se reduciría y cuál no? ¿Por qué?",
+        "reforzar": "Incertidumbre individual frente a incertidumbre de la media."
+      },
+      "conclusion_sin_datos": {
+        "mejorar": "Concluyeron cuál medición es más confiable sin apoyarse en sus datos.",
+        "sugerencia": "¿Qué dato de su tabla respalda la conclusión? Si no hay uno, ¿qué medirían para obtenerlo?",
+        "reforzar": "Apoyar las conclusiones en los datos."
+      },
+      "relaciona_objetivos": {
+        "mejor": "Relacionaron los objetivos del curso con sus intereses profesionales, con ejemplos."
+      }
+    }
+  }
 }

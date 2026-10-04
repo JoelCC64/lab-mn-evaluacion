@@ -29,6 +29,35 @@
         "aspecto": { "$ref": "#/$defs/id" },
         "pregunta": { "type": "string", "minLength": 1 }
       }
+    },
+    "texto_tono": {
+      "description": "Un texto para las dos metodologías o uno por metodología (el tono cambia: Clásica concreto, SQI con preguntas).",
+      "oneOf": [
+        { "$ref": "#/$defs/texto" },
+        { "type": "object", "minProperties": 1, "additionalProperties": false,
+          "properties": { "TRAD": { "$ref": "#/$defs/texto" }, "SQI": { "$ref": "#/$defs/texto" } } }
+      ]
+    },
+    "plantilla": {
+      "description": "Frases del feedback: «mejor» (lo mejor), «mejorar» (a mejorar), «sugerencia» y «reforzar» (para el resumen del curso).",
+      "type": "object",
+      "minProperties": 1,
+      "additionalProperties": false,
+      "properties": {
+        "mejor": { "$ref": "#/$defs/texto_tono" },
+        "mejorar": { "$ref": "#/$defs/texto_tono" },
+        "sugerencia": { "$ref": "#/$defs/texto_tono" },
+        "reforzar": { "$ref": "#/$defs/texto_tono" }
+      }
+    },
+    "feedback_actividad": {
+      "description": "Plantillas de feedback de la actividad: por etiqueta y por parte (criterio, aspecto, pregunta del TC o «integral»).",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "etiquetas": { "type": "object", "propertyNames": { "$ref": "#/$defs/id" }, "additionalProperties": { "$ref": "#/$defs/plantilla" } },
+        "partes": { "type": "object", "propertyNames": { "type": "string", "minLength": 1 }, "additionalProperties": { "$ref": "#/$defs/plantilla" } }
+      }
     }
   }
 }

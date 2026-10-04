@@ -44,6 +44,7 @@ export function construirManifiesto(raiz = DIR_CONFIG) {
     planificacion_conocimiento: 'planificacion-conocimiento.json',
     asistencia: 'asistencia.json',
     excel: 'excel.json',
+    feedback: 'feedback.json',
   };
   const h = createHash('sha256');
   for (const ruta of archivosDelManifiesto(m)) {
@@ -57,7 +58,7 @@ export function construirManifiesto(raiz = DIR_CONFIG) {
 export function archivosDelManifiesto(m) {
   return [m.semestre, m.cursos, m.catalogo, ...m.cronogramas, ...m.esquemas, ...m.actividades,
     m.sqi_aspectos, m.sqi_aspectos_por_practica, m.control_oral, m.trabajo_preparatorio,
-    m.planificacion_conocimiento, m.asistencia, m.excel];
+    m.planificacion_conocimiento, m.asistencia, m.excel, m.feedback];
 }
 
 /** Esquema JSON que valida cada archivo del manifiesto. */
@@ -76,6 +77,7 @@ export function esquemaParaArchivo(ruta, m) {
     [m.planificacion_conocimiento]: 'planificacion-conocimiento.schema.json',
     [m.asistencia]: 'asistencia.schema.json',
     [m.excel]: 'excel.schema.json',
+    [m.feedback]: 'feedback.schema.json',
   }[ruta];
 }
 
@@ -113,11 +115,19 @@ export function leerConfigDisco(raiz = DIR_CONFIG) {
       pyc: leer(m.planificacion_conocimiento),
       asistencia: leer(m.asistencia),
       excel: leer(m.excel),
+      feedback: leer(m.feedback),
     }),
   };
 }
 
 const casiIgual = (a, b) => Math.abs(a - b) < 1e-9;
+
+/** Partes evaluables de una actividad: criterios (Clásica), aspectos (SQI), «integral» (taller) o preguntas (TC). */
+function partesDeActividad(a) {
+  if (a.tipo === 'practica') return a.criterios ? a.criterios.map((c) => c.id) : a.aspectos_aplicables;
+  if (a.tipo === 'taller') return ['integral'];
+  return (a.preguntas ?? []).map((p) => p.id);
+}
 const maximo = (escala) => Math.max(...escala);
 
 /** Reglas que un esquema JSON no puede expresar (sumas, referencias cruzadas). Devuelve la lista de errores. */
@@ -243,6 +253,26 @@ export function validarSemantica(cfg) {
         err.push(`${id}: está sin nota, pero el esquema no lo lista en «sin_nota»`);
       }
     }
+  }
+
+  // Plantillas de feedback (Fase 7): cada plantilla apunta a una etiqueta o a una parte que existen en la actividad.
+  for (const a of Object.values(cfg.actividades)) {
+    if (!a.feedback) continue;
+    const id = `actividad ${a.id}`;
+    const etiquetas = new Map((a.etiquetas ?? []).map((t) => [t.id, t]));
+    for (const [tid, p] of Object.entries(a.feedback.etiquetas ?? {})) {
+      const t = etiquetas.get(tid);
+      if (!t) { err.push(`${id}: el feedback tiene una plantilla para una etiqueta que no existe (${tid})`); continue; }
+      if (t.signo === '+' && (p.mejorar || p.reforzar)) err.push(`${id}: la etiqueta positiva ${tid} no lleva «mejorar» ni «reforzar»`);
+      if (t.signo === '-' && p.mejor) err.push(`${id}: la etiqueta negativa ${tid} no lleva «mejor»`);
+    }
+    const partes = partesDeActividad(a);
+    for (const pid of Object.keys(a.feedback.partes ?? {})) {
+      if (!partes.includes(pid)) err.push(`${id}: el feedback tiene una plantilla para una parte que no existe (${pid})`);
+    }
+  }
+  for (const k of Object.keys(cfg.feedback.partes.SQI)) {
+    if (k !== 'integral' && !cfg.sqi.aspectos[k]) err.push(`feedback: ${k} no es un aspecto SQI`);
   }
 
   // Control oral, preparatorio y Planificación y conocimiento

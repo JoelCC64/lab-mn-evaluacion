@@ -1,9 +1,10 @@
-// Pestaña «Retro» del taller: retroalimentación corta de la práctica anterior, grupo por grupo, armada con lo que
-// la app registró (rúbrica, etiquetas, nota del profesor y control oral). Una casilla marca la retro como dada.
+// Pestaña «Retro» del taller: retroalimentación corta de la práctica anterior, grupo por grupo, con la versión corta
+// del feedback (Fase 7: 2 o 3 líneas armadas con lo registrado) y la nota del profesor. Una casilla marca la retro
+// como dada. El feedback completo de la práctica está en su pestaña «Feedback».
 import { html, useApp, Chip, Aviso, enlace } from './base.js';
 import { marcarRetro } from '../datos/acciones.js';
 import { retroDelTaller } from '../nucleo/retro.js';
-import { sobreDiez, textoNotaGrupo } from '../nucleo/motor-vista.js';
+import { textoNotaGrupo } from '../nucleo/motor-vista.js';
 
 const primerNombre = (nombre) => {
   const p = String(nombre).split(' ').filter(Boolean);
@@ -16,20 +17,22 @@ export function Retro({ ctx, evento }) {
     return html`<${Aviso}>Este taller no tiene una práctica antes en el cronograma del curso: no lleva retroalimentación.<//>`;
   }
   const dadas = r.grupos.filter((g) => g.dada).length;
-  const sinNada = r.grupos.every((g) => !g.nota.partes?.some((p) => p.valor !== null && p.valor !== undefined) && !g.etiquetas.length && !g.notaProfesor);
+  const sinNada = r.grupos.every((g) => g.vacio);
   return html`
     <p class="tenue pequeno">
       Retroalimentación de <a class="negrita" href=${enlace('evento', r.practica.id)}>${r.practica.codigo} · ${r.practica.titulo}</a>,
       grupo por grupo, mientras los demás trabajan. ${dadas}/${r.grupos.length} dadas.
     </p>
-    ${sinNada && html`<${Aviso} tono="aviso">En ${r.practica.codigo} no hay nada registrado todavía (rúbrica, etiquetas ni notas).<//>`}
+    ${sinNada
+      ? html`<${Aviso} tono="aviso">En ${r.practica.codigo} no hay nada registrado todavía (rúbrica, etiquetas ni notas).<//>`
+      : html`<a class="boton chico ancho" href=${enlace('evento', r.practica.id, 'feedback')}>Feedback completo de ${r.practica.codigo} ›</a>`}
     ${r.grupos.map((g) => html`<${TarjetaRetro} key=${g.grupo} g=${g} taller=${evento} />`)}`;
 }
 
 function TarjetaRetro({ g, taller }) {
   const { db } = useApp();
-  const conValor = (g.nota.partes ?? []).filter((p) => p.valor !== null && p.valor !== undefined);
-  const tono = (p) => (p.valor === p.max ? 'ok' : p.valor / p.max < 0.5 ? 'mal' : 'aviso');
+  // La primera línea de la versión corta («Grupo 3 · 7.5/10») ya está en el encabezado de la tarjeta.
+  const lineas = g.corto ? g.corto.split('\n').slice(1) : [];
   return html`
     <div class=${`tarjeta retro ${g.dada ? 'dada' : ''}`}>
       <div class="separado">
@@ -38,16 +41,11 @@ function TarjetaRetro({ g, taller }) {
           : g.nota.completo ? html`<${Chip} tono="info">${textoNotaGrupo(g.nota)}<//>` : html`<${Chip}>sin evaluar<//>`}
       </div>
       <div class="fila-flex pequeno">
-        ${g.integrantes.map(({ estudiante, asistencia, control }) => html`
-          <span class=${asistencia.falta ? 'tachado' : ''}>${primerNombre(estudiante.nombre)}${control.estado === 'calculada'
-            ? html` <${Chip} tono=${control.valor === null ? (control.aprobado ? 'ok' : 'mal') : control.valor >= 0.75 ? 'ok' : control.valor >= 0.5 ? 'aviso' : 'mal'}>control ${control.valor === null ? (control.aprobado ? '✓' : '✗') : sobreDiez(control.valor)}<//>`
-            : ''}${asistencia.falta ? html` <${Chip} tono="mal">faltó<//>` : ''}</span>`)}
+        ${g.integrantes.map(({ estudiante, asistencia }) => html`
+          <span class=${asistencia.falta ? 'tachado' : ''}>${primerNombre(estudiante.nombre)}${asistencia.falta ? html` <${Chip} tono="mal">faltó<//>` : ''}</span>`)}
       </div>
-      ${conValor.length > 0 && html`
-        <div class="fila-flex">${conValor.map((p) => html`<${Chip} tono=${tono(p)}>${p.corto} ${p.valor}/${p.max}<//>`)}</div>`}
-      ${g.etiquetas.length > 0 && html`
-        <ul class="retro-etiquetas">${g.etiquetas.map((t) => html`<li class=${t.signo === '+' ? 'pos' : 'neg'}><span>${t.signo === '+' ? '+' : '−'}</span> ${t.texto}</li>`)}</ul>`}
-      ${g.notaProfesor && html`<blockquote class="retro-nota">${g.notaProfesor}</blockquote>`}
+      ${lineas.length > 0 && html`<p class="texto-corto">${lineas.join('\n')}</p>`}
+      ${g.notaProfesor && !lineas.some((l) => l.includes(g.notaProfesor)) && html`<blockquote class="retro-nota">${g.notaProfesor}</blockquote>`}
       <label class="interruptor">
         <span><b>Retro dada</b></span>
         <input type="checkbox" aria-label=${`Retro dada al grupo ${g.grupo}`} checked=${g.dada} onChange=${(e) => marcarRetro(db, taller.id, g.grupo, e.currentTarget.checked)} />

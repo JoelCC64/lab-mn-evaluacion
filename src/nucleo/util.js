@@ -112,6 +112,11 @@ export function huella(texto) {
   return (4294967296 * (2097151 & h2) + (h1 >>> 0)).toString(16).padStart(14, '0');
 }
 
+/** Enumeración en español: [a, b, c] → «a, b y c». */
+export function enLista(xs) {
+  return xs.length <= 1 ? xs.join('') : `${xs.slice(0, -1).join(', ')} y ${xs.at(-1)}`;
+}
+
 /** Compara grupos como números cuando lo son («2» < «10»). */
 export function compararGrupos(a, b) {
   const na = Number(a), nb = Number(b);

@@ -7,17 +7,17 @@ export async function cargarConfig(leer) {
   const varios = async (rutas) => Promise.all(rutas.map((r) => leer(r)));
 
   const [semestre, cursosArchivo, catalogo, cronogramas, esquemas, actividades, aspectos, porPractica,
-    controlOral, preparatorio, pyc, asistencia, excel] = await Promise.all([
+    controlOral, preparatorio, pyc, asistencia, excel, feedback] = await Promise.all([
     uno(manifiesto.semestre), uno(manifiesto.cursos), uno(manifiesto.catalogo),
     varios(manifiesto.cronogramas), varios(manifiesto.esquemas), varios(manifiesto.actividades),
     uno(manifiesto.sqi_aspectos), uno(manifiesto.sqi_aspectos_por_practica),
     uno(manifiesto.control_oral), uno(manifiesto.trabajo_preparatorio),
-    uno(manifiesto.planificacion_conocimiento), uno(manifiesto.asistencia), uno(manifiesto.excel),
+    uno(manifiesto.planificacion_conocimiento), uno(manifiesto.asistencia), uno(manifiesto.excel), uno(manifiesto.feedback),
   ]);
 
   return armarConfig({
     version: manifiesto.version, semestre, cursos: cursosArchivo.cursos, catalogo, cronogramas, esquemas,
-    actividades, sqi: { aspectos, porPractica }, controlOral, preparatorio, pyc, asistencia, excel,
+    actividades, sqi: { aspectos, porPractica }, controlOral, preparatorio, pyc, asistencia, excel, feedback,
   });
 }
 
@@ -39,6 +39,7 @@ export function armarConfig(p) {
     pyc: p.pyc,
     asistencia: p.asistencia,
     excel: p.excel,
+    feedback: p.feedback,
   };
 }
 

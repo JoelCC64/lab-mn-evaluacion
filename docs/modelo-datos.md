@@ -41,6 +41,7 @@ Claves entre corchetes: compuestas. Todas las tablas de registro llevan `fecha` 
 | `recuperaciones` | `[evento+estudiante]` | `estado` (`solicitada` · `realizada` · `no_asistio`), `nota` (0–1, si se realizó), `motivo` (`justificada` · `feriado`), `detalle` (dónde y cuándo) | Recuperación de un estudiante del curso en otra sesión. Desde la versión 4 de la base (Fase 6) | `recoveries` |
 | `plic` | `[evento+estudiante]` | `completo_valido` | PLIC del 2.º bimestre (`evento` = `PARALELO:PLIC`). Desde la versión 4 (Fase 6) | `plic` |
 | `trabajos_casa` | `[evento+unidad+unidad_id]` | `unidad` (`grupo` · `estudiante`, según `unidad_calificacion` del TC), `unidad_id` (número de grupo o código), `entregado`, `puntajes` (`{ pregunta: puntos }`), `etiquetas` (ids de la configuración) | TC de SQI pregunta por pregunta. `entregado: false` vale 0 y conserva los puntajes por si fue un toque equivocado. Desde la versión 3 de la base (Fase 5) | `homework` |
+| `feedback` | `[evento+unidad+unidad_id]` | `unidad` (`grupo` · `estudiante`), `texto` (el editado, o `null`), `base` (el texto generado cuando se editó), `copiado` (momento en que se copió o compartió) | Solo lo que el profesor hizo con el feedback: el texto generado no se guarda, se arma cada vez con lo registrado. Si lo registrado cambia después de editar, `base` ya no coincide y la app lo avisa. Desde la versión 5 (Fase 7) | (nuevo) |
 | `cambios_evento` | `evento` | `estado` (`sin_clase` · `normal`), `motivo` | Cambios manuales del calendario (clase suspendida, semana 1 sin clase) | `events.estado` |
 | `importaciones` | autoincremental | `tipo` (`excel_semestre` · `asistencia_semana1` · `respaldo`), `archivo`, `resumen` (solo conteos) | Historial de lecturas del Excel y de restauraciones | (nuevo) |
 | `meta` | `clave` | `valor` | Datos sueltos: último respaldo, versión del modelo | (nuevo) |
@@ -51,6 +52,7 @@ Claves entre corchetes: compuestas. Todas las tablas de registro llevan `fecha` 
 - 2: Fase 4, con la tabla `retroalimentaciones`.
 - 3: Fase 5, con la tabla `trabajos_casa`.
 - 4: Fase 6, con las tablas `recuperaciones` y `plic`.
+- 5: Fase 7, con la tabla `feedback`.
 
 **Lo último que se escribió en el Excel** (`excel_writes` en el §4) no va en la base: va en la hoja oculta «_app» del propio Excel (ver `docs/excel.md`). Así viaja con el archivo y no se pierde cuando la Mac importa un respaldo del iPhone, que reemplaza toda la base.
 

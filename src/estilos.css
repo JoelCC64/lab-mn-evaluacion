@@ -400,3 +400,24 @@ textarea.entrada.texto-profesor { min-height: 220px; font-size: 14px; line-heigh
 .tabla-bimestre td { padding: 7px 4px; }
 .tabla-bimestre td.num { font-size: 13.5px; }
 .tabla-bimestre .nombre-celda { max-width: 128px; font-size: 13.5px; }
+
+/* Feedback (Fase 7) */
+textarea.entrada.texto-feedback { min-height: 120px; font-size: 14px; line-height: 1.45; white-space: pre-wrap; overflow: hidden; resize: none; }
+.texto-corto, .texto-resumen { margin: 4px 0 0; white-space: pre-wrap; font-size: 14.5px; line-height: 1.45; }
+.tarjeta.atenuado { opacity: .6; }
+@media (max-width: 420px) {
+  /* Con 5 o 6 pestañas: cada una con su ancho natural; si no caben, la barra se desliza. */
+  .pestanas { gap: 2px; padding: 6px; }
+  .pestanas a { flex: 1 0 auto; min-width: 0; padding: 9px 6px; font-size: 13.5px; }
+  .pestanas .punto { margin-left: 4px; }
+}
+
+/* Revisión de notas (semana 18) */
+.revision-cabeza { text-align: center; }
+.revision-nombre { font-size: 22px; font-weight: 800; line-height: 1.2; }
+.revision-total { margin-top: 6px; }
+.revision-total b { font-size: 52px; font-weight: 800; font-variant-numeric: tabular-nums; }
+.revision-total span { font-size: 20px; color: var(--tenue); }
+.revision-nav { display: flex; gap: 8px; }
+.revision-nav .boton { font-size: 20px; min-width: 56px; }
+.revision-nav .boton.crece { font-size: 15px; }

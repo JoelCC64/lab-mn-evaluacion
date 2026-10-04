@@ -16,7 +16,7 @@ import { conteoTablas } from '../datos/consultas.js';
 import { validarRespaldo } from '../datos/respaldo.js';
 import { hojasPropiasDelPlan, aplicarEscritura, compararLibros, letra, planificarEscritura, zonasDelPlan } from '../nucleo/excel-escritura.js';
 import { inflarEnNavegador, revisarPartesExcel } from '../nucleo/zip.js';
-import { hoyLocal } from '../nucleo/util.js';
+import { enLista, hoyLocal } from '../nucleo/util.js';
 import { VERSION_APP } from '../version.js';
 import { AjusteProfesor, useProfesor } from './dispositivo.js';
 
@@ -325,9 +325,4 @@ function Conflictos({ conflictos, decidir }) {
           </div>
         </div>`)}
     </div>`;
-}
-
-/** «a», «a y b», «a, b y c». */
-function enLista(xs) {
-  return xs.length <= 1 ? xs.join('') : `${xs.slice(0, -1).join(', ')} y ${xs.at(-1)}`;
 }

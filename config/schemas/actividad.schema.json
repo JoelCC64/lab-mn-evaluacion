@@ -17,7 +17,8 @@
     },
     "bimestre": { "enum": [1, 2] },
     "etiquetas": { "type": "array", "items": { "$ref": "comun.schema.json#/$defs/etiqueta" } },
-    "preguntas_discusion": { "type": "array", "items": { "$ref": "comun.schema.json#/$defs/texto" } }
+    "preguntas_discusion": { "type": "array", "items": { "$ref": "comun.schema.json#/$defs/texto" } },
+    "feedback": { "$ref": "comun.schema.json#/$defs/feedback_actividad" }
   },
   "allOf": [
     {
@@ -27,7 +28,7 @@
         "additionalProperties": false,
         "properties": {
           "id": true, "codigo": true, "fuente": true, "tipo": true, "metodologia": true, "bimestre": true,
-          "etiquetas": true, "preguntas_discusion": true,
+          "etiquetas": true, "preguntas_discusion": true, "feedback": true,
           "componente": { "const": "diseno_datos_analisis" },
           "unidad_calificacion": { "const": "grupo" },
           "individual": { "type": "array", "items": { "enum": ["trabajo_preparatorio", "control_oral"] } },
@@ -61,7 +62,7 @@
         "additionalProperties": false,
         "properties": {
           "id": true, "codigo": true, "fuente": true, "tipo": true, "metodologia": true, "bimestre": true,
-          "etiquetas": true, "preguntas_discusion": true,
+          "etiquetas": true, "preguntas_discusion": true, "feedback": true,
           "unidad_calificacion": { "const": "grupo" },
           "aspectos_aplicables": { "type": "array", "minItems": 1, "uniqueItems": true, "items": { "$ref": "comun.schema.json#/$defs/id" } },
           "individual": { "type": "array", "items": { "enum": ["control_oral_sin_nota"] } },
@@ -82,7 +83,7 @@
         "additionalProperties": false,
         "properties": {
           "id": true, "codigo": true, "fuente": true, "tipo": true, "metodologia": true, "bimestre": true,
-          "etiquetas": true, "preguntas_discusion": true,
+          "etiquetas": true, "preguntas_discusion": true, "feedback": true,
           "pesos": {
             "type": "object", "required": ["asistencia_permanencia", "evaluacion_integral"], "additionalProperties": false,
             "properties": { "asistencia_permanencia": { "$ref": "comun.schema.json#/$defs/peso" }, "evaluacion_integral": { "$ref": "comun.schema.json#/$defs/peso" } }
@@ -129,7 +130,7 @@
         "additionalProperties": false,
         "properties": {
           "id": true, "codigo": true, "fuente": true, "tipo": true, "metodologia": true, "bimestre": true,
-          "etiquetas": true, "preguntas_discusion": true,
+          "etiquetas": true, "preguntas_discusion": true, "feedback": true,
           "practica": { "$ref": "comun.schema.json#/$defs/codigo_actividad" },
           "ponderacion": { "$ref": "comun.schema.json#/$defs/peso" },
           "sin_nota": { "type": "boolean" },

@@ -13,7 +13,8 @@ Plan: [PROYECTO_LABORATORIOS_v4.md](PROYECTO_LABORATORIOS_v4.md). Al empezar una
 | 4. Talleres | ✅ Completa | 3-oct-2026 |
 | 5. Trabajos en casa (SQI) | ✅ Completa | 3-oct-2026 |
 | 6. Nota bimestral, excepciones y coordinación | ✅ Completa | 4-oct-2026 |
-| 7–9 | — | |
+| 7. Feedback | ✅ Completa | 4-oct-2026 |
+| 8–9 | — | |
 
 ## Fase 0 (3-oct-2026)
 
@@ -223,6 +224,56 @@ Detalle en [docs/excel.md](docs/excel.md).
 - **La nota del grupo de un taller se muestra como nivel** («1/2»), no sobre 10: es la mitad grupal de la nota.
 - **El trabajo firmado y la penalización total salen de la configuración** de cada actividad (`cierre`, `penalizacion_total`). Los talleres no tienen penalización total.
 
+## Fase 7 (4-oct-2026) · feedback · versión 0.9.0
+
+**Antes (0.8.1): el nombre del profesor pasa a un ajuste del dispositivo** (pedido de Joel: no quiere su nombre en el repositorio, que es público).
+- Datos › «Este dispositivo» › «Tu nombre»: se guarda en la base local del dispositivo (`lab-mn-2026B-local`), no en la configuración, y no viaja en el respaldo. Se escribe una vez en el iPhone y otra en la Mac.
+- Lo usan la columna PROFESOR de «Coordinación B1/B2» y la firma del texto para el profesor de un visitante. Sin él, esa columna queda vacía, la revisión del Excel lo avisa y lo pide en la misma pantalla, y el texto va sin firma.
+- `semestre-2026B.json` ya no tiene `profesor`; las pruebas usan un nombre ficticio.
+
+**Hecho**
+- **Base versión 5** con la tabla `feedback`: solo lo que el profesor hizo con el texto (lo editado y si se copió). El texto generado no se guarda: se arma cada vez con lo registrado.
+- **Generador** (`src/nucleo/feedback.js`, documentado en `docs/feedback.md`): arma el feedback solo con lo registrado.
+  - Fuentes: puntajes por criterio o aspecto, etiquetas, nota del profesor (tal cual), control oral (sin decir quién) y puntajes por pregunta de los TC.
+  - Estructura *lo mejor / a mejorar / sugerencia*; lo más bajo va primero.
+  - Las etiquetas reemplazan la frase general de su criterio, aspecto o pregunta.
+- **Plantillas en la configuración:**
+  - Por etiqueta y por parte (criterio, aspecto, pregunta o `integral`), en cada actividad.
+  - Por defecto en `config/feedback.json`, con el tono de cada metodología: Clásica concreto y correctivo («Sugerencia»); SQI con preguntas para explorar («Para explorar»).
+  - Una frase puede ir por metodología (talleres comunes).
+  - `npm run config` las valida contra las etiquetas y partes de cada actividad.
+  - Escritas para P1 (Clásica y SQI), T1 y TC1, con frases en la voz del grupo («Respondieron sin explicar…»).
+- **Pestaña «Feedback»** en prácticas, talleres y TC evaluados:
+  - Por grupo: el texto editable (lo editado se guarda y se puede volver al generado), «Copiar», «Compartir» y «Copiar todos». Avisa si lo registrado cambió después de editar.
+  - Corto: 2 o 3 líneas por grupo.
+  - Curso: resumen sin nombres (promedios por sección o aspecto, preguntas de TC con más errores, etiquetas más marcadas, control oral y **qué reforzar**), con «Copiar».
+- **Retro del taller:** ya no muestra los datos sueltos de la Fase 4. Muestra las 2 o 3 líneas de la práctica anterior y la nota del profesor, con un enlace al feedback completo.
+- **Revisión de notas** (Notas del bimestre › «Revisión de notas»), para la semana 18:
+  - Un estudiante a la vez, en letra grande, con su nota del bimestre y el desglose por componente.
+  - Se pasa con ‹ › o se busca por apellido; no muestra las notas de los demás.
+- **Pestañas en el iPhone:** cada una con su ancho natural. Las cinco de una práctica caben desde 390 px; con seis (talleres), la barra se desliza y la elegida queda a la vista.
+- **Pruebas** (123 en total, 12 nuevas desde la 0.8.0):
+  - Texto de grupos de Clásica y SQI, versión corta, resumen del curso, TC por pregunta, taller con frases por metodología y retro.
+  - Ediciones guardadas y aviso de cambio; grupos sin evaluar y penalización total.
+  - Validación de plantillas.
+  - Que ningún texto lleve nombres ni códigos.
+  - Nombre del profesor como ajuste del dispositivo (no viaja en el respaldo; sin él, aviso y columna vacía).
+  - Base de la versión 4 a la 5.
+
+**Verificado en el navegador** (demostración, 375 y 390 px):
+- Feedback de P1 en GR2QB: textos, edición guardada al recargar, «Volver al texto generado», vistas Corto y Curso.
+- Retro del T1, feedback del TC1 de GR1AA y revisión de notas de GR1AA y GR2QB.
+- Ajuste «Tu nombre» en Datos y en la pantalla del Excel.
+- Sin errores en la consola.
+
+**Decisiones de implementación**
+- «Nota baja» = 50 % o menos del máximo de la parte (`umbral_bajo`). En un TC, toda pregunta sin el puntaje completo va a «a mejorar».
+- El control oral va sin nombres:
+  - Si todos los integrantes consultados respondieron bien (75 % o más), va en «lo mejor».
+  - Si alguno respondió por debajo del 50 %, va en «a mejorar», después de lo del trabajo del grupo.
+- En SQI, un grupo sin nada que corregir recibe una pregunta para extender: la de una etiqueta positiva o una del banco de la práctica (distinta según el grupo).
+- Copiar todos deja fuera a los grupos sin nada registrado.
+
 ## Fase 6 (4-oct-2026) · nota bimestral, excepciones y coordinación · versión 0.8.0
 
 **Hecho**
@@ -251,7 +302,7 @@ Detalle en [docs/excel.md](docs/excel.md).
 - **Aviso de control oral al cierre:** cuando quedan 2 sesiones o menos del bimestre (`aviso_cierre_sesiones` en `control-oral.json`), el curso y las notas muestran quién sigue sin control.
 - **Recordatorio del envío** en Inicio: los días que faltan para el 1-dic (o el 29-ene) y los eventos que ya pasaron y siguen sin evaluar en todos los cursos. Se destaca a 14 días o menos (`dias_aviso_envio`).
 - **Excel:** hojas «Coordinación B1» y «Coordinación B2» (ver `docs/excel.md`):
-  - APELLIDOS Y NOMBRES | NÚMERO ÚNICO | NOTA(/6) | PROFESOR. El nombre del profesor es un ajuste del dispositivo desde la 0.9.0 (ver Fase 7).
+  - APELLIDOS Y NOMBRES | NÚMERO ÚNICO | NOTA(/6) | PROFESOR. El nombre del profesor es un ajuste del dispositivo desde la 0.8.1 (ver Fase 7).
   - Orden alfabético; los pendientes van aparte, en ámbar.
   - La nota es la misma de la hoja del curso, con 2 decimales.
   - La verificación antes de guardar conoce las hojas nuevas.
@@ -280,7 +331,7 @@ Detalle en [docs/excel.md](docs/excel.md).
   - Se agregan como presentes, porque están en la sala; se corrigen como cualquiera.
   - No se pueden sortear para el control. Su texto incluye el control si se registró.
 - **Coordinación:** una sola lista por bimestre con todos los cursos, por orden alfabético, y la nota solo cuando el bimestre está completo.
-- El nombre del profesor estuvo en la configuración hasta la 0.8.0; desde la 0.9.0 es un ajuste del dispositivo (ver Fase 7).
+- El nombre del profesor estuvo en la configuración hasta la 0.8.0; desde la 0.8.1 es un ajuste del dispositivo (ver Fase 7).
 
 ## Fase 5 (3-oct-2026) · trabajos en casa (SQI) · versión 0.7.0
 
@@ -383,4 +434,5 @@ Pedido de Joel: un solo archivo por día con todo (notas, asistencia, etc.) para
   - Las primeras que hacen falta:
     - P2 (Clásica y SQI): cronograma A, semana 5, desde el 26-oct.
     - T2: cronograma B, semana 5; cronograma A, semana 6.
-- Fase 7: feedback (plantillas por etiqueta y aspecto, texto por grupo, versión corta para la retro del taller y resumen del curso).
+- Plantillas de feedback de TC2–TC7, con sus etiquetas, cuando lleguen sus hojas; las de P2, T2, … con cada guía (ver `docs/feedback.md`).
+- Fase 8: métricas. Solo cuando Joel la pida.

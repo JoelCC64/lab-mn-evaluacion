@@ -213,6 +213,35 @@ export async function marcarRetro(db, evento, grupo, dada, ahora = ahoraISO()) {
   else await db.retroalimentaciones.delete([evento, String(grupo)]);
 }
 
+// ---------- Feedback (Fase 7) ----------
+// Una fila por evento y unidad (grupo, o estudiante en un TC individual) solo si el profesor editó el texto generado o
+// lo copió. `base` es el texto generado al editar: si lo registrado cambia después, la app avisa.
+
+async function cambiarFeedback(db, evento, unidad, unidadId, f, ahora) {
+  const id = String(unidadId);
+  await db.transaction('rw', db.feedback, async () => {
+    const actual = (await db.feedback.get([evento, unidad, id])) ?? { evento, unidad, unidad_id: id, texto: null, base: null, copiado: null };
+    await db.feedback.put({ ...actual, ...f(actual), fecha: ahora });
+  });
+}
+
+/** Guarda el texto editado. Si queda igual al generado (o vacío), vuelve al generado. */
+export async function guardarFeedback(db, evento, unidad, unidadId, texto, generado, ahora = ahoraISO()) {
+  const limpio = String(texto ?? '').trim();
+  const propio = limpio && limpio !== String(generado ?? '').trim();
+  await cambiarFeedback(db, evento, unidad, unidadId, () => (propio ? { texto: limpio, base: generado } : { texto: null, base: null }), ahora);
+}
+
+/** Descarta lo editado: el texto vuelve a ser el generado con lo registrado. */
+export async function restaurarFeedback(db, evento, unidad, unidadId, ahora = ahoraISO()) {
+  await cambiarFeedback(db, evento, unidad, unidadId, () => ({ texto: null, base: null }), ahora);
+}
+
+/** Marca como copiados (o compartidos) los textos de una o varias unidades: [{ unidad, id }]. */
+export async function marcarFeedbackCopiado(db, evento, unidades, ahora = ahoraISO()) {
+  for (const u of unidades) await cambiarFeedback(db, evento, u.unidad, u.id, () => ({ copiado: ahora }), ahora);
+}
+
 // ---------- Trabajos en casa (TC) ----------
 // Una fila por TC y unidad (`unidad` = 'grupo' con el número de grupo, o 'estudiante' con su id): si entregó,
 // el puntaje de cada pregunta y las etiquetas marcadas. Los grupos son los de la práctica: no se crea instantánea.

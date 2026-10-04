@@ -1,5 +1,5 @@
-// Evento: encabezado, pestañas de la clase (Puerta · Control · [Retro] · Grupos · Resumen) y avisos de estado.
-import { useMemo, useState } from '../vendor/preact-htm.js';
+// Evento: encabezado, pestañas de la clase (Puerta · Control · [Retro] · Grupos · Resumen · Feedback) y avisos de estado.
+import { useEffect, useMemo, useState } from '../vendor/preact-htm.js';
 import { html, useApp, Pantalla, Aviso, Cargando, Hoja, enlace } from './base.js';
 import { useCurso, textoBimestre } from './curso-datos.js';
 import { Puerta } from './puerta.js';
@@ -9,9 +9,11 @@ import { Resumen } from './resumen.js';
 import { Retro } from './retro.js';
 import { Trabajos } from './trabajos.js';
 import { Plic } from './plic.js';
+import { Feedback } from './feedback.js';
 import { RecuperacionesDelEvento } from './recuperacion.js';
 import { marcarHuboClase, marcarSinClase, quitarCambioEvento } from '../datos/acciones.js';
 import { retroDelTaller } from '../nucleo/retro.js';
+import { tieneFeedback } from '../nucleo/feedback.js';
 import { estadoEvento } from '../nucleo/estado-evento.js';
 import { unidadTrabajo } from '../nucleo/motor.js';
 import { avanceEvaluacion, seCalificaTrabajo } from '../nucleo/motor-vista.js';
@@ -44,7 +46,7 @@ export function useEvento(id) {
 export function pestanasDe(cfg, evento) {
   if (seCalificaTrabajo(evento)) {
     const porGrupo = unidadTrabajo(cfg.actividades[evento.config]) === 'grupo';
-    return [{ id: 'grupos', texto: porGrupo ? 'Grupos' : 'Estudiantes' }, { id: 'resumen', texto: 'Resumen' }];
+    return [{ id: 'grupos', texto: porGrupo ? 'Grupos' : 'Estudiantes' }, { id: 'resumen', texto: 'Resumen' }, { id: 'feedback', texto: 'Feedback' }];
   }
   if (!evento.sesion || evento.estado !== 'normal') return [];
   const conPuerta = cfg.preparatorio.aplica_a.includes(evento.tipo);
@@ -56,6 +58,7 @@ export function pestanasDe(cfg, evento) {
     conRetro && { id: 'retro', texto: 'Retro' },
     { id: 'grupos', texto: 'Grupos' },
     { id: 'resumen', texto: 'Resumen' },
+    tieneFeedback(evento) && { id: 'feedback', texto: 'Feedback' },
   ].filter(Boolean);
 }
 
@@ -75,6 +78,8 @@ export function Evento({ id, pestana }) {
   // La pestaña por defecto se elige una sola vez al abrir el evento (no salta mientras se registra).
   const listo = Boolean(ctx && evento);
   const porDefecto = useMemo(() => (listo ? pestanaPorDefecto(ctx, evento, pestanasDe(cfg, evento)) : null), [id, listo]);
+  // En el iPhone las pestañas pueden no caber: la elegida se desliza a la vista.
+  useEffect(() => { document.querySelector('.pestanas a.activa')?.scrollIntoView({ block: 'nearest', inline: 'nearest' }); }, [id, pestana, listo]);
   if (!curso || (!cargando && eventos && !evento)) {
     return html`<${Pantalla} titulo="Evento desconocido" atras="#/"><${Aviso} tono="mal">No existe el evento ${id}.<//><//>`;
   }
@@ -111,6 +116,7 @@ export function Evento({ id, pestana }) {
       ${activa === 'retro' && html`<${Retro} ctx=${ctx} evento=${evento} />`}
       ${activa === 'grupos' && (evento.tipo === 'trabajo_casa' ? html`<${Trabajos} ctx=${ctx} evento=${evento} />` : html`<${Grupos} ctx=${ctx} evento=${evento} />`)}
       ${activa === 'resumen' && html`<${Resumen} ctx=${ctx} evento=${evento} />`}
+      ${activa === 'feedback' && html`<${Feedback} ctx=${ctx} evento=${evento} />`}
     <//>`;
 }
 

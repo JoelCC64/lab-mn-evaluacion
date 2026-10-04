@@ -192,5 +192,69 @@
     "¿Qué le pasaría a ε_rel si cronometrara alguien más rápido?",
     "¿Qué indica que h_exp caiga dentro o fuera del intervalo de incertidumbre?",
     "¿Qué error sistemático quedaría aunque repitieran la medición 1000 veces?"
-  ]
+  ],
+  "feedback": {
+    "etiquetas": {
+      "h_mal_medida": {
+        "mejorar": "La altura h se midió desde un punto equivocado.",
+        "sugerencia": "Midan h desde el piso hasta la varilla de 10 cm, con la cinta métrica vertical, y verifiquen cada altura antes de cronometrar.",
+        "reforzar": "Medir las alturas desde la referencia correcta."
+      },
+      "sin_protocolo": {
+        "mejorar": "No definieron un protocolo de cronometraje.",
+        "sugerencia": "Definan antes de medir quién suelta, quién cronometra y en qué instante se detiene el cronómetro, y mantengan ese protocolo en todas las mediciones.",
+        "reforzar": "Definir el protocolo de cronometraje antes de medir."
+      },
+      "sin_dinst": {
+        "mejorar": "No identificaron δ_inst antes de medir.",
+        "sugerencia": "Antes de medir, anoten el error instrumental (δ_inst) del cronómetro y de la cinta métrica, como lo indica la guía.",
+        "reforzar": "Identificar el error instrumental antes de medir."
+      },
+      "condiciones_var": {
+        "sugerencia": "Mantengan constantes la posición de salida y el cronometrista en todas las mediciones de una misma altura.",
+        "reforzar": "Mantener constantes las condiciones de medición."
+      },
+      "cifras_incoh": {
+        "sugerencia": "Anoten los tiempos con las cifras que muestra el cronómetro y redondeen cada resultado según su incertidumbre.",
+        "reforzar": "Cifras coherentes con el instrumento y con la incertidumbre."
+      },
+      "borra_datos": {
+        "mejorar": "Descartaron datos sin justificar.",
+        "sugerencia": "Antes de descartar un dato, escriban el motivo (por ejemplo, un error de cronometraje identificado) y conserven el dato tachado en la tabla.",
+        "reforzar": "Criterios para descartar datos."
+      },
+      "un_solo_integrante": {
+        "mejorar": "El trabajo recayó en un solo integrante.",
+        "sugerencia": "Repartan los roles (soltar, cronometrar, anotar) y túrnenlos entre las series de mediciones.",
+        "reforzar": "Reparto de roles dentro del grupo."
+      },
+      "distingue_errores": {
+        "mejor": "Distinguieron el error sistemático del aleatorio con ejemplos propios."
+      },
+      "confunde_reaccion": {
+        "mejorar": "Trataron el error de reacción como si fuera aleatorio puro.",
+        "sugerencia": "Separen la parte sistemática del tiempo de reacción de su parte aleatoria y justifiquen cuál domina en sus mediciones.",
+        "reforzar": "Tiempo de reacción: parte sistemática y parte aleatoria."
+      },
+      "sin_dep_indep": {
+        "mejorar": "No justificaron si los errores son dependientes o independientes.",
+        "sugerencia": "Justifiquen si los errores son dependientes (se suman linealmente) o independientes (se suman en cuadratura) antes de calcular δt_total.",
+        "reforzar": "Combinación de errores dependientes e independientes."
+      },
+      "propagacion_mal": {
+        "mejorar": "La propagación de la incertidumbre en h_exp fue incorrecta.",
+        "sugerencia": "En h_exp = g·t²/2, la incertidumbre relativa de h es el doble de la del tiempo: δh/h = 2·δt/t (si g se toma sin incertidumbre).",
+        "reforzar": "Propagación de la incertidumbre en h_exp = g·t²/2."
+      },
+      "sin_comparar": {
+        "mejorar": "No compararon h_exp con h1 dentro de la incertidumbre.",
+        "sugerencia": "Comparen h_exp ± δh con h1: si los intervalos se superponen, los valores son compatibles; si no, busquen el error sistemático que lo explique.",
+        "reforzar": "Comparar un resultado con el valor de referencia dentro de la incertidumbre."
+      },
+      "memorizado": {
+        "sugerencia": "Apoyen cada conclusión en un número de su tabla (por ejemplo, su σ_m o su ε_rel).",
+        "reforzar": "Discutir los resultados con los datos propios."
+      }
+    }
+  }
 }

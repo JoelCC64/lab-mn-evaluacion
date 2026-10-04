@@ -1,0 +1,59 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "feedback.schema.json",
+  "title": "Feedback: tono por metodología y plantillas por defecto (Fase 7)",
+  "type": "object",
+  "required": ["id", "umbral_bajo", "maximo", "tono", "partes", "control"],
+  "additionalProperties": false,
+  "properties": {
+    "id": { "const": "feedback" },
+    "fuente": { "type": "string" },
+    "umbral_bajo": { "type": "number", "exclusiveMinimum": 0, "exclusiveMaximum": 1 },
+    "maximo": {
+      "type": "object", "required": ["mejor", "sugerencia"], "additionalProperties": false,
+      "properties": {
+        "mejor": { "type": "integer", "minimum": 1, "maximum": 10 },
+        "sugerencia": { "type": "integer", "minimum": 1, "maximum": 10 }
+      }
+    },
+    "tono": {
+      "type": "object", "required": ["TRAD", "SQI"], "additionalProperties": false,
+      "properties": { "TRAD": { "$ref": "#/$defs/tono" }, "SQI": { "$ref": "#/$defs/tono" } }
+    },
+    "partes": {
+      "type": "object", "required": ["TRAD", "SQI"], "additionalProperties": false,
+      "properties": { "TRAD": { "$ref": "#/$defs/plantillas" }, "SQI": { "$ref": "#/$defs/plantillas" } }
+    },
+    "control": {
+      "type": "object", "required": ["TRAD", "SQI"], "additionalProperties": false,
+      "properties": { "TRAD": { "$ref": "comun.schema.json#/$defs/plantilla" }, "SQI": { "$ref": "comun.schema.json#/$defs/plantilla" } }
+    },
+    "trabajo_casa": {
+      "type": "object", "additionalProperties": false,
+      "properties": { "TRAD": { "$ref": "comun.schema.json#/$defs/plantilla" }, "SQI": { "$ref": "comun.schema.json#/$defs/plantilla" } }
+    }
+  },
+  "$defs": {
+    "tono": {
+      "type": "object", "required": ["titulos", "sin_mejorar", "sugerencia_general"], "additionalProperties": false,
+      "properties": {
+        "descripcion": { "type": "string" },
+        "titulos": {
+          "type": "object", "required": ["mejor", "mejorar", "sugerencia"], "additionalProperties": false,
+          "properties": {
+            "mejor": { "$ref": "comun.schema.json#/$defs/texto" },
+            "mejorar": { "$ref": "comun.schema.json#/$defs/texto" },
+            "sugerencia": { "$ref": "comun.schema.json#/$defs/texto" }
+          }
+        },
+        "sin_mejorar": { "$ref": "comun.schema.json#/$defs/texto" },
+        "sugerencia_general": { "$ref": "comun.schema.json#/$defs/texto" }
+      }
+    },
+    "plantillas": {
+      "type": "object",
+      "propertyNames": { "$ref": "comun.schema.json#/$defs/id" },
+      "additionalProperties": { "$ref": "comun.schema.json#/$defs/plantilla" }
+    }
+  }
+}

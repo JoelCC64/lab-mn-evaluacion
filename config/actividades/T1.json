@@ -110,5 +110,59 @@
       "signo": "-",
       "texto": "Sigue el ejemplo sugerido sin justificar decisiones"
     }
-  ]
+  ],
+  "feedback": {
+    "partes": {
+      "integral": {
+        "sugerencia": {
+          "TRAD": "Completen las tareas pendientes del taller y revisen las preguntas de discusión con sus propios datos.",
+          "SQI": "¿Cuál de las preguntas del taller les dejó más dudas? Tráiganla a la próxima sesión con una propuesta para resolverla."
+        },
+        "reforzar": "Tareas y preguntas del taller de errores en las medidas."
+      }
+    },
+    "etiquetas": {
+      "distingue_exac_prec": {
+        "mejor": "Distinguieron exactitud de precisión con datos propios."
+      },
+      "disena_procedimiento": {
+        "mejor": "Diseñaron su propio procedimiento y justificaron sus decisiones."
+      },
+      "registra_x_dx": {
+        "mejor": "Registraron las mediciones como x ± δx, con unidades."
+      },
+      "confunde_exac_prec": {
+        "mejorar": "Confundieron exactitud con precisión.",
+        "sugerencia": {
+          "TRAD": "Exactitud es cercanía al valor de referencia; precisión, poca dispersión entre repeticiones. Identifiquen cada una en sus tiros con x̄ y s_x.",
+          "SQI": "En sus tiros, ¿qué número describe qué tan cerca están del centro y cuál qué tan agrupados están?"
+        },
+        "reforzar": "Exactitud y precisión."
+      },
+      "sin_dep_indep": {
+        "mejorar": "Aplicaron la misma regla de propagación sin distinguir medidas dependientes de independientes.",
+        "sugerencia": {
+          "TRAD": "Usen la suma lineal para medidas dependientes y la suma en cuadratura para independientes, y justifiquen cuál aplica en cada caso.",
+          "SQI": "¿Sus medidas comparten la misma fuente de error? ¿Cómo cambia eso la forma de combinar las incertidumbres?"
+        },
+        "reforzar": "Propagación para medidas dependientes e independientes."
+      },
+      "sin_referencia": {
+        "mejorar": "No compararon con el valor de referencia.",
+        "sugerencia": {
+          "TRAD": "Calculen el error absoluto y el relativo respecto al valor de referencia y digan si es aceptable.",
+          "SQI": "¿Contra qué valor compararían su resultado para saber si es aceptable? ¿Qué error relativo aceptarían y por qué?"
+        },
+        "reforzar": "Error absoluto y relativo respecto a una referencia."
+      },
+      "sigue_guia_sin_decidir": {
+        "mejorar": "Siguieron el ejemplo sugerido sin justificar sus decisiones.",
+        "sugerencia": {
+          "TRAD": "Justifiquen por escrito cada decisión del procedimiento: qué medir, cuántas veces y con qué instrumento.",
+          "SQI": "Si diseñaran el procedimiento desde cero, ¿qué decisión de la guía cambiarían y por qué?"
+        },
+        "reforzar": "Tomar y justificar decisiones experimentales."
+      }
+    }
+  }
 }

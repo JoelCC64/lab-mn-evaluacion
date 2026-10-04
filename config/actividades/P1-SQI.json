@@ -90,5 +90,42 @@
     "¿Cómo decidirías si una diferencia entre dos medidas es significativa?",
     "¿Qué harías para reducir la incertidumbre de tu medición?",
     "¿Qué es para ti la física experimental?"
-  ]
+  ],
+  "feedback": {
+    "etiquetas": {
+      "mide_ambas": {
+        "mejor": "Midieron y registraron por su cuenta las dos posiciones.",
+        "sugerencia": "¿Por qué una de las dos posiciones da una medición más confiable? ¿Qué número de sus datos lo muestra?"
+      },
+      "registro_incompleto": {
+        "sugerencia": "Si alguien leyera solo su diario, ¿sabría qué midieron, con qué unidades y en qué condiciones?",
+        "reforzar": "Registro completo en el diario, con unidades y observaciones."
+      },
+      "sin_datos_clase": {
+        "mejorar": "No registraron los datos de la clase.",
+        "sugerencia": "¿Qué muestran los datos de toda la clase que no se ve en los suyos? Regístrenlos en la Tabla 1.1 y compárenlos.",
+        "reforzar": "Usar los datos de la clase (Tabla 1.1) para comparar mediciones."
+      },
+      "justifica_eleccion": {
+        "mejor": "Justificaron con razonamiento su elección de la medición más confiable."
+      },
+      "sin_razonamiento": {
+        "mejorar": "Respondieron sin explicar su razonamiento.",
+        "sugerencia": "¿Qué evidencia de sus mediciones respalda la opción que eligieron? Escriban el razonamiento, no solo la opción.",
+        "reforzar": "Justificar con evidencia cuál medición es más confiable."
+      },
+      "participa_discusion": {
+        "mejor": "Participaron en la discusión y anotaron las ideas."
+      },
+      "no_anota_ideas": {
+        "mejorar": "No anotaron las ideas de la discusión.",
+        "sugerencia": "¿Qué idea de la discusión les pareció más discutible? Anótenla y digan si sus datos la apoyan.",
+        "reforzar": "Registrar la discusión en el diario."
+      },
+      "hace_preguntas": {
+        "mejor": "Plantearon preguntas o dudas sobre la medición.",
+        "sugerencia": "¿Qué pregunta sobre la medición les quedó abierta? ¿Cómo la pondrían a prueba en la próxima práctica?"
+      }
+    }
+  }
 }

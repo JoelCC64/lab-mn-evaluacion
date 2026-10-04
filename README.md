@@ -6,6 +6,8 @@ App web para el celular (PWA, funciona sin conexión). Sirve para evaluar en el 
 - **Demostración con datos ficticios:** la misma dirección con `?demo=1`, que usa una base aparte.
 - **En clase:** todo ocurre en el iPhone, sin conexión. Para pasar las notas al Excel: respaldo por AirDrop a la Mac y, en Chrome, «Datos › Escribir las notas en el Excel» (ver [docs/excel.md](docs/excel.md)).
 - **Respaldo del día:** «Exportar el respaldo del día» crea un solo Excel con todo (para leer y para restaurar). Súbelo a Drive cada día; la app avisa en Inicio si hay registros sin respaldar.
+- **Feedback:** pestaña «Feedback» de cada evento evaluado: texto por grupo, versión corta y resumen del curso, armados con lo registrado (ver [docs/feedback.md](docs/feedback.md)).
+- **Tu nombre** (columna PROFESOR de coordinación) es un ajuste de cada dispositivo, en «Datos › Este dispositivo»: no está en este repositorio.
 
 ## Entorno (aislado; nada se instala de forma global)
 
@@ -20,7 +22,7 @@ source .venv/bin/activate       # node, npm y python del proyecto
 
 | Comando | Qué hace |
 |---|---|
-| `npm test` | Pruebas automáticas (configuración, calendario, lectura y escritura del Excel, respaldo, motor de notas, sorteo, talleres, trabajos en casa, nota bimestral y coordinación) |
+| `npm test` | Pruebas automáticas (configuración, calendario, lectura y escritura del Excel, respaldo, motor de notas, sorteo, talleres, trabajos en casa, nota bimestral, coordinación y feedback) |
 | `npm run config` | Valida `/config` y actualiza `config/manifest.json` (después de agregar o editar una actividad) |
 | `npm run ejemplo` | Regenera los Excel ficticios de `/datos-ejemplo` |
 | `npm run vendor` | Copia a `src/vendor` las librerías para el navegador |
