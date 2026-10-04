@@ -193,6 +193,14 @@
     "¿Qué indica que h_exp caiga dentro o fuera del intervalo de incertidumbre?",
     "¿Qué error sistemático quedaría aunque repitieran la medición 1000 veces?"
   ],
+  "conceptos_control": [
+    { "id": "tipos_error", "texto": "Errores sistemáticos y aleatorios" },
+    { "id": "tiempo_reaccion", "texto": "Tiempo de reacción" },
+    { "id": "incertidumbre", "texto": "Incertidumbre del cronómetro y de h" },
+    { "id": "propagacion", "texto": "Propagación en h = g·t²/2" },
+    { "id": "comparacion", "texto": "Comparar h_exp con la h medida" },
+    { "id": "procedimiento", "texto": "Procedimiento de la guía" }
+  ],
   "feedback": {
     "etiquetas": {
       "h_mal_medida": {

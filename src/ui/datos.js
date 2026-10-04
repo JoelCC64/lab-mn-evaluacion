@@ -9,6 +9,7 @@ import { conteoTablas } from '../datos/consultas.js';
 import { guardarLocal } from '../datos/local.js';
 import { ACEPTA_EXCEL, abrirLibro, elegirArchivo } from './archivos.js';
 import { AjusteProfesor } from './dispositivo.js';
+import { simularClases } from '../datos/simulacion.js';
 import { VERSION_APP } from '../version.js';
 
 const ARCHIVO_DEMO = 'datos-ejemplo/Cursos_Lab_MN_2026B_EJEMPLO.xlsx';
@@ -54,6 +55,11 @@ export function Datos() {
   const exportar = () => conOcupado('Preparando el respaldo…', async () => {
     const { resultado, nombre } = await exportarRespaldoDelDia({ cfg, db, demo });
     if (resultado !== 'cancelado') avisar(resultado === 'compartido' ? 'Respaldo compartido.' : `Respaldo guardado: ${nombre}`, 'ok');
+  });
+
+  const simular = (hastaSemana) => conOcupado('Simulando clases…', async () => {
+    const r = await simularClases(db, cfg, { hastaSemana });
+    avisar(r.eventos ? `Listo: ${r.eventos} eventos ficticios en ${r.cursos} cursos.` : 'No quedaban eventos sin registrar hasta esa semana.', 'ok');
   });
 
   const elegirRespaldo = () => conOcupado('Leyendo el respaldo…', async () => {
@@ -102,6 +108,19 @@ export function Datos() {
         <button class="boton ancho" disabled=${!!ocupado} onClick=${elegirRespaldo}>Restaurar un respaldo…</button>
         <p class="tenue pequeno">Para recuperar todo en otro dispositivo, abre la app ahí y restaura el último respaldo (Excel, o JSON de versiones anteriores).</p>
       </div>
+
+      ${demo && html`
+        <div class="tarjeta">
+          <h2>Clases ficticias <span class="tenue pequeno">(solo en la demostración)</span></h2>
+          <p class="tenue pequeno">
+            Simula asistencia, preparatorio, control oral, rúbricas, etiquetas y TC en todos los cursos, para probar las métricas.
+            Usa el Excel ficticio (cárgalo antes) y no toca lo que ya registraste a mano en la demostración.
+          </p>
+          <div class="botones">
+            ${[[5, 'Hasta la semana 5'], [9, '1.er bimestre'], [cfg.semestre.semanas, 'Todo el semestre']].map(([s, t]) => html`
+              <button class="boton chico" disabled=${!!ocupado || !conteo?.estudiantes} onClick=${() => simular(s)}>${t}</button>`)}
+          </div>
+        </div>`}
 
       <div class="tarjeta">
         <h2>Este dispositivo</h2>

@@ -22,7 +22,9 @@ export function Inicio() {
   const deHoy = cfg.cursos.filter((c) => c.dia === diaHoy);
   const otros = cfg.cursos.filter((c) => c.dia !== diaHoy);
 
-  const acciones = html`<a class="icono-boton texto-boton" href=${enlace('datos')}>Datos</a>`;
+  const acciones = html`
+    <a class="icono-boton texto-boton" href=${enlace('metricas')}>Métricas</a>
+    <a class="icono-boton texto-boton" href=${enlace('datos')}>Datos</a>`;
   return html`
     <${Pantalla} titulo="Lab. MN · ${cfg.semestre.semestre}" subtitulo="Evaluación y calificaciones" acciones=${acciones}>
       ${sinDatos && html`

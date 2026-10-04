@@ -14,7 +14,8 @@ Plan: [PROYECTO_LABORATORIOS_v4.md](PROYECTO_LABORATORIOS_v4.md). Al empezar una
 | 5. Trabajos en casa (SQI) | ✅ Completa | 3-oct-2026 |
 | 6. Nota bimestral, excepciones y coordinación | ✅ Completa | 4-oct-2026 |
 | 7. Feedback | ✅ Completa | 4-oct-2026 |
-| 8–9 | — | |
+| 8. Métricas | ✅ Completa | 4-oct-2026 |
+| 9 | — | |
 
 ## Fase 0 (3-oct-2026)
 
@@ -223,6 +224,66 @@ Detalle en [docs/excel.md](docs/excel.md).
 **Decisiones de implementación**
 - **La nota del grupo de un taller se muestra como nivel** («1/2»), no sobre 10: es la mitad grupal de la nota.
 - **El trabajo firmado y la penalización total salen de la configuración** de cada actividad (`cierre`, `penalizacion_total`). Los talleres no tienen penalización total.
+
+## Fase 8 (4-oct-2026) · métricas · versión 0.10.0
+
+Detalle en [docs/metricas.md](docs/metricas.md).
+
+**Hecho**
+- **Tablero** («Inicio › Métricas» y «Métricas del curso»):
+  - Alcance: todos los cursos, una metodología o un curso.
+  - Periodo: 1.er bimestre, 2.º bimestre o semestre.
+  - Dos vistas: **Para presentar** (agregada, sin nombres) y **Profesor** (con quién falta, quién está en riesgo y los grupos por revisar).
+- **Métricas** (`src/nucleo/metricas.js`, funciones puras sobre lo registrado):
+  - Asistencia y permanencia por curso, grupo, sesión, día, franja y estudiante.
+  - Distribución por criterio o aspecto en cada práctica, y de la evaluación integral en los talleres.
+  - Etiquetas más marcadas.
+  - TC: entregas y promedio por pregunta, de menor a mayor.
+  - Control oral: cobertura por curso; respuestas 0/1/2 y aprobados; resultados por concepto.
+  - Preparatorio por sesión (Clásica).
+  - Evolución entre eventos, por metodología.
+  - Feriados: sesiones perdidas, recuperaciones y sesiones que quedan para el control oral.
+  - Comparación entre cursos.
+  - Comparación entre metodologías: solo notas normalizadas de prácticas y talleres, nunca la nota total.
+  - Estudiantes y grupos en riesgo.
+- **Advertencias obligatorias** (`config/metricas.json`):
+  - Muestras pequeñas.
+  - Franjas de una sola metodología. Se calcula con los cursos: «la franja 07:00–09:00 solo tiene cursos SQI; las demás, solo Clásica».
+  - Metodologías: descripción, no comparación causal.
+- **Control oral por concepto:**
+  - Cada práctica o taller puede listar `conceptos_control`. En la pantalla del control, cada pregunta tiene un selector opcional del concepto.
+  - Se guarda en `controles.conceptos`; no hace falta cambiar la base.
+  - Conceptos escritos para P1 (Clásica y SQI) y T1.
+- **Gráficos SVG propios** (`src/nucleo/graficos.js`, sin librerías): barras, distribuciones, evolución y tablas.
+  - En la pantalla se dibujan al ancho real (teléfono o Mac) y siguen el tema claro u oscuro.
+  - En el navegador, el texto se mide con un lienzo para que nada se salga.
+- **Exportar para presentar** (`src/nucleo/tablero.js`):
+  - La lámina lleva las mismas secciones de la vista para presentar, con las advertencias y sin nombres.
+  - **Imagen PNG** de una sola pieza.
+  - **PDF** A4, con una imagen por página y sin cortar secciones. El escritor de PDF es propio, de unas 60 líneas (`src/nucleo/pdf.js`).
+  - En el iPhone el archivo se prepara y se comparte con un toque; en la Mac se descarga.
+- **Clases ficticias** en la demostración (Datos): simula hasta la semana 5, el 1.er bimestre o el semestre en todos los cursos.
+  - Usa una semilla fija.
+  - No toca lo registrado a mano y se niega a trabajar en la base real.
+- **Pruebas** (133 en total, 10 nuevas):
+  - Listo cuando: tablero con datos ficticios de varios eventos y lámina en páginas y continua, con las advertencias y **sin ningún nombre ni código**. PDF con estructura y desplazamientos válidos.
+  - Simulador: solo demostración, no pisa lo registrado y es reproducible.
+  - Asistencia, rúbricas (con penalización y escalas SQI distintas), control por concepto (y quitar una pregunta), preparatorio, TC, feriados y riesgo, contra cálculos a mano.
+  - Advertencia de franjas calculada, recortes de texto y configuración.
+
+**Verificado en el navegador** (demostración con el 1.er bimestre simulado; 375 px, 1100 px y modo oscuro):
+- Tablero de todos los cursos y de GR7SA (asistencia por grupo).
+- Vista del profesor.
+- Concepto del control: elegir y quitar una pregunta.
+- PNG de 1252 × 12779 px (2,3 MB) y PDF de 10 páginas (3,4 MB), generados en menos de 0,3 s cada uno.
+- Sin errores en la consola.
+
+**Decisiones de implementación**
+- **Asistencia** = vinieron (presentes y quienes se retiraron antes) / registrados. **Permanencia** = se quedaron / vinieron. Solo cuentan los pases cerrados y los estudiantes activos.
+- **Notas que se comparan:** la nota de grupo normalizada (prácticas y talleres) y la de cada unidad del TC. Así la asistencia no se mezcla con el desempeño, porque se muestra aparte.
+- **Riesgo por rendimiento:** menos del 60 % de lo posible en lo evaluado, y solo desde 2 actividades con nota. Con una sola, una falta deja el componente en 0 y la proyección exagera. Los umbrales son valores por defecto, para revisar con Joel.
+- **Talleres separados por metodología** en la distribución y en la evolución, para no mezclar Clásica y SQI.
+- **La lámina se exporta solo desde la vista para presentar.** La vista del profesor no se exporta.
 
 ## Fase 7 (4-oct-2026) · feedback · versión 0.9.0
 
@@ -434,5 +495,6 @@ Pedido de Joel: un solo archivo por día con todo (notas, asistencia, etc.) para
   - Las primeras que hacen falta:
     - P2 (Clásica y SQI): cronograma A, semana 5, desde el 26-oct.
     - T2: cronograma B, semana 5; cronograma A, semana 6.
-- Plantillas de feedback de TC2–TC7, con sus etiquetas, cuando lleguen sus hojas; las de P2, T2, … con cada guía (ver `docs/feedback.md`).
-- Fase 8: métricas. Solo cuando Joel la pida.
+- Plantillas de feedback de TC2–TC7, con sus etiquetas, cuando lleguen sus hojas; las de P2, T2, … con cada guía (ver `docs/feedback.md`), y sus `conceptos_control` (ver `docs/metricas.md`).
+- Revisar con Joel los umbrales de riesgo (`config/metricas.json`) y los conceptos del control de P1 y T1.
+- Fase 9: respaldo completo y varios dispositivos. Solo cuando Joel la pida.

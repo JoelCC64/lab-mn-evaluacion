@@ -33,7 +33,7 @@ Claves entre corchetes: compuestas. Todas las tablas de registro llevan `fecha` 
 | `puntajes` | `[evento+grupo+aspecto]` | `valor` | Un puntaje por grupo, evento y aspecto o criterio (formato largo) | `group_scores` |
 | `etiquetas` | `[evento+grupo+etiqueta]` | | Etiquetas rápidas marcadas a un grupo | `tags_applied` |
 | `notas` | `[evento+unidad+unidad_id]` | `unidad` (`grupo` · `estudiante`), `texto` | Nota del profesor, escrita o dictada | `notes` |
-| `controles` | `[evento+estudiante]` | `estado` (`sorteado` · `respondio` · `no_esta` · `salio`), `puntajes` (lista 0/1/2, Clásica), `aprobado` (SQI), `orden`, `manual` | Control oral | `oral_control` |
+| `controles` | `[evento+estudiante]` | `estado` (`sorteado` · `respondio` · `no_esta` · `salio`), `puntajes` (lista 0/1/2, Clásica), `aprobado` (SQI), `conceptos` (opcional, desde la Fase 8: ids de `conceptos_control` de la actividad, alineados con `puntajes`; en SQI, uno), `orden`, `manual` | Control oral | `oral_control` |
 | `revision_preparatorio` | `evento` | `revisada` | «Revisión hecha: todos cumplieron» | `prep_review` |
 | `novedades_preparatorio` | `[evento+estudiante]` | `nivel` (1 incompleto · 0 no lo hizo · `null` en SQI), `no_ingresa`, `observacion` | Solo las excepciones de la revisión en la puerta | `prep_novedades` |
 | `ajustes` | `[evento+estudiante]` | `valor` (0–1), `motivo` (obligatorio) | Ajuste individual explícito de la nota del evento | `overrides` |

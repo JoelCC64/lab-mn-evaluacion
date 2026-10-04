@@ -40,6 +40,11 @@ export function Curso({ paralelo }) {
           <div class="tenue pequeno">Semana ${sugerido.semana} · ${sugerido.lugar === 'lab' ? 'laboratorio' : 'aula'} · ${textoBimestre(sugerido.bimestre)}</div>
         </a>`}
       ${activos.length > 0 && html`<${TarjetaNotas} ctx=${ctx} paralelo=${paralelo} enCurso=${enCurso} hoy=${hoy} />`}
+      ${activos.length > 0 && html`
+        <a class="tarjeta" href=${enlace('metricas', paralelo)}>
+          <div class="separado"><h2>Métricas del curso</h2><span class="flecha">›</span></div>
+          <div class="tenue pequeno">Asistencia, rúbricas, control oral y evolución entre eventos; para presentar o en detalle.</div>
+        </a>`}
       ${porBimestre.map(({ b, eventos: lista }) => html`
         <div class="seccion-titulo">${textoBimestre(b)}</div>
         <div class="lista">${lista.map((e) => html`<${FilaEvento} evento=${e} ctx=${ctx} />`)}</div>`)}

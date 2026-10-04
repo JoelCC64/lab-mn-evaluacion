@@ -3,7 +3,7 @@ import { useState } from '../vendor/preact-htm.js';
 import { html, useApp, Chip, Hoja, Persona, Aviso } from './base.js';
 import { BuscarEstudiante } from './buscar.js';
 import {
-  agregarAlControl, aprobarControl, marcarNoEsta, marcarSalio, puntuarPregunta, quitarDelControl, volverASorteado,
+  agregarAlControl, aprobarControl, elegirConcepto, marcarNoEsta, marcarSalio, puntuarPregunta, quitarDelControl, volverASorteado,
 } from '../datos/acciones.js';
 import { candidatosSorteo, coberturaControl, sortear } from '../nucleo/sorteo.js';
 import { notaControl } from '../nucleo/motor.js';
@@ -87,6 +87,7 @@ function TarjetaControl({ fila, estudiante, evento, ctx, califica, sinControlAnt
   const motivo = co.salio.motivo_falta;
   const escala = co.escala_pregunta;
   const puntajes = fila.puntajes ?? [];
+  const conceptos = (evento.config && cfg.actividades[evento.config]?.conceptos_control) || [];
 
   if (fila.estado === 'no_esta' || fila.estado === 'salio') {
     return html`
@@ -116,17 +117,32 @@ function TarjetaControl({ fila, estudiante, evento, ctx, califica, sinControlAnt
               onClick=${() => puntuarPregunta(db, evento.id, estudiante.id, i, v)}>${v}</button>`)}
           </div>
           ${p !== null ? html`<button class="quitar" aria-label="Quitar pregunta" onClick=${() => puntuarPregunta(db, evento.id, estudiante.id, i, null)}>×</button>` : html`<span style="width:32px"></span>`}
-        </div>`)}
+        </div>
+        <${Concepto} conceptos=${conceptos} valor=${fila.conceptos?.[i]} numero=${i + 1}
+          alElegir=${(c) => elegirConcepto(db, evento.id, estudiante.id, i, c)} />`)}
       ${califica && html`<p class="tenue pequeno">2 = correcto y justificado · 1 = parcial o con ayuda · 0 = incorrecto o no responde</p>`}
       ${!califica && html`
         <div class="segmentado">
           <button class=${fila.aprobado === true ? 'elegido ok' : ''} onClick=${() => aprobarControl(db, evento.id, estudiante.id, fila.aprobado === true ? null : true)}>Aprobado</button>
           <button class=${fila.aprobado === false ? 'elegido mal' : ''} onClick=${() => aprobarControl(db, evento.id, estudiante.id, fila.aprobado === false ? null : false)}>No aprobado</button>
-        </div>`}
+        </div>
+        <${Concepto} conceptos=${conceptos} valor=${fila.conceptos?.[0]} alElegir=${(c) => elegirConcepto(db, evento.id, estudiante.id, 0, c)} />`}
       <div class="botones">
         <button class="boton chico" onClick=${alNoEsta}>No está</button>
         <button class="boton chico peligro" onClick=${alSalio}>Salió</button>
         <button class="boton chico" onClick=${() => quitarDelControl(db, evento.id, estudiante.id, motivo)}>Quitar</button>
       </div>
     </div>`;
+}
+
+/** Concepto de la pregunta (opcional): sirve para ver en las métricas en qué conceptos fallan. */
+function Concepto({ conceptos, valor, numero, alElegir }) {
+  if (!conceptos.length) return null;
+  return html`
+    <select class=${`concepto-control ${valor ? 'elegido' : ''} ${numero ? 'con-numero' : ''}`} value=${valor ?? ''}
+      aria-label=${numero ? `Concepto de la pregunta ${numero}` : 'Concepto del control'}
+      onChange=${(e) => alElegir(e.currentTarget.value || null)}>
+      <option value="">${numero ? `Concepto de P${numero} (opcional)…` : 'Concepto (opcional)…'}</option>
+      ${conceptos.map((c) => html`<option value=${c.id}>${c.texto}</option>`)}
+    </select>`;
 }

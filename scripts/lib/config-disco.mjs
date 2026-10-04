@@ -45,6 +45,7 @@ export function construirManifiesto(raiz = DIR_CONFIG) {
     asistencia: 'asistencia.json',
     excel: 'excel.json',
     feedback: 'feedback.json',
+    metricas: 'metricas.json',
   };
   const h = createHash('sha256');
   for (const ruta of archivosDelManifiesto(m)) {
@@ -58,7 +59,7 @@ export function construirManifiesto(raiz = DIR_CONFIG) {
 export function archivosDelManifiesto(m) {
   return [m.semestre, m.cursos, m.catalogo, ...m.cronogramas, ...m.esquemas, ...m.actividades,
     m.sqi_aspectos, m.sqi_aspectos_por_practica, m.control_oral, m.trabajo_preparatorio,
-    m.planificacion_conocimiento, m.asistencia, m.excel, m.feedback];
+    m.planificacion_conocimiento, m.asistencia, m.excel, m.feedback, m.metricas];
 }
 
 /** Esquema JSON que valida cada archivo del manifiesto. */
@@ -78,6 +79,7 @@ export function esquemaParaArchivo(ruta, m) {
     [m.asistencia]: 'asistencia.schema.json',
     [m.excel]: 'excel.schema.json',
     [m.feedback]: 'feedback.schema.json',
+    [m.metricas]: 'metricas.schema.json',
   }[ruta];
 }
 
@@ -116,6 +118,7 @@ export function leerConfigDisco(raiz = DIR_CONFIG) {
       asistencia: leer(m.asistencia),
       excel: leer(m.excel),
       feedback: leer(m.feedback),
+      metricas: leer(m.metricas),
     }),
   };
 }
@@ -273,6 +276,12 @@ export function validarSemantica(cfg) {
   }
   for (const k of Object.keys(cfg.feedback.partes.SQI)) {
     if (k !== 'integral' && !cfg.sqi.aspectos[k]) err.push(`feedback: ${k} no es un aspecto SQI`);
+  }
+
+  // Conceptos del control oral (Fase 8): ids únicos en cada actividad.
+  for (const a of Object.values(cfg.actividades)) {
+    const ids = (a.conceptos_control ?? []).map((c) => c.id);
+    if (new Set(ids).size !== ids.length) err.push(`actividad ${a.id}: conceptos del control repetidos`);
   }
 
   // Control oral, preparatorio y Planificación y conocimiento

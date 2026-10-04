@@ -1,0 +1,18 @@
+{
+  "id": "metricas",
+  "fuente": "Plan v4, Fase 8. Los umbrales de riesgo son valores por defecto: se cambian aquí.",
+  "riesgo": {
+    "faltas": 2,
+    "rendimiento_bajo": 0.6,
+    "rendimiento_minimo_actividades": 2,
+    "grupo_bajo": 0.6,
+    "grupo_minimo_actividades": 2
+  },
+  "etiquetas_maximo": 6,
+  "advertencias": {
+    "muestras": "Muestras pequeñas: unos {n} estudiantes por curso, en grupos de 3 o 4. Una diferencia de pocos puntos entre cursos, días, franjas o grupos puede deberse al azar.",
+    "franjas": "{detalle}. Una diferencia entre franjas puede deberse a la metodología, no al horario.",
+    "metodologias": "Clásica y SQI tienen rúbricas, grupos, horarios y condiciones distintos: esto describe lo registrado, no es una comparación causal. Solo se comparan notas normalizadas (0–100 %) de prácticas y talleres, nunca la nota total.",
+    "presentar": "Vista para presentar: solo datos agregados, sin nombres ni códigos de estudiantes."
+  }
+}

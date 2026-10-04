@@ -158,14 +158,29 @@ async function cambiarControl(db, evento, estudiante, f, ahora) {
   });
 }
 
-/** Puntaje de la pregunta `indice` (Clásica, 0/1/2). Con null se quita esa pregunta. */
+/** Puntaje de la pregunta `indice` (Clásica, 0/1/2). Con null se quita esa pregunta (y su concepto). */
 export async function puntuarPregunta(db, evento, estudiante, indice, puntaje, ahora = ahoraISO()) {
   await cambiarControl(db, evento, estudiante, (c) => {
     const p = [...(c.puntajes ?? [])];
-    if (puntaje === null || puntaje === undefined) p.splice(indice, 1);
-    else p[indice] = puntaje;
+    const k = [...(c.conceptos ?? [])];
+    if (puntaje === null || puntaje === undefined) { p.splice(indice, 1); k.splice(indice, 1); } else p[indice] = puntaje;
     const limpios = p.filter((x) => x !== null && x !== undefined);
-    return { puntajes: limpios, estado: limpios.length ? 'respondio' : 'sorteado' };
+    return { puntajes: limpios, conceptos: sinNulosAlFinal(k), estado: limpios.length ? 'respondio' : 'sorteado' };
+  }, ahora);
+}
+
+const sinNulosAlFinal = (xs) => { const k = [...xs]; while (k.length && (k.at(-1) ?? null) === null) k.pop(); return k; };
+
+/**
+ * Concepto de la pregunta `indice` del control (opcional; un id de `conceptos_control` de la actividad), para ver
+ * los resultados por concepto en las métricas. En SQI hay una sola respuesta: `indice` 0. Con null se quita.
+ */
+export async function elegirConcepto(db, evento, estudiante, indice, concepto, ahora = ahoraISO()) {
+  await cambiarControl(db, evento, estudiante, (c) => {
+    const k = [...(c.conceptos ?? [])];
+    while (k.length <= indice) k.push(null);
+    k[indice] = concepto || null;
+    return { conceptos: sinNulosAlFinal(k) };
   }, ahora);
 }
 

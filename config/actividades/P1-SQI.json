@@ -91,6 +91,13 @@
     "¿Qué harías para reducir la incertidumbre de tu medición?",
     "¿Qué es para ti la física experimental?"
   ],
+  "conceptos_control": [
+    { "id": "confiabilidad", "texto": "Confiabilidad de una medición" },
+    { "id": "incertidumbre", "texto": "Incertidumbre de las mediciones" },
+    { "id": "comparar", "texto": "Comparar dos medidas" },
+    { "id": "fisica_experimental", "texto": "Qué es la física experimental" },
+    { "id": "procedimiento", "texto": "Procedimiento de la guía" }
+  ],
   "feedback": {
     "etiquetas": {
       "mide_ambas": {

@@ -8,6 +8,7 @@ import { Grupo } from './grupo.js';
 import { TrabajoCasa } from './trabajos.js';
 import { Notas } from './notas.js';
 import { RevisionNotas } from './revision.js';
+import { Metricas } from './metricas.js';
 import { Datos } from './datos.js';
 import { Excel } from './excel.js';
 import { escucharVersionNueva } from './pwa.js';
@@ -43,6 +44,7 @@ function Rutas() {
   const [pantalla, a, b, c] = useRuta();
   if (pantalla === 'datos') return html`<${Datos} />`;
   if (pantalla === 'excel') return html`<${Excel} />`;
+  if (pantalla === 'metricas') return html`<${Metricas} alcance=${a} />`;
   if (pantalla === 'curso' && a && b === 'notas') return html`<${Notas} paralelo=${a} />`;
   if (pantalla === 'curso' && a && b === 'revision') return html`<${RevisionNotas} paralelo=${a} />`;
   if (pantalla === 'curso' && a) return html`<${Curso} paralelo=${a} />`;

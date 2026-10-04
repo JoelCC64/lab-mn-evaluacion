@@ -320,6 +320,12 @@ textarea.entrada { min-height: 84px; resize: vertical; }
 .pregunta .num { width: 28px; color: var(--tenue); font-weight: 700; font-size: 14px; }
 .pregunta .niveles { flex: 1; }
 .pregunta .quitar { border: 0; background: none; color: var(--tenue); font-size: 20px; width: 32px; cursor: pointer; }
+.concepto-control {
+  align-self: stretch; min-height: 36px; padding: 6px 10px; margin-top: -4px;
+  border: 1px dashed var(--borde); border-radius: 10px; background: transparent; color: var(--tenue); font-size: 13.5px;
+}
+.concepto-control.con-numero { margin-left: 36px; }
+.concepto-control.elegido { border-style: solid; color: var(--texto); background: var(--superficie-2); }
 
 .resultados { display: flex; flex-direction: column; }
 .resultado { display: flex; align-items: center; gap: 10px; min-height: 54px; padding: 8px 14px; border-top: 1px solid var(--borde); background: none; border-left: 0; border-right: 0; border-bottom: 0; width: 100%; text-align: left; cursor: pointer; }
@@ -405,6 +411,23 @@ textarea.entrada.texto-profesor { min-height: 220px; font-size: 14px; line-heigh
 textarea.entrada.texto-feedback { min-height: 120px; font-size: 14px; line-height: 1.45; white-space: pre-wrap; overflow: hidden; resize: none; }
 .texto-corto, .texto-resumen { margin: 4px 0 0; white-space: pre-wrap; font-size: 14.5px; line-height: 1.45; }
 .tarjeta.atenuado { opacity: .6; }
+/* ---------- Métricas (Fase 8) ---------- */
+/* Colores de los gráficos SVG (src/nucleo/graficos.js); sin esta hoja (imagen exportada) quedan los claros. */
+.grafico {
+  --g-texto: var(--texto); --g-tenue: var(--tenue); --g-borde: var(--borde); --g-fondo: var(--superficie);
+  --g-caja: var(--superficie-2); --g-pista: #EDF1F6; --g-azul: var(--azul-2); --g-ok: var(--ok); --g-mal: var(--mal);
+  --g-aviso: var(--aviso); --g-avisoFondo: var(--aviso-suave); --g-sqi: var(--sqi); --g-trad: var(--trad);
+  width: 100%; overflow: hidden;
+}
+.grafico svg { display: block; max-width: 100%; height: auto; }
+@media (prefers-color-scheme: dark) {
+  .grafico { --g-pista: #243142; --g-azul: #5B8BD0; }
+}
+.solo-profesor { border-top: 1px dashed var(--aviso); padding-top: 10px; display: flex; flex-direction: column; gap: 8px; }
+.lista-riesgo { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
+.lista-riesgo li { display: flex; flex-direction: column; gap: 4px; }
+.lista-riesgo .fila-flex { gap: 4px; }
+
 @media (max-width: 420px) {
   /* Con 5 o 6 pestañas: cada una con su ancho natural; si no caben, la barra se desliza. */
   .pestanas { gap: 2px; padding: 6px; }

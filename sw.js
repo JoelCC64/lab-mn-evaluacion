@@ -2,7 +2,7 @@
 // Guarda todos los archivos de la app para que funcione sin conexión.
 // En localhost usa primero la red (desarrollo); publicada, usa primero lo guardado (rápido y sin conexión).
 
-const VERSION = '0.9.0-a9f451ef15';
+const VERSION = '0.10.0-bf2c5109e9';
 const CACHE = `lab-mn-${VERSION}`;
 const ARCHIVOS = [
   "./",
@@ -19,6 +19,7 @@ const ARCHIVOS = [
   "src/datos/importar.js",
   "src/datos/local.js",
   "src/datos/respaldo.js",
+  "src/datos/simulacion.js",
   "src/db.js",
   "src/estilos.css",
   "src/nucleo/bimestre.js",
@@ -28,14 +29,18 @@ const ARCHIVOS = [
   "src/nucleo/excel-escritura.js",
   "src/nucleo/excel-lectura.js",
   "src/nucleo/feedback.js",
+  "src/nucleo/graficos.js",
   "src/nucleo/grupos.js",
+  "src/nucleo/metricas.js",
   "src/nucleo/motor-vista.js",
   "src/nucleo/motor.js",
+  "src/nucleo/pdf.js",
   "src/nucleo/respaldo-libro.js",
   "src/nucleo/resultados.js",
   "src/nucleo/retro.js",
   "src/nucleo/sorteo.js",
   "src/nucleo/tablas.js",
+  "src/nucleo/tablero.js",
   "src/nucleo/util.js",
   "src/nucleo/visitantes.js",
   "src/nucleo/zip.js",
@@ -50,10 +55,12 @@ const ARCHIVOS = [
   "src/ui/dispositivo.js",
   "src/ui/evento.js",
   "src/ui/excel.js",
+  "src/ui/exportar-lamina.js",
   "src/ui/feedback.js",
   "src/ui/grupo.js",
   "src/ui/grupos.js",
   "src/ui/inicio.js",
+  "src/ui/metricas.js",
   "src/ui/notas.js",
   "src/ui/plic.js",
   "src/ui/puerta.js",
@@ -97,6 +104,7 @@ const ARCHIVOS = [
   "config/excel.json",
   "config/feedback.json",
   "config/manifest.json",
+  "config/metricas.json",
   "config/planificacion-conocimiento.json",
   "config/semestre-2026B.json",
   "config/sqi/aspectos-por-practica.json",

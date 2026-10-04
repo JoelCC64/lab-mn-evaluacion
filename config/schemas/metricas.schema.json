@@ -1,0 +1,36 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "metricas.schema.json",
+  "title": "Métricas (Fase 8): umbrales de riesgo y advertencias obligatorias",
+  "type": "object",
+  "required": ["id", "riesgo", "etiquetas_maximo", "advertencias"],
+  "additionalProperties": false,
+  "properties": {
+    "id": { "const": "metricas" },
+    "fuente": { "type": "string" },
+    "riesgo": {
+      "type": "object",
+      "required": ["faltas", "rendimiento_bajo", "rendimiento_minimo_actividades", "grupo_bajo", "grupo_minimo_actividades"],
+      "additionalProperties": false,
+      "properties": {
+        "faltas": { "type": "integer", "minimum": 1 },
+        "rendimiento_bajo": { "type": "number", "exclusiveMinimum": 0, "exclusiveMaximum": 1 },
+        "rendimiento_minimo_actividades": { "type": "integer", "minimum": 1 },
+        "grupo_bajo": { "type": "number", "exclusiveMinimum": 0, "exclusiveMaximum": 1 },
+        "grupo_minimo_actividades": { "type": "integer", "minimum": 1 }
+      }
+    },
+    "etiquetas_maximo": { "type": "integer", "minimum": 1, "maximum": 20 },
+    "advertencias": {
+      "type": "object",
+      "required": ["muestras", "franjas", "metodologias", "presentar"],
+      "additionalProperties": false,
+      "properties": {
+        "muestras": { "type": "string", "pattern": "\\{n\\}" },
+        "franjas": { "type": "string", "pattern": "\\{detalle\\}" },
+        "metodologias": { "type": "string", "minLength": 1 },
+        "presentar": { "type": "string", "minLength": 1 }
+      }
+    }
+  }
+}

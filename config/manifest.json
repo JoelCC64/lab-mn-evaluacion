@@ -1,6 +1,6 @@
 {
   "aviso": "Generado por «npm run config». No editar a mano.",
-  "version": "4dda927ad073",
+  "version": "2952f5d150a2",
   "semestre": "semestre-2026B.json",
   "cursos": "cursos-2026B.json",
   "catalogo": "actividades-catalogo.json",
@@ -35,5 +35,6 @@
   "planificacion_conocimiento": "planificacion-conocimiento.json",
   "asistencia": "asistencia.json",
   "excel": "excel.json",
-  "feedback": "feedback.json"
+  "feedback": "feedback.json",
+  "metricas": "metricas.json"
 }

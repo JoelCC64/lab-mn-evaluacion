@@ -74,6 +74,13 @@
     "Si midieran el pasillo con 10 tramos en vez de 5, ¿cómo cambiaría la incertidumbre total?",
     "¿Qué error relativo consideran aceptable para este experimento y por qué?"
   ],
+  "conceptos_control": [
+    { "id": "exactitud_precision", "texto": "Exactitud y precisión" },
+    { "id": "sistematicos_aleatorios", "texto": "Errores sistemáticos y aleatorios" },
+    { "id": "dependientes", "texto": "Medidas dependientes (suma lineal)" },
+    { "id": "independientes", "texto": "Medidas independientes (cuadratura)" },
+    { "id": "absoluto_relativo", "texto": "Error absoluto y relativo" }
+  ],
   "etiquetas": [
     {
       "id": "distingue_exac_prec",

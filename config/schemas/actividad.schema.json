@@ -18,7 +18,15 @@
     "bimestre": { "enum": [1, 2] },
     "etiquetas": { "type": "array", "items": { "$ref": "comun.schema.json#/$defs/etiqueta" } },
     "preguntas_discusion": { "type": "array", "items": { "$ref": "comun.schema.json#/$defs/texto" } },
-    "feedback": { "$ref": "comun.schema.json#/$defs/feedback_actividad" }
+    "feedback": { "$ref": "comun.schema.json#/$defs/feedback_actividad" },
+    "conceptos_control": {
+      "description": "Conceptos del control oral (Fase 8): opcionales, para ver los resultados por concepto",
+      "type": "array", "minItems": 1,
+      "items": {
+        "type": "object", "required": ["id", "texto"], "additionalProperties": false,
+        "properties": { "id": { "$ref": "comun.schema.json#/$defs/id" }, "texto": { "$ref": "comun.schema.json#/$defs/texto" } }
+      }
+    }
   },
   "allOf": [
     {
@@ -28,7 +36,7 @@
         "additionalProperties": false,
         "properties": {
           "id": true, "codigo": true, "fuente": true, "tipo": true, "metodologia": true, "bimestre": true,
-          "etiquetas": true, "preguntas_discusion": true, "feedback": true,
+          "etiquetas": true, "preguntas_discusion": true, "feedback": true, "conceptos_control": true,
           "componente": { "const": "diseno_datos_analisis" },
           "unidad_calificacion": { "const": "grupo" },
           "individual": { "type": "array", "items": { "enum": ["trabajo_preparatorio", "control_oral"] } },
@@ -62,7 +70,7 @@
         "additionalProperties": false,
         "properties": {
           "id": true, "codigo": true, "fuente": true, "tipo": true, "metodologia": true, "bimestre": true,
-          "etiquetas": true, "preguntas_discusion": true, "feedback": true,
+          "etiquetas": true, "preguntas_discusion": true, "feedback": true, "conceptos_control": true,
           "unidad_calificacion": { "const": "grupo" },
           "aspectos_aplicables": { "type": "array", "minItems": 1, "uniqueItems": true, "items": { "$ref": "comun.schema.json#/$defs/id" } },
           "individual": { "type": "array", "items": { "enum": ["control_oral_sin_nota"] } },
@@ -83,7 +91,7 @@
         "additionalProperties": false,
         "properties": {
           "id": true, "codigo": true, "fuente": true, "tipo": true, "metodologia": true, "bimestre": true,
-          "etiquetas": true, "preguntas_discusion": true, "feedback": true,
+          "etiquetas": true, "preguntas_discusion": true, "feedback": true, "conceptos_control": true,
           "pesos": {
             "type": "object", "required": ["asistencia_permanencia", "evaluacion_integral"], "additionalProperties": false,
             "properties": { "asistencia_permanencia": { "$ref": "comun.schema.json#/$defs/peso" }, "evaluacion_integral": { "$ref": "comun.schema.json#/$defs/peso" } }
