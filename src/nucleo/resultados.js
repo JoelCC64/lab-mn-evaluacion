@@ -10,7 +10,8 @@ import { controlCalifica, esquemaDe } from './config.js';
 import { TIPOS_SESION } from './calendario.js';
 import { gruposDelEvento } from './grupos.js';
 import {
-  asistenciaDe, crearContexto, gruposDe, notaBimestre, notaControl, notaEvento, notaGrupo, notaPreparatorio,
+  asistenciaDe, crearContexto, gruposDe, notaBimestre, notaControl, notaEvento, notaGrupo, notaPreparatorio, notaTrabajo,
+  unidadTrabajo,
 } from './motor.js';
 
 /** Valor de una celda de un evento que no se hizo en el curso (feriado o sin clase). */
@@ -246,9 +247,16 @@ export function filaDetalle(ctx, evento, estudiante) {
     etiquetas = (config?.etiquetas ?? []).filter((t) => marcadas.has(t.id)).map((t) => `${t.signo === '+' ? '+' : '−'} ${t.texto}`).join(' · ') || null;
     notaProfesor = ctx.reg.notas.find((x) => x.evento === evento.id && x.unidad === 'grupo' && x.unidad_id === grupo)?.texto ?? null;
   }
-  if (evento.tipo === 'trabajo_casa' && grupo !== null) {
-    const tc = ctx.trabajosCasa.get(`${evento.id}|${grupo}`);
-    if (tc) puntajes = tc.entregado ? Object.entries(tc.puntajes ?? {}).map(([k, v]) => `${k} ${v}`).join(' · ') || null : 'no entregó';
+  if (evento.tipo === 'trabajo_casa' && config?.preguntas) {
+    const porGrupo = unidadTrabajo(config) === 'grupo';
+    const t = porGrupo && grupo === null ? null : notaTrabajo(ctx, evento, porGrupo ? grupo : id);
+    if (t?.registrado) {
+      puntajes = t.entregado ? t.partes.filter((p) => p.valor !== null).map((p) => `${p.id} ${p.valor}`).join(' · ') || null : 'no entregó';
+      if (porGrupo && t.completo) notaDelGrupo = sobreDiez(t.valor);
+      etiquetas = (config.etiquetas ?? []).filter((x) => t.etiquetas.includes(x.id))
+        .map((x) => `${x.signo === '+' ? '+' : '−'} ${x.texto} (${x.pregunta})`).join(' · ') || null;
+    }
+    if (porGrupo && grupo !== null) notaProfesor = ctx.reg.notas.find((x) => x.evento === evento.id && x.unidad === 'grupo' && x.unidad_id === grupo)?.texto ?? null;
   }
   const obsEstudiante = ctx.asistencia.get(`${evento.id}|${id}`)?.observacion ?? null;
   const notaEstudiante = ctx.reg.notas.find((x) => x.evento === evento.id && x.unidad === 'estudiante' && x.unidad_id === id)?.texto ?? null;

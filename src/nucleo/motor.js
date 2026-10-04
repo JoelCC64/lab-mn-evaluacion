@@ -26,7 +26,7 @@ export function crearContexto(cfg, curso, eventos, reg) {
     revisionPrep: indice('revision_preparatorio', (f) => f.evento),
     novedades: indice('novedades_preparatorio', (f) => `${f.evento}|${f.estudiante}`),
     ajustes: indice('ajustes', (f) => `${f.evento}|${f.estudiante}`),
-    trabajosCasa: indice('trabajos_casa', (f) => `${f.evento}|${f.grupo}`),
+    trabajosCasa: indice('trabajos_casa', (f) => `${f.evento}|${f.unidad}|${f.unidad_id}`),
     recuperaciones: indice('recuperaciones', (f) => `${f.evento}|${f.estudiante}`),
     plic: indice('plic', (f) => f.estudiante),
     cacheGrupos: new Map(),
@@ -99,6 +99,35 @@ export function notaGrupo(ctx, evento, grupo) {
   return { valor, completo: true, partes };
 }
 
+/** Unidad que se califica en un trabajo en casa: 'grupo' (por defecto) o 'estudiante' (configurable por TC). */
+export function unidadTrabajo(config) {
+  return config?.unidad_calificacion === 'estudiante' ? 'estudiante' : 'grupo';
+}
+
+/**
+ * Trabajo en casa de una unidad (número de grupo o id de estudiante), pregunta por pregunta:
+ * { registrado, entregado, completo, valor (0–1, o null si falta algo), puntos, total, partes, faltan, etiquetas }.
+ * Nota = Σ puntos / escala total (10), sin penalización por atraso. «No entregó» vale 0.
+ */
+export function notaTrabajo(ctx, evento, unidadId) {
+  const config = evento.config ? ctx.cfg.actividades[evento.config] : null;
+  const fila = ctx.trabajosCasa.get(`${evento.id}|${unidadTrabajo(config)}|${unidadId}`) ?? null;
+  const partes = (config?.preguntas ?? []).map((p) => {
+    const v = fila?.puntajes?.[p.id];
+    return { id: p.id, texto: p.texto, puntajes: p.puntajes, max: Math.max(...p.puntajes), valor: v === undefined ? null : v };
+  });
+  const faltan = partes.filter((p) => p.valor === null).map((p) => p.id);
+  const puntos = partes.reduce((s, p) => s + (p.valor ?? 0), 0);
+  const r = {
+    registrado: Boolean(fila), entregado: fila ? fila.entregado !== false : null, completo: false, valor: null,
+    puntos, total: config?.escala_total ?? null, partes, faltan, etiquetas: fila?.etiquetas ?? [],
+  };
+  if (!fila || !config?.preguntas) return r;
+  if (fila.entregado === false) return { ...r, completo: true, valor: 0, puntos: 0 };
+  if (faltan.length) return r;
+  return { ...r, completo: true, valor: puntos / config.escala_total };
+}
+
 function conAjuste(ctx, r) {
   const ajuste = ctx.ajustes.get(`${r.evento}|${r.estudiante}`);
   if (!ajuste) return r;
@@ -165,14 +194,16 @@ export function notaEvento(ctx, evento, estudiante) {
   }
 
   if (evento.tipo === 'trabajo_casa') {
-    if (!config || config.sin_nota) return { ...r, estado: 'sin_nota' };
-    const tc = r.grupo === null ? null : ctx.trabajosCasa.get(`${evento.id}|${r.grupo}`);
-    if (!tc) return conAjuste(ctx, { ...r, motivo: 'falta registrar el trabajo en casa' });
-    if (!tc.entregado) return conAjuste(ctx, { ...r, estado: 'calculada', valor: 0, motivo: 'no entregó' });
-    const faltan = config.preguntas.filter((p) => tc.puntajes?.[p.id] === undefined || tc.puntajes?.[p.id] === null);
-    if (faltan.length) return conAjuste(ctx, { ...r, motivo: `faltan ${faltan.length} pregunta(s) del TC` });
-    const puntos = config.preguntas.reduce((s, p) => s + tc.puntajes[p.id], 0);
-    return conAjuste(ctx, { ...r, estado: 'calculada', valor: puntos / config.escala_total, partes: { puntos } });
+    if (config?.sin_nota) return { ...r, estado: 'sin_nota' };
+    if (!config) return conAjuste(ctx, { ...r, motivo: 'falta la configuración del trabajo en casa' });
+    const porGrupo = unidadTrabajo(config) === 'grupo';
+    if (porGrupo && r.grupo === null) return conAjuste(ctx, { ...r, motivo: 'sin grupo en la práctica' });
+    const t = notaTrabajo(ctx, evento, porGrupo ? r.grupo : estudiante);
+    r.partes = { trabajo: t };
+    if (!t.registrado) return conAjuste(ctx, { ...r, motivo: porGrupo ? `falta calificar el grupo ${r.grupo}` : 'falta calificar su trabajo' });
+    if (!t.entregado) return conAjuste(ctx, { ...r, estado: 'calculada', valor: 0, motivo: 'no entregó' });
+    if (!t.completo) return conAjuste(ctx, { ...r, motivo: t.faltan.length === 1 ? 'falta 1 pregunta por calificar' : `faltan ${t.faltan.length} preguntas por calificar` });
+    return conAjuste(ctx, { ...r, estado: 'calculada', valor: t.valor });
   }
 
   return { ...r, estado: 'sin_nota' };
@@ -324,6 +355,9 @@ export function resumenEvento(ctx, evento) {
     }));
   const avisos = [];
   const base = eventoBase(evento, ctx.eventos);
+  if (evento.tipo === 'trabajo_casa' && evento.con_nota && evento.estado === 'normal' && base !== evento && !ctx.pases.get(base.id)?.cerrado) {
+    avisos.push(`El pase de ${base.codigo} no está cerrado: las notas del ${evento.codigo} siguen pendientes hasta cerrarlo.`);
+  }
   if (evento.sesion && evento.estado === 'normal') {
     if (!ctx.pases.get(base.id)?.cerrado) avisos.push('El pase final no está cerrado: las notas siguen pendientes.');
     const p = ctx.cfg.preparatorio;

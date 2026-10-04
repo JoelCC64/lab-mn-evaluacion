@@ -11,7 +11,8 @@ Plan: [PROYECTO_LABORATORIOS_v4.md](PROYECTO_LABORATORIOS_v4.md). Al empezar una
 | 2. La clase: prácticas, control oral, asistencia y preparatorio | ✅ Completa | 3-oct-2026 |
 | 3. Escritura en el Excel (Mac, Chrome) | ✅ Completa | 3-oct-2026 |
 | 4. Talleres | ✅ Completa | 3-oct-2026 |
-| 5–9 | — | |
+| 5. Trabajos en casa (SQI) | ✅ Completa | 3-oct-2026 |
+| 6–9 | — | |
 
 ## Fase 0 (3-oct-2026)
 
@@ -221,6 +222,63 @@ Detalle en [docs/excel.md](docs/excel.md).
 - **La nota del grupo de un taller se muestra como nivel** («1/2»), no sobre 10: es la mitad grupal de la nota.
 - **El trabajo firmado y la penalización total salen de la configuración** de cada actividad (`cierre`, `penalizacion_total`). Los talleres no tienen penalización total.
 
+## Fase 5 (3-oct-2026) · trabajos en casa (SQI) · versión 0.7.0
+
+**Hecho**
+- **Tabla `trabajos_casa`** (base versión 3): una fila por TC y unidad, con la entrega, el puntaje de cada pregunta y las etiquetas. La unidad sale de `unidad_calificacion` en la configuración de cada TC: por grupo (como ahora) o por estudiante.
+- **Pantalla del TC** (en el curso, debajo de su práctica). Tiene dos pestañas:
+  - «Grupos»:
+    - Los grupos de la práctica con su estado: sin calificar, «8.5/10», «no entregó · 0» o «6 · faltan 2».
+    - Quién faltó a la práctica.
+    - El botón «Empezar» o «Seguir», que lleva al siguiente grupo por calificar.
+    - Un grupo en el que faltaron todos queda atenuado: tiene 0 y no hace falta calificarlo.
+  - «Resumen»: la nota de cada estudiante con el motivo de cada 0 o pendiente, el detalle por pregunta y el ajuste individual (también vale en un TC).
+- **Calificación de un grupo:**
+  - Integrantes con su asistencia en la práctica. Quien faltó aparece en rojo con «no vino a P1 · 0».
+  - «Entregó» o «No entregó (0)».
+  - Rúbrica oficial pregunta por pregunta: un toque por nivel (1 · 0.5 · 0, etc.).
+  - Suma sobre 10 siempre a la vista, en la barra superior: «6.5/10 · faltan 2».
+  - Etiquetas de errores comunes debajo de su pregunta (por ahora solo el TC1 trae etiquetas).
+  - Nota del profesor (dictable).
+  - Borrar la calificación, con confirmación.
+- **Avance automático:**
+  - Cuando un toque completa el grupo (la última pregunta, o «No entregó»), aparece «✓ 8.5/10 · pasando al grupo 4…» y a los 1.5 s la app abre el siguiente grupo por calificar.
+  - Salta los grupos ya calificados y los que faltaron completos, y da la vuelta al llegar al final.
+  - Con «Quedarme», o con cualquier otro toque, se queda. Al terminar el último grupo va al resumen.
+- **En el Excel:** las columnas TC1…TC7 y «Trabajos en casa (/2 o /1.5)» ya existían; ahora tienen valores. El detalle del TC lleva:
+  - Los puntajes por pregunta.
+  - La nota del grupo.
+  - Las etiquetas, con su pregunta.
+  - La nota del profesor.
+- **Curso y navegación:**
+  - El TC muestra «Calificado · 6/6 grupos» o «En curso · 3/6 grupos».
+  - El TC6 dice «Sin nota».
+- **Aviso en la Mac:** si el dispositivo trabaja con un respaldo importado del iPhone, la pantalla del TC avisa que lo calificado ahí no vuelve al iPhone. En el iPhone no se avisa, porque allí restaurar es una recuperación.
+- **Pruebas** (102 en total, 8 nuevas):
+  - Componente: TC1 = 40 % de 2 puntos = 0.80 como máximo; TC1, TC2 y TC3 ponderados 40/25/35.
+  - «No entregó» y faltas a la práctica.
+  - Preguntas pendientes y pase sin cerrar.
+  - TC individual, TC6 sin nota y ajuste en un TC.
+  - Un TC1 completo contra la base: grupos de P1, avance automático, etiquetas, corrección y borrado.
+  - Prueba de ida y vuelta del Excel con el TC1 de GR1AA calificado: las celdas coinciden con el motor y no cambia nada fuera de las zonas.
+  - Actualización de la base de la versión 2 a la 3.
+
+**Verificado en el navegador** (demostración, 375 px):
+- GR1AA, tras cerrar el pase de P1: 6 grupos del TC1 calificados.
+- Grupo 1 con 8.5/10 y dos etiquetas, pasando solo al grupo 2.
+- Grupo 2 «no entregó».
+- «Quedarme» en el grupo 5.
+- Grupo 6 → grupo 4 (vuelta al pendiente).
+- Al terminar, el resumen con «TC1 calificado: 6 grupos.».
+- Sin errores en la consola.
+
+**Decisiones de implementación**
+- **Calificar una pregunta deja el TC como entregado.** «No entregó» conserva los puntajes (no cuentan), por si fue un toque equivocado.
+- **Calificar un TC no crea instantánea de grupos:** el TC sigue a los grupos de su práctica.
+- **Avance automático con 1.5 s de margen** y botón «Quedarme», para poder agregar una etiqueta o una nota antes de pasar.
+- **Los TC se califican en el iPhone.** La Mac trabaja con copias del iPhone: lo que se registre ahí se pierde con el próximo respaldo que se importe. Si Joel prefiere calificar en la Mac, haría falta una importación que solo sume los TC (trabajo en varios dispositivos, previsto para más adelante).
+- **Etiquetas solo en el TC1** (las del Anexo C). Las de TC2–TC7 se pueden agregar cuando lleguen sus hojas.
+
 ## Respaldo del día (3-oct-2026) · versión 0.6.0
 
 Pedido de Joel: un solo archivo por día con todo (notas, asistencia, etc.) para subirlo a Drive, como respaldo por si algo le pasa al celular o a la Mac.
@@ -266,4 +324,4 @@ Pedido de Joel: un solo archivo por día con todo (notas, asistencia, etc.) para
     - P2 (Clásica y SQI): cronograma A, semana 5, desde el 26-oct.
     - T2: cronograma B, semana 5; cronograma A, semana 6.
 - Antes de la Fase 6: nombre del profesor para la columna PROFESOR de las hojas de coordinación.
-- Fase 5: trabajos en casa (SQI).
+- Fase 6: nota bimestral, excepciones (feriados, recuperaciones, PLIC) y hojas de coordinación.

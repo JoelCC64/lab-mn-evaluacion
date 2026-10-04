@@ -4,7 +4,7 @@ import assert from 'node:assert/strict';
 
 import { generarEventos } from '../src/nucleo/calendario.js';
 import {
-  crearContexto, notaBimestre, notaControl, notaEvento, notaGrupo, notaPreparatorio, resumenEvento,
+  crearContexto, notaBimestre, notaControl, notaEvento, notaGrupo, notaPreparatorio, notaTrabajo, resumenEvento,
 } from '../src/nucleo/motor.js';
 import { redondear } from '../src/nucleo/util.js';
 import { configReal, copia } from './ayudas.js';
@@ -56,7 +56,7 @@ test('SQI P1: grupo con 4/5 → 0.8 × 0.60 = 0.48 puntos en Prácticas', () => 
 
 test('TC1 del grupo con 8.5/10 → 0.85 × 0.80 = 0.68 para cada integrante presente en P1', () => {
   const s = escenario('GR1AA', { a: '1', b: '1', c: '1' }).pase('P1');
-  s.reg.trabajos_casa.push({ evento: 'GR1AA:TC1', grupo: '1', entregado: true,
+  s.reg.trabajos_casa.push({ evento: 'GR1AA:TC1', unidad: 'grupo', unidad_id: '1', entregado: true,
     puntajes: { '1a': 1, '1b': 2, '2a-i': 1, '2a-ii': 0.5, '2b-i': 1, '2b-ii': 1, '2c': 1, '2d': 1 } });
   const ctx = s.ctx();
   cerca(notaEvento(ctx, s.e('TC1'), 'b').valor, 0.85);
@@ -67,7 +67,7 @@ test('TC1 del grupo con 8.5/10 → 0.85 × 0.80 = 0.68 para cada integrante pres
 test('SQI: quien «no vino» a P1 tiene 0 en P1 y 0 en TC1, aunque su grupo tenga nota', () => {
   const s = escenario('GR1AA', { a: '1', b: '1', c: '1' }).pase('P1', { c: 'no_vino' })
     .puntos('P1', '1', { resp_pred_plan: 2, ejec_registro: 2, discusion: 1 });
-  s.reg.trabajos_casa.push({ evento: 'GR1AA:TC1', grupo: '1', entregado: true,
+  s.reg.trabajos_casa.push({ evento: 'GR1AA:TC1', unidad: 'grupo', unidad_id: '1', entregado: true,
     puntajes: { '1a': 1, '1b': 2, '2a-i': 1, '2a-ii': 1, '2b-i': 1, '2b-ii': 1, '2c': 1, '2d': 2 } });
   const ctx = s.ctx();
   assert.equal(notaEvento(ctx, s.e('P1'), 'a').valor, 1);
@@ -75,6 +75,80 @@ test('SQI: quien «no vino» a P1 tiene 0 en P1 y 0 en TC1, aunque su grupo teng
   const tc1 = notaEvento(ctx, s.e('TC1'), 'c');
   assert.deepEqual([p1.valor, p1.motivo], [0, 'no vino']);
   assert.deepEqual([tc1.valor, tc1.motivo], [0, 'no vino en la práctica']);
+});
+
+/** Fila de un TC (por grupo, salvo que se indique la unidad). */
+const tc = (codigo, unidadId, puntajes, otros = {}) => ({
+  evento: `GR1AA:${codigo}`, unidad: 'grupo', unidad_id: unidadId, entregado: true, puntajes, etiquetas: [], ...otros,
+});
+const TC1_COMPLETO = { '1a': 1, '1b': 2, '2a-i': 1, '2a-ii': 1, '2b-i': 1, '2b-ii': 1, '2c': 1, '2d': 2 };
+
+test('TC1: componente = 40 % de 2 puntos = 0.80 como máximo; con TC1, TC2 y TC3 se pondera 40/25/35', () => {
+  const s = escenario('GR1AA', { a: '1', b: '2' }).pase('P1').pase('P2').pase('P3');
+  s.reg.trabajos_casa.push(tc('TC1', '1', TC1_COMPLETO));
+  const comp = (ctx, id) => notaBimestre(ctx, id, 1).componentes.find((c) => c.id === 'trabajos_casa');
+  let t = comp(s.ctx(), 'a');
+  cerca(t.acumulada, 0.8, 'TC1 completo: 0.4 × 1 × 2');
+  cerca(t.proyectada, 2, 'proyectada sobre lo ya calificado');
+  assert.equal(t.completo, false);
+  // Grupo 2 sin calificar: su TC1 queda pendiente y no suma.
+  const b = notaEvento(s.ctx(), s.e('TC1'), 'b');
+  assert.deepEqual([b.estado, b.motivo], ['pendiente', 'falta calificar el grupo 2']);
+  // TC2 = 2 + 1.5 + 0 + 3 = 6.5/10 y TC3 = 10/10.
+  s.reg.trabajos_casa.push(tc('TC2', '1', { 1: 2, '2a-i': 1.5, '2a-ii': 0, '2b': 3 }));
+  s.reg.trabajos_casa.push(tc('TC3', '1', { '1a': 1, '1b': 2, '2a': 2, '2b': 3, '2c': 2 }));
+  t = comp(s.ctx(), 'a');
+  assert.equal(t.completo, true);
+  cerca(t.proyectada, (0.4 * 1 + 0.25 * 0.65 + 0.35 * 1) * 2);
+  cerca(t.acumulada, t.proyectada);
+});
+
+test('TC: «no entregó» vale 0 para los presentes en la práctica; quien faltó a la práctica tiene 0 por su falta', () => {
+  const s = escenario('GR1AA', { a: '1', b: '1', c: '1' }).pase('P1', { c: 'no_vino' });
+  s.reg.trabajos_casa.push(tc('TC1', '1', { '1a': 1, '1b': 2 }, { entregado: false }));
+  const ctx = s.ctx();
+  const a = notaEvento(ctx, s.e('TC1'), 'a');
+  assert.deepEqual([a.estado, a.valor, a.motivo], ['calculada', 0, 'no entregó']);
+  assert.deepEqual([notaEvento(ctx, s.e('TC1'), 'c').valor, notaEvento(ctx, s.e('TC1'), 'c').motivo], [0, 'no vino en la práctica']);
+  const t = notaTrabajo(ctx, s.e('TC1'), '1');
+  assert.deepEqual([t.registrado, t.entregado, t.completo, t.valor, t.puntos], [true, false, true, 0, 0], 'los puntajes se conservan, pero no cuentan');
+});
+
+test('TC: preguntas sin calificar dejan la nota pendiente; sin el pase de la práctica, también', () => {
+  const s = escenario('GR1AA', { a: '1' });
+  const { '2d': _, ...sin2d } = TC1_COMPLETO;
+  s.reg.trabajos_casa.push(tc('TC1', '1', sin2d));
+  let n = notaEvento(s.ctx(), s.e('TC1'), 'a');
+  assert.deepEqual([n.estado, n.motivo], ['pendiente', 'falta cerrar el pase de la práctica']);
+  assert.ok(resumenEvento(s.ctx(), s.e('TC1')).avisos.some((x) => x.startsWith('El pase de P1 no está cerrado')));
+  s.pase('P1');
+  n = notaEvento(s.ctx(), s.e('TC1'), 'a');
+  assert.deepEqual([n.estado, n.motivo], ['pendiente', 'falta 1 pregunta por calificar']);
+  const t = notaTrabajo(s.ctx(), s.e('TC1'), '1');
+  assert.deepEqual([t.puntos, t.faltan], [8, ['2d']]);
+  assert.deepEqual(resumenEvento(s.ctx(), s.e('TC1')).avisos, []);
+});
+
+test('TC individual (unidad configurable): cada estudiante con su propio trabajo', () => {
+  const cfgInd = copia(cfg);
+  cfgInd.actividades['TC1-SQI'].unidad_calificacion = 'estudiante';
+  const s = escenario('GR1AA', { a: '1', b: '1' }, { cfgUsada: cfgInd }).pase('P1');
+  s.reg.trabajos_casa.push(tc('TC1', 'a', TC1_COMPLETO, { unidad: 'estudiante' }));
+  s.reg.trabajos_casa.push(tc('TC1', '1', TC1_COMPLETO));   // una fila por grupo no cuenta en un TC individual
+  const ctx = s.ctx();
+  assert.equal(notaEvento(ctx, s.e('TC1'), 'a').valor, 1);
+  assert.deepEqual([notaEvento(ctx, s.e('TC1'), 'b').estado, notaEvento(ctx, s.e('TC1'), 'b').motivo], ['pendiente', 'falta calificar su trabajo']);
+});
+
+test('TC6 no tiene nota y no entra en el componente; un ajuste individual también vale en un TC', () => {
+  const s = escenario('GR1AA', { a: '1' }).pase('P1').pase('P6');
+  assert.equal(notaEvento(s.ctx(), s.e('TC6'), 'a').estado, 'sin_nota');
+  const items = notaBimestre(s.ctx(), 'a', 2).componentes.find((c) => c.id === 'trabajos_casa').items.map((i) => i.codigo);
+  assert.deepEqual(items, ['TC4', 'TC5', 'TC7']);
+  s.reg.trabajos_casa.push(tc('TC1', '1', TC1_COMPLETO));
+  s.reg.ajustes.push({ evento: 'GR1AA:TC1', estudiante: 'a', valor: 0.5, motivo: 'No participó en el TC' });
+  const n = notaEvento(s.ctx(), s.e('TC1'), 'a');
+  assert.deepEqual([n.valor, n.valor_sin_ajuste, n.motivo], [0.5, 1, 'ajuste: No participó en el TC']);
 });
 
 test('Clásica: diseño 3/4, datos 4/4 y análisis 2/4 → 0.15 + 0.30 + 0.25 = 0.70', () => {

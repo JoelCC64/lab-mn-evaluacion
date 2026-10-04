@@ -17,8 +17,8 @@ import { aplicarAsistenciaSemana1, aplicarExcelSemestre } from '../src/datos/imp
 import { registrosDelCurso } from '../src/datos/consultas.js';
 import { cargarCursos } from '../src/datos/excel-datos.js';
 import {
-  agregarAlControl, cerrarPase, guardarNovedad, guardarPuntaje, marcarAsistencia, marcarRevisionPreparatorio, puntuarPregunta,
-  aprobarControl,
+  agregarAlControl, cerrarPase, guardarNovedad, guardarPuntaje, marcarAsistencia, marcarEntrega, marcarRevisionPreparatorio,
+  puntuarPregunta, puntuarTrabajo, aprobarControl,
 } from '../src/datos/acciones.js';
 import { generarEventos } from '../src/nucleo/calendario.js';
 import { gruposDelEvento, listaDeGrupos } from '../src/nucleo/grupos.js';
@@ -74,7 +74,20 @@ async function clase(db, paralelo, codigo, { niveles, faltan = [], retirados = [
   return { evento, grupos };
 }
 
-/** Base con el Excel ficticio, la semana 1 y una P1 evaluada en GR2QB (Clásica) y GR1AA (SQI). */
+/** Califica un TC de todos los grupos de su práctica: `puntajes(grupo)` en el orden de las preguntas, o null (no entregó). */
+async function trabajoEnCasa(db, paralelo, codigo, puntajes) {
+  const reg = await registrosDelCurso(db, paralelo);
+  const eventos = generarEventos(cfg, cfg.cursoPorId[paralelo], reg.cambios_evento);
+  const evento = eventos.find((e) => e.codigo === codigo);
+  const { preguntas } = cfg.actividades[evento.config];
+  for (const { grupo } of listaDeGrupos(gruposDelEvento(evento, eventos, reg).porEstudiante, reg.estudiantes).grupos) {
+    const p = puntajes(Number(grupo));
+    if (!p) await marcarEntrega(db, evento.id, 'grupo', grupo, false, AHORA);
+    else for (const [i, q] of preguntas.entries()) await puntuarTrabajo(db, evento.id, 'grupo', grupo, q.id, p[i], AHORA);
+  }
+}
+
+/** Base con el Excel ficticio, la semana 1 y una P1 evaluada en GR2QB (Clásica) y GR1AA (SQI), con el TC1 de GR1AA. */
 async function baseEvaluada() {
   const db = abrirBase(`excel-${randomUUID()}`);
   await aplicarExcelSemestre(db, leerExcelSemestre(await libro(), cfg), { ahora: AHORA });
@@ -89,6 +102,7 @@ async function baseEvaluada() {
   });
   const [ausenteSqi] = conGrupo(gr1aa);
   await clase(db, 'GR1AA', 'P1', { niveles: (g) => [2, g % 3, 1], faltan: [ausenteSqi.id], controles: [[conGrupo(gr1aa)[1].id, true]] });
+  await trabajoEnCasa(db, 'GR1AA', 'TC1', (g) => (g === 2 ? null : [1, 2, 1, 0.5, 1, 1, 1, g % 2 ? 2 : 1]));
   return { db, gr2qb: { ausente, retirado, conNovedad, controlado }, gr1aa: { ausente: ausenteSqi, presente: conGrupo(gr1aa)[1] } };
 }
 
@@ -170,7 +184,18 @@ test('ida y vuelta: fuera de las zonas de la app todo queda idéntico (ExcelJS y
   const sqi = nuevo.getWorksheet('GR1AA');
   assert.equal(celdaDe(sqi, plan, gr1aa.ausente.id, 'B1:P1'), 0);
   assert.equal(celdaDe(sqi, plan, gr1aa.ausente.id, 'B1:TC1'), 0, 'quien faltó a P1 tiene 0 en el TC1');
-  assert.equal(celdaDe(sqi, plan, gr1aa.presente.id, 'B1:TC1'), null, 'el TC1 del grupo aún no se registra (Fase 5)');
+  const regSqi = await registrosDelCurso(db, 'GR1AA');
+  const evSqi = generarEventos(cfg, cfg.cursoPorId.GR1AA, regSqi.cambios_evento);
+  const ctxSqi = crearContexto(cfg, cfg.cursoPorId.GR1AA, evSqi, regSqi);
+  const tc1 = evSqi.find((e) => e.codigo === 'TC1');
+  for (const [codigo] of plan.hojas.find((x) => x.hoja === 'GR1AA').filas) {
+    const n = notaEvento(ctxSqi, tc1, codigo);
+    assert.equal(n.estado, 'calculada', `TC1 de ${codigo} (${n.motivo})`);
+    assert.equal(celdaDe(sqi, plan, codigo, 'B1:TC1'), Math.round(n.valor * 1000 + 1e-9) / 100, `TC1 de ${codigo}`);
+  }
+  const g = Number(gr1aa.presente.grupo_excel);
+  assert.equal(celdaDe(sqi, plan, gr1aa.presente.id, 'B1:TC1'), g === 2 ? 0 : g % 2 ? 9.5 : 8.5, 'TC1 de su grupo');
+  assert.equal(celdaDe(sqi, plan, gr1aa.presente.id, 'B1:trabajos_casa'), null, 'el componente se escribe con TC1, TC2 y TC3');
   assert.equal(celdaDe(sqi, plan, gr1aa.presente.id, 'B1:control'), 'sí');
   assert.equal(celdaDe(sqi, plan, gr1aa.ausente.id, 'B1:control'), null, 'sin control todavía (el bimestre no termina)');
 

@@ -55,9 +55,12 @@ function EstadoChip({ evento, ctx }) {
 
 function FilaEvento({ evento, ctx }) {
   const est = estadoEvento(evento, ctx.reg, avanceEvaluacion(ctx, evento));
-  const secundaria = evento.tipo === 'sin_nota' || evento.tipo === 'trabajo_casa' || evento.tipo === 'plic';
+  const esTC = evento.tipo === 'trabajo_casa';
+  const secundaria = evento.tipo === 'sin_nota' || evento.tipo === 'plic' || (esTC && !evento.con_nota);
   const lugar = evento.lugar ? (evento.lugar === 'lab' ? 'lab.' : 'aula') : '';
-  const detalle = [fechaCorta(evento.fecha), lugar, evento.con_nota ? null : 'sin nota'].filter(Boolean).join(' · ');
+  // Un TC va bajo su práctica (misma fecha): se muestra como trabajo en casa, con su avance.
+  const detalle = esTC ? 'en casa'
+    : [fechaCorta(evento.fecha), lugar, evento.con_nota ? null : 'sin nota'].filter(Boolean).join(' · ');
   return html`
     <a class=${`fila ${secundaria ? 'atenuada' : ''} ${evento.tipo === 'trabajo_casa' ? 'sangria' : ''}`} href=${enlace('evento', evento.id)}>
       ${evento.tipo === 'trabajo_casa' ? null : html`<span class="semana"><b>${evento.semana}</b>sem</span>`}

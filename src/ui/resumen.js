@@ -2,8 +2,9 @@
 import { useState } from '../vendor/preact-htm.js';
 import { html, useApp, Chip, Hoja, Aviso, Persona } from './base.js';
 import { borrarAjuste, guardarAjuste } from '../datos/acciones.js';
-import { resumenEvento } from '../nucleo/motor.js';
-import { sobreDiez } from '../nucleo/motor-vista.js';
+import { resumenEvento, unidadTrabajo } from '../nucleo/motor.js';
+import { sobreDiez, textoPuntos } from '../nucleo/motor-vista.js';
+import { eventoBase } from '../nucleo/grupos.js';
 import { compararGrupos } from '../nucleo/util.js';
 import { controlCalifica, preparatorioCalifica } from '../nucleo/config.js';
 
@@ -21,12 +22,14 @@ export function Resumen({ ctx, evento }) {
   const presentes = filas.filter((f) => ['presente', 'se_retiro_antes'].includes(f.asistencia.estado)).length;
   const faltas = filas.filter((f) => f.asistencia.falta).length;
   const pendientes = filas.filter((f) => f.nota.estado === 'pendiente').length;
+  // Un TC usa la asistencia de su práctica.
+  const enPractica = evento.tipo === 'trabajo_casa' ? ` en ${eventoBase(evento, ctx.eventos).codigo}` : '';
 
   return html`
     ${avisos.map((a) => html`<${Aviso} tono="aviso">${a}<//>`)}
     <div class="resumen-numeros">
-      <div><b>${presentes}</b><span>presentes</span></div>
-      <div><b>${faltas}</b><span>faltas</span></div>
+      <div><b>${presentes}</b><span>presentes${enPractica}</span></div>
+      <div><b>${faltas}</b><span>faltas${enPractica}</span></div>
       ${conNota && html`<div><b>${pendientes}</b><span>notas pendientes</span></div>`}
     </div>
     <div class="lista desplazable">
@@ -83,6 +86,7 @@ function HojaDetalle({ fila, evento, ctx, cerrar }) {
     } catch (e) { avisar(e.message, 'mal'); }
   };
   const partes = nota.partes?.grupo?.partes ?? [];
+  const trabajo = nota.partes?.trabajo ?? null;
   return html`
     <${Hoja} titulo="Detalle" alCerrar=${cerrar}>
       <${Persona} estudiante=${fila.estudiante} />
@@ -94,10 +98,12 @@ function HojaDetalle({ fila, evento, ctx, cerrar }) {
         ${nota.valor_sin_ajuste !== undefined && html`<tr><td>Sin el ajuste</td><td>${sobreDiez(nota.valor_sin_ajuste)}/10</td></tr>`}
         ${nota.partes?.asistencia_permanencia !== undefined && html`<tr><td>Asistencia y permanencia</td><td>${nota.partes.asistencia_permanencia}${nota.partes.asistencia_permanencia < 1 ? ' (se retiró antes)' : ''}</td></tr>`}
         ${partes.length > 0 && html`<tr><td>${evento.tipo === 'taller' ? 'Evaluación del grupo' : 'Rúbrica del grupo'}</td><td>${partes.map((p) => `${p.nombre}: ${p.valor ?? '—'}/${p.max}`).join(' · ')}</td></tr>`}
+        ${trabajo?.registrado && html`<tr><td>${unidadTrabajo(ctx.cfg.actividades[evento.config]) === 'grupo' ? `TC del grupo ${fila.grupo}` : 'Su TC'}</td>
+          <td>${trabajo.entregado === false ? 'no entregó' : html`<b>${textoPuntos(trabajo.puntos)}/${trabajo.total}</b>${trabajo.faltan.length ? ` (faltan ${trabajo.faltan.length})` : ''} · ${trabajo.partes.map((p) => `${p.id}: ${p.valor ?? '—'}`).join(' · ')}`}</td></tr>`}
         ${preparatorio.estado !== 'sin_nota' && html`<tr><td>Preparatorio</td><td>${preparatorio.estado === 'calculada' ? `${preparatorio.nivel}/2` : preparatorio.estado}${preparatorio.motivo ? ` · ${preparatorio.motivo}` : ''}</td></tr>`}
         ${control.estado !== 'sin_control' && html`<tr><td>Control oral</td><td>${control.estado === 'calculada' ? (control.valor !== null ? `${sobreDiez(control.valor)}/10 (${(control.puntajes ?? []).join(', ') || control.motivo})` : (control.aprobado ? 'aprobado' : 'no aprobado')) : control.estado}</td></tr>`}
       </tbody></table>
-      ${evento.con_nota && evento.tipo !== 'trabajo_casa' && html`
+      ${evento.con_nota && html`
         <div class="tarjeta">
           <h3>Ajuste individual</h3>
           <p class="tenue pequeno">Reemplaza la nota de este evento para este estudiante. Siempre con motivo.</p>

@@ -38,19 +38,19 @@ Claves entre corchetes: compuestas. Todas las tablas de registro llevan `fecha` 
 | `novedades_preparatorio` | `[evento+estudiante]` | `nivel` (1 incompleto · 0 no lo hizo · `null` en SQI), `no_ingresa`, `observacion` | Solo las excepciones de la revisión en la puerta | `prep_novedades` |
 | `ajustes` | `[evento+estudiante]` | `valor` (0–1), `motivo` (obligatorio) | Ajuste individual explícito de la nota del evento | `overrides` |
 | `retroalimentaciones` | `[evento+grupo]` | `dada` | Retroalimentación de la práctica anterior dada en el taller (`evento` = el taller; `grupo` = el de la práctica). Desde la versión 2 de la base (Fase 4) | (nuevo) |
+| `trabajos_casa` | `[evento+unidad+unidad_id]` | `unidad` (`grupo` · `estudiante`, según `unidad_calificacion` del TC), `unidad_id` (número de grupo o código), `entregado`, `puntajes` (`{ pregunta: puntos }`), `etiquetas` (ids de la configuración) | TC de SQI pregunta por pregunta. `entregado: false` vale 0 y conserva los puntajes por si fue un toque equivocado. Desde la versión 3 de la base (Fase 5) | `homework` |
 | `cambios_evento` | `evento` | `estado` (`sin_clase` · `normal`), `motivo` | Cambios manuales del calendario (clase suspendida, semana 1 sin clase) | `events.estado` |
 | `importaciones` | autoincremental | `tipo` (`excel_semestre` · `asistencia_semana1` · `respaldo`), `archivo`, `resumen` (solo conteos) | Historial de lecturas del Excel y de restauraciones | (nuevo) |
 | `meta` | `clave` | `valor` | Datos sueltos: último respaldo, versión del modelo | (nuevo) |
 
-El motor de notas ya sabe leer `trabajos_casa`, `recuperaciones` y `plic` si existen; sus pantallas y tablas llegan en las fases siguientes.
+El motor de notas ya sabe leer `recuperaciones` y `plic` si existen; sus pantallas y tablas llegan en la Fase 6.
 
 **Versiones de la base** (`VERSION_BASE` en `src/db.js`). Una versión nueva solo agrega tablas o índices; Dexie actualiza la base del dispositivo al abrirla, sin perder datos. Una prueba lo comprueba.
 - 1: Fases 1 a 3.
 - 2: Fase 4, con la tabla `retroalimentaciones`.
+- 3: Fase 5, con la tabla `trabajos_casa`.
 
-Fases siguientes:
-- `trabajos_casa` (Fase 5).
-- `plic` y `recuperaciones` (Fase 6).
+Fases siguientes: `plic` y `recuperaciones` (Fase 6).
 
 **Lo último que se escribió en el Excel** (`excel_writes` en el §4) no va en la base: va en la hoja oculta «_app» del propio Excel (ver `docs/excel.md`). Así viaja con el archivo y no se pierde cuando la Mac importa un respaldo del iPhone, que reemplaza toda la base.
 
@@ -77,7 +77,10 @@ Fases siguientes:
 
 La instantánea se crea la primera vez que se registra algo de grupo en el evento: un puntaje, el pase de un grupo o un cambio de grupo. Desde ahí las notas de ese evento ya no cambian si después se mueven estudiantes en otro evento. Un cambio de grupo pasa a los eventos siguientes que aún no tienen instantánea.
 
-**Trabajos en casa:** usan los grupos y la asistencia de su práctica (`evento.practica`).
+**Trabajos en casa:**
+- Usan los grupos y la asistencia de su práctica (`evento.practica`). Calificar un TC no crea instantánea de grupos: si en la práctica se mueve a alguien, el TC lo sigue.
+- La nota del TC (por grupo) se copia a los integrantes que estuvieron en la práctica; quien faltó tiene 0.
+- La nota del profesor del TC va en `notas`, con la misma unidad que el TC.
 
 ## Respaldo del día (archivo Excel) · desde la versión 0.6.0
 

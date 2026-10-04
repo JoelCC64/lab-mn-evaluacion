@@ -212,6 +212,41 @@ export async function marcarRetro(db, evento, grupo, dada, ahora = ahoraISO()) {
   else await db.retroalimentaciones.delete([evento, String(grupo)]);
 }
 
+// ---------- Trabajos en casa (TC) ----------
+// Una fila por TC y unidad (`unidad` = 'grupo' con el número de grupo, o 'estudiante' con su id): si entregó,
+// el puntaje de cada pregunta y las etiquetas marcadas. Los grupos son los de la práctica: no se crea instantánea.
+
+async function cambiarTrabajo(db, evento, unidad, unidadId, f, ahora) {
+  const id = String(unidadId);
+  await db.transaction('rw', db.trabajos_casa, async () => {
+    const actual = (await db.trabajos_casa.get([evento, unidad, id]))
+      ?? { evento, unidad, unidad_id: id, entregado: true, puntajes: {}, etiquetas: [] };
+    await db.trabajos_casa.put({ ...actual, ...f(actual), fecha: ahora });
+  });
+}
+
+/** Puntaje de una pregunta (un toque por nivel). Calificar una pregunta deja el trabajo como entregado. */
+export async function puntuarTrabajo(db, evento, unidad, unidadId, pregunta, valor, ahora = ahoraISO()) {
+  await cambiarTrabajo(db, evento, unidad, unidadId, (t) => ({ entregado: true, puntajes: { ...t.puntajes, [pregunta]: valor } }), ahora);
+}
+
+/** Entregó (true) o no entregó (false, vale 0). Los puntajes se conservan por si fue un toque equivocado. */
+export async function marcarEntrega(db, evento, unidad, unidadId, entregado, ahora = ahoraISO()) {
+  await cambiarTrabajo(db, evento, unidad, unidadId, () => ({ entregado: Boolean(entregado) }), ahora);
+}
+
+/** Marca o desmarca una etiqueta rápida (error común de una pregunta). */
+export async function alternarEtiquetaTrabajo(db, evento, unidad, unidadId, etiqueta, ahora = ahoraISO()) {
+  await cambiarTrabajo(db, evento, unidad, unidadId, (t) => ({
+    etiquetas: t.etiquetas.includes(etiqueta) ? t.etiquetas.filter((x) => x !== etiqueta) : [...t.etiquetas, etiqueta],
+  }), ahora);
+}
+
+/** Borra lo registrado del TC de la unidad (la nota del profesor se conserva). */
+export async function borrarTrabajo(db, evento, unidad, unidadId) {
+  await db.trabajos_casa.delete([evento, unidad, String(unidadId)]);
+}
+
 // ---------- Ajuste individual ----------
 
 /** Ajuste explícito de la nota del evento (0–1), siempre con motivo. */

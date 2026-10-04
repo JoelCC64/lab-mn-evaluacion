@@ -44,6 +44,7 @@ async function baseConClase() {
   // Una nota larguísima, para que los datos ocupen varias celdas (con espacios y emojis en cualquier lugar).
   const largo = Array.from({ length: 4000 }, (_, i) => (i % 7 === 0 ? '🧪 ' : 'medición ') + i).join('  ');
   await db.notas.put({ evento: p1.id, unidad: 'grupo', unidad_id: '2', texto: ` ${largo} `, fecha: AHORA });
+  await db.trabajos_casa.put({ evento: 'GR1AA:TC1', unidad: 'grupo', unidad_id: '3', entregado: true, puntajes: { '1a': 1, '2a-i': 0.5, '2d': 2 }, etiquetas: ['conclusion_sin_datos'], fecha: AHORA });
   return { db, p1, a, b };
 }
 

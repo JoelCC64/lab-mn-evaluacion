@@ -51,6 +51,7 @@ Componentes y notas:
   - S1 … S18: P presente, F no vino o salió, R se retiró antes, «—» sin clase o feriado, vacío sin pase.
   - Asistencias (P + R) y % sobre las sesiones con pase.
 - «Detalle (app)»: una fila por estudiante y evento ya ocurrido, con todo lo registrado. Además de las columnas del Anexo J lleva «Etiquetas».
+  - En un TC: «Puntajes» lleva cada pregunta («1a 1 · 1b 2 · 2a-i 0.5 …») o «no entregó», «Nota del grupo» la del TC sobre 10, «Etiquetas» los errores marcados con su pregunta y la observación, la nota del profesor.
 - Los pendientes de nómina van en fila ámbar.
 
 **Hoja oculta «_app»**:

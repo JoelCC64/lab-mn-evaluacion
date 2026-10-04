@@ -1,10 +1,11 @@
 // Raíz de la interfaz: contexto, rutas, avisos flotantes y bandas (demostración, versión nueva).
 import { useCallback, useEffect, useRef, useState } from '../vendor/preact-htm.js';
-import { html, Contexto, useRuta } from './base.js';
+import { html, Contexto, useApp, useRuta } from './base.js';
 import { Inicio } from './inicio.js';
 import { Curso } from './curso.js';
 import { Evento } from './evento.js';
 import { Grupo } from './grupo.js';
+import { TrabajoCasa } from './trabajos.js';
 import { Datos } from './datos.js';
 import { Excel } from './excel.js';
 import { escucharVersionNueva } from './pwa.js';
@@ -36,11 +37,16 @@ export function App({ cfg, db, demo }) {
 }
 
 function Rutas() {
+  const { cfg } = useApp();
   const [pantalla, a, b, c] = useRuta();
   if (pantalla === 'datos') return html`<${Datos} />`;
   if (pantalla === 'excel') return html`<${Excel} />`;
   if (pantalla === 'curso' && a) return html`<${Curso} paralelo=${a} />`;
-  if (pantalla === 'evento' && a && b === 'grupo' && c) return html`<${Grupo} id=${a} grupo=${c} />`;
+  if (pantalla === 'evento' && a && ['grupo', 'estudiante'].includes(b) && c) {
+    // Un trabajo en casa se califica por grupo (o por estudiante); lo demás es la pantalla del grupo en clase.
+    if (cfg.catalogo[String(a).split(':')[1]]?.tipo === 'trabajo_casa') return html`<${TrabajoCasa} id=${a} unidadId=${c} />`;
+    if (b === 'grupo') return html`<${Grupo} id=${a} grupo=${c} />`;
+  }
   if (pantalla === 'evento' && a) return html`<${Evento} id=${a} pestana=${b} />`;
   return html`<${Inicio} />`;
 }

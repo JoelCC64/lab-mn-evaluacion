@@ -65,6 +65,8 @@ Si llega un documento oficial nuevo que contradiga algo de aquí, se pregunta a 
 | Por grupo hasta nuevo aviso, registrados pregunta por pregunta | Joel | `unidad_calificacion: grupo` |
 | Sin penalización por entrega tardía | Joel | `entrega_tardia: sin_penalizacion` |
 | El TC6 no tiene nota (se evalúa en P7) | LE-SQI | `sin_nota: true` |
+| Quien faltó a la práctica no recibe la nota del TC de su grupo | Joel | Motor (Fase 5) |
+| «No entregó» = 0 | LE-SQI | Pantalla del TC (Fase 5) |
 
 ## Notas del bimestre
 

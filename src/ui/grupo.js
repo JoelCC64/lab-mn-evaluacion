@@ -155,7 +155,7 @@ function Etiquetas({ ctx, evento, grupo, config, grupos }) {
 }
 
 /** Texto con guardado automático (al escribir, con pausa, y al salir del campo). Admite dictado del teclado. */
-function NotaTexto({ evento, unidad, unidadId, actual, etiqueta = 'Nota del profesor', placeholder = 'Escribe o dicta con el micrófono del teclado…' }) {
+export function NotaTexto({ evento, unidad, unidadId, actual, etiqueta = 'Nota del profesor', placeholder = 'Escribe o dicta con el micrófono del teclado…' }) {
   const { db } = useApp();
   const [texto, setTexto] = useState(actual);
   const espera = useRef(null);

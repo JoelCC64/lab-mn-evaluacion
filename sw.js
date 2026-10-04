@@ -2,7 +2,7 @@
 // Guarda todos los archivos de la app para que funcione sin conexión.
 // En localhost usa primero la red (desarrollo); publicada, usa primero lo guardado (rápido y sin conexión).
 
-const VERSION = '0.6.0-88e098a0ae';
+const VERSION = '0.7.0-26912d8494';
 const CACHE = `lab-mn-${VERSION}`;
 const ARCHIVOS = [
   "./",
@@ -54,6 +54,7 @@ const ARCHIVOS = [
   "src/ui/respaldo-dia.js",
   "src/ui/resumen.js",
   "src/ui/retro.js",
+  "src/ui/trabajos.js",
   "src/vendor/dexie.js",
   "src/vendor/exceljs.min.js",
   "src/vendor/htm.js",

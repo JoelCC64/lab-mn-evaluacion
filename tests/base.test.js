@@ -140,6 +140,7 @@ test('respaldo: exportar, borrar todo, restaurar y obtener datos idénticos', as
   await db.novedades_preparatorio.put({ evento: ev, estudiante: e.id, nivel: 1, no_ingresa: false, observacion: null, fecha: AHORA });
   await db.ajustes.put({ evento: ev, estudiante: e.id, valor: 0.5, motivo: 'prueba', fecha: AHORA });
   await db.retroalimentaciones.put({ evento: 'GR2QB:T1', grupo: '1', dada: true, fecha: AHORA });
+  await db.trabajos_casa.put({ evento: 'GR1AA:TC1', unidad: 'grupo', unidad_id: '1', entregado: true, puntajes: { '1a': 1, '2a-i': 0.5 }, etiquetas: ['confunde_inc_media'], fecha: AHORA });
   await db.meta.put({ clave: 'prueba', valor: 1 });
 
   const opciones = { semestre: '2026B', app: 'prueba', config: cfg.version, ahora: AHORA };
@@ -166,26 +167,40 @@ test('el respaldo rechaza archivos de otro formato, versión o semestre', async 
   assert.ok(validarRespaldo({ ...base, semestre: '2026B', tablas: { inventada: [] } }, db, { semestre: '2026B' }).some((e) => e.includes('inventada')));
 });
 
-test('una base de la versión 1 (Fases 1–3) se actualiza al abrirla, sin perder datos', async () => {
-  const nombre = `prueba-v1-${randomUUID()}`;
-  const v1 = new Dexie(nombre);
-  const { retroalimentaciones, ...tablasV1 } = TABLAS;
-  v1.version(1).stores(tablasV1);
-  await v1.estudiantes.put({ id: '199900001', codigo: '199900001', nombre: 'RUIZ ANA', curso: 'GR2QB', estado: 'nomina' });
-  await v1.asistencia.put({ evento: 'GR2QB:P1', estudiante: '199900001', estado: 'presente', motivo: null, observacion: null, fecha: AHORA });
-  v1.close();
+/** Crea una base como la dejó una versión anterior de la app (sin las tablas nuevas) y la cierra. */
+async function baseAnterior(version, sinTablas) {
+  const nombre = `prueba-v${version}-${randomUUID()}`;
+  const vieja = new Dexie(nombre);
+  vieja.version(version).stores(Object.fromEntries(Object.entries(TABLAS).filter(([t]) => !sinTablas.includes(t))));
+  await vieja.estudiantes.put({ id: '199900001', codigo: '199900001', nombre: 'RUIZ ANA', curso: 'GR2QB', estado: 'nomina' });
+  await vieja.asistencia.put({ evento: 'GR2QB:P1', estudiante: '199900001', estado: 'presente', motivo: null, observacion: null, fecha: AHORA });
+  vieja.close();
+  return nombre;
+}
 
-  const db = abrirBase(nombre);
+test('una base de la versión 1 (Fases 1–3) se actualiza al abrirla, sin perder datos', async () => {
+  const db = abrirBase(await baseAnterior(1, ['retroalimentaciones', 'trabajos_casa']));
   await db.open();
   assert.equal(await db.estudiantes.count(), 1);
   assert.equal((await db.asistencia.get(['GR2QB:P1', '199900001'])).estado, 'presente');
   assert.equal(await db.retroalimentaciones.count(), 0, 'la tabla nueva existe y está vacía');
+  assert.equal(await db.trabajos_casa.count(), 0);
 });
 
-test('un respaldo hecho con la versión anterior (sin la tabla de retroalimentaciones) se puede restaurar', async () => {
+test('una base de la versión 2 (Fase 4) se actualiza a la 3 (trabajos en casa), sin perder datos', async () => {
+  const db = abrirBase(await baseAnterior(2, ['trabajos_casa']));
+  await db.open();
+  assert.equal(db.verno, 3);
+  assert.equal((await db.asistencia.get(['GR2QB:P1', '199900001'])).estado, 'presente');
+  await db.trabajos_casa.put({ evento: 'GR1AA:TC1', unidad: 'grupo', unidad_id: '2', entregado: false, puntajes: {}, etiquetas: [], fecha: AHORA });
+  assert.equal((await db.trabajos_casa.where('evento').equals('GR1AA:TC1').first()).unidad_id, '2');
+});
+
+test('un respaldo hecho con una versión anterior (sin retroalimentaciones ni trabajos en casa) se puede restaurar', async () => {
   const db = await baseConEjemplo();
   const viejo = await exportarRespaldo(db, { semestre: '2026B', app: '0.3.0', config: cfg.version, ahora: AHORA });
   delete viejo.tablas.retroalimentaciones;
+  delete viejo.tablas.trabajos_casa;
   assert.deepEqual(validarRespaldo(viejo, db, { semestre: '2026B' }), []);
   await restaurarRespaldo(db, viejo);
   assert.equal(await db.estudiantes.count(), 196);

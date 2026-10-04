@@ -7,9 +7,18 @@ import { Control } from './control.js';
 import { Grupos } from './grupos.js';
 import { Resumen } from './resumen.js';
 import { Retro } from './retro.js';
+import { Trabajos } from './trabajos.js';
 import { retroDelTaller } from '../nucleo/retro.js';
 import { estadoEvento } from '../nucleo/estado-evento.js';
+import { unidadTrabajo } from '../nucleo/motor.js';
+import { avanceEvaluacion, seCalificaTrabajo } from '../nucleo/motor-vista.js';
 import { fechaCorta } from '../nucleo/util.js';
+
+/** ¿Todas las unidades por calificar del TC tienen nota? */
+function trabajoCalificado(ctx, evento) {
+  const a = avanceEvaluacion(ctx, evento);
+  return Boolean(a && a.grupos > 0 && a.evaluados === a.grupos);
+}
 
 export function nombreEvento(evento) {
   return ['INTRO', 'REFUERZO', 'REVISION'].includes(evento.codigo) ? evento.titulo : `${evento.codigo} · ${evento.titulo}`;
@@ -29,6 +38,10 @@ export function useEvento(id) {
 
 /** Pestañas que aplican al evento. */
 export function pestanasDe(cfg, evento) {
+  if (seCalificaTrabajo(evento)) {
+    const porGrupo = unidadTrabajo(cfg.actividades[evento.config]) === 'grupo';
+    return [{ id: 'grupos', texto: porGrupo ? 'Grupos' : 'Estudiantes' }, { id: 'resumen', texto: 'Resumen' }];
+  }
   if (!evento.sesion || evento.estado !== 'normal') return [];
   const conPuerta = cfg.preparatorio.aplica_a.includes(evento.tipo);
   const conControl = cfg.controlOral.sesiones.includes(evento.tipo);
@@ -45,6 +58,7 @@ export function pestanasDe(cfg, evento) {
 /** Primera pestaña con algo por hacer: puerta → control → grupos; con el pase cerrado, resumen. */
 function pestanaPorDefecto(ctx, evento, pestanas) {
   const ids = pestanas.map((p) => p.id);
+  if (seCalificaTrabajo(evento)) return trabajoCalificado(ctx, evento) ? 'resumen' : 'grupos';
   if (ctx.pases.get(evento.id)?.cerrado) return 'resumen';
   if (ids.includes('puerta') && !ctx.revisionPrep.get(evento.id)?.revisada) return 'puerta';
   if (ids.includes('control') && !ctx.reg.controles.some((c) => c.evento === evento.id)) return 'control';
@@ -68,6 +82,7 @@ export function Evento({ id, pestana }) {
   const punto = (p) => {
     if (p.id === 'puerta') return ctx.revisionPrep.get(evento.id)?.revisada ? 'ok' : null;
     if (p.id === 'control') return ctx.reg.controles.some((c) => c.evento === evento.id) ? 'ok' : null;
+    if (p.id === 'grupos' && evento.tipo === 'trabajo_casa') return trabajoCalificado(ctx, evento) ? 'ok' : null;
     if (p.id === 'grupos') return ctx.pases.get(evento.id)?.cerrado ? 'ok' : null;
     if (p.id === 'retro') {
       const r = retroDelTaller(ctx, evento);
@@ -87,19 +102,23 @@ export function Evento({ id, pestana }) {
       ${activa === 'puerta' && html`<${Puerta} ctx=${ctx} evento=${evento} />`}
       ${activa === 'control' && html`<${Control} ctx=${ctx} evento=${evento} />`}
       ${activa === 'retro' && html`<${Retro} ctx=${ctx} evento=${evento} />`}
-      ${activa === 'grupos' && html`<${Grupos} ctx=${ctx} evento=${evento} />`}
+      ${activa === 'grupos' && (evento.tipo === 'trabajo_casa' ? html`<${Trabajos} ctx=${ctx} evento=${evento} />` : html`<${Grupos} ctx=${ctx} evento=${evento} />`)}
       ${activa === 'resumen' && html`<${Resumen} ctx=${ctx} evento=${evento} />`}
     <//>`;
 }
 
 export function AvisoDeEstado({ evento, estado, eventos }) {
+  const { cfg } = useApp();
   if (estado.clave === 'feriado') return html`<${Aviso} tono="aviso" titulo="Feriado: ${estado.detalle}">Esta actividad no se hace en este curso y no cuenta en la nota del bimestre.<//>`;
   if (estado.clave === 'sin_clase') return html`<${Aviso} tono="aviso" titulo="Sin clase: ${estado.detalle}">Esta sesión no cuenta.<//>`;
   if (evento.tipo === 'trabajo_casa') {
     const practica = eventos.find((e) => e.id === evento.practica);
-    return html`<${Aviso} titulo=${evento.con_nota ? 'Trabajo en casa (se califica en la Fase 5)' : 'Trabajo en casa sin nota'}>
-      Usa los grupos y la asistencia de ${practica ? html`<a class="negrita" href=${enlace('evento', practica.id)}>${practica.codigo}</a>` : 'su práctica'}.
-    <//>`;
+    const enlacePractica = practica ? html`<a class="negrita" href=${enlace('evento', practica.id)}>${practica.codigo}</a>` : 'su práctica';
+    if (!evento.con_nota) {
+      return html`<${Aviso} titulo="Trabajo en casa sin nota">${cfg.actividades[evento.config]?.nota ?? 'No tiene nota propia.'}<//>`;
+    }
+    if (!evento.config) return html`<${Aviso} tono="aviso" titulo="Falta la configuración de este TC">Cuando esté cargada, se califica aquí con los grupos de ${enlacePractica}.<//>`;
+    return html`<p class="tenue pequeno">Trabajo en casa de ${enlacePractica}: usa sus grupos y su asistencia (quien faltó tiene 0).</p>`;
   }
   if (evento.tipo === 'plic') return html`<${Aviso} titulo="PLIC (Fase 6)">Examen presencial controlado por un profesor; vale 0.5 si se completa de forma válida.<//>`;
   if (evento.tipo === 'sin_nota') return html`<${Aviso}>Sesión sin nota: solo se registra la asistencia (pase por grupo).<//>`;
