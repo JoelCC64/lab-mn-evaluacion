@@ -58,6 +58,7 @@ Claves entre corchetes: compuestas. Todas las tablas de registro llevan `fecha` 
 - La carpeta del Excel elegida en Chrome.
 - El último respaldo importado.
 - El registro de escrituras en el Excel (solo conteos).
+- El nombre del profesor (Datos › Este dispositivo), para la columna PROFESOR de las hojas de coordinación y la firma del texto para otros profesores. No está en la configuración porque el repositorio es público; se escribe una vez en el iPhone y otra en la Mac.
 
 ## Reglas del modelo
 

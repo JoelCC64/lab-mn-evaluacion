@@ -17,10 +17,11 @@ const TROZO = 30000;   // caracteres por celda (Excel admite hasta 32 767)
 const ARGB = { azul: 'FF1F3A5F', blanco: 'FFFFFFFF', gris: 'FF5A6270', ambar: 'FFFFF4D6' };
 
 /**
- * Libro de respaldo. `cursos`: [{ curso, eventos, reg }]; `respaldo`: el objeto de exportarRespaldo.
- * Devuelve el libro de ExcelJS (falta escribirlo con wb.xlsx.writeBuffer()).
+ * Libro de respaldo. `cursos`: [{ curso, eventos, reg }]; `respaldo`: el objeto de exportarRespaldo; `profesor`: el
+ * nombre para las hojas de coordinación (ajuste del dispositivo). Devuelve el libro de ExcelJS (falta escribirlo con
+ * wb.xlsx.writeBuffer()).
  */
-export function crearLibroRespaldo(ExcelJS, cfg, cursos, respaldo, { hoy, demo = false }) {
+export function crearLibroRespaldo(ExcelJS, cfg, cursos, respaldo, { hoy, demo = false, profesor = null }) {
   const wb = new ExcelJS.Workbook();
   wb.creator = 'App Lab MN';
   wb.created = new Date(respaldo.creado);
@@ -51,7 +52,7 @@ export function crearLibroRespaldo(ExcelJS, cfg, cursos, respaldo, { hoy, demo =
       }
     });
   }
-  const plan = planificarEscritura(wb, cfg, cursos, { hoy });
+  const plan = planificarEscritura(wb, cfg, cursos, { hoy, profesor });
   aplicarEscritura(wb, cfg, plan, { app: respaldo.app, ahora: respaldo.creado, config: respaldo.config });
   wb.removeWorksheet(wb.getWorksheet(cfg.excel.escritura.hoja_control).id);   // la hoja de control no hace falta aquí
 

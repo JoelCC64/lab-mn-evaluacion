@@ -10,6 +10,7 @@ import { leerAsistenciaSemana1, leerExcelSemestre } from '../src/nucleo/excel-le
 import { aplicarAsistenciaSemana1, aplicarExcelSemestre, planificarImportacion } from '../src/datos/importar.js';
 import { borrarTodo, exportarRespaldo, restaurarRespaldo, validarRespaldo } from '../src/datos/respaldo.js';
 import { registrosDelCurso } from '../src/datos/consultas.js';
+import { guardarProfesor, leerProfesor } from '../src/datos/local.js';
 import { generarEventos } from '../src/nucleo/calendario.js';
 import { ASISTENCIA_EJEMPLO, EXCEL_EJEMPLO, configReal } from './ayudas.js';
 
@@ -158,6 +159,21 @@ test('respaldo: exportar, borrar todo, restaurar y obtener datos idénticos', as
   await restaurarRespaldo(db, leido);
   const despues = await exportarRespaldo(db, opciones);
   assert.deepEqual(despues, antes);
+});
+
+test('el nombre del profesor se guarda solo en este dispositivo: no viaja en el respaldo y restaurar no lo borra', async () => {
+  const db = await baseConEjemplo();
+  assert.equal(await leerProfesor(db), null);
+  await assert.rejects(guardarProfesor(db, 'alguien@ejemplo.ec'), /correo/);
+  await guardarProfesor(db, '  Prof.   Nombre  Ficticio ');
+  assert.equal(await leerProfesor(db), 'Prof. Nombre Ficticio');
+  const respaldo = await exportarRespaldo(db, { semestre: '2026B', app: 'prueba', config: cfg.version, ahora: AHORA });
+  assert.ok(!JSON.stringify(respaldo).includes('Prof. Nombre Ficticio'), 'no viaja en el respaldo');
+  await borrarTodo(db);
+  await restaurarRespaldo(db, respaldo);
+  assert.equal(await leerProfesor(db), 'Prof. Nombre Ficticio', 'restaurar un respaldo no lo borra');
+  await guardarProfesor(db, ' ');
+  assert.equal(await leerProfesor(db), null, 'vacío lo borra');
 });
 
 test('el respaldo rechaza archivos de otro formato, versión o semestre', async () => {

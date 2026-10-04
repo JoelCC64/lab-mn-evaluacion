@@ -251,7 +251,7 @@ Detalle en [docs/excel.md](docs/excel.md).
 - **Aviso de control oral al cierre:** cuando quedan 2 sesiones o menos del bimestre (`aviso_cierre_sesiones` en `control-oral.json`), el curso y las notas muestran quién sigue sin control.
 - **Recordatorio del envío** en Inicio: los días que faltan para el 1-dic (o el 29-ene) y los eventos que ya pasaron y siguen sin evaluar en todos los cursos. Se destaca a 14 días o menos (`dias_aviso_envio`).
 - **Excel:** hojas «Coordinación B1» y «Coordinación B2» (ver `docs/excel.md`):
-  - APELLIDOS Y NOMBRES | NÚMERO ÚNICO | NOTA(/6) | PROFESOR, con «Prof. Nombre Ficticio» (`semestre-2026B.json → profesor`).
+  - APELLIDOS Y NOMBRES | NÚMERO ÚNICO | NOTA(/6) | PROFESOR. El nombre del profesor es un ajuste del dispositivo desde la 0.9.0 (ver Fase 7).
   - Orden alfabético; los pendientes van aparte, en ámbar.
   - La nota es la misma de la hoja del curso, con 2 decimales.
   - La verificación antes de guardar conoce las hojas nuevas.
@@ -280,7 +280,7 @@ Detalle en [docs/excel.md](docs/excel.md).
   - Se agregan como presentes, porque están en la sala; se corrigen como cualquiera.
   - No se pueden sortear para el control. Su texto incluye el control si se registró.
 - **Coordinación:** una sola lista por bimestre con todos los cursos, por orden alfabético, y la nota solo cuando el bimestre está completo.
-- **El nombre del profesor está en la configuración del repositorio, que es público.**
+- El nombre del profesor estuvo en la configuración hasta la 0.8.0; desde la 0.9.0 es un ajuste del dispositivo (ver Fase 7).
 
 ## Fase 5 (3-oct-2026) · trabajos en casa (SQI) · versión 0.7.0
 

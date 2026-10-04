@@ -18,6 +18,7 @@ import { hojasPropiasDelPlan, aplicarEscritura, compararLibros, letra, planifica
 import { inflarEnNavegador, revisarPartesExcel } from '../nucleo/zip.js';
 import { hoyLocal } from '../nucleo/util.js';
 import { VERSION_APP } from '../version.js';
+import { AjusteProfesor, useProfesor } from './dispositivo.js';
 
 const EXCEL_DEMO = 'datos-ejemplo/Cursos_Lab_MN_2026B_EJEMPLO.xlsx';
 const TIPO_XLSX = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
@@ -41,6 +42,7 @@ export function Excel() {
   const [revision, setRevision] = useState(null);
   const [ocupado, setOcupado] = useState(null);
   const [resultado, setResultado] = useState(null);
+  const profesor = useProfesor();                       // ajuste del dispositivo: columna PROFESOR de coordinación
 
   useEffect(() => {
     leerLocal(db, 'respaldo_importado').then(setRespaldo);
@@ -95,9 +97,14 @@ export function Excel() {
     const partes = await revisarPartesExcel(fuente.bytes, inflarEnNavegador);
     const wb = await abrirLibro(fuente.bytes);
     const cursos = await cargarCursos(db, cfg);
-    const plan = planificarEscritura(wb, cfg, cursos, { hoy: hoyLocal(), decisiones });
+    const plan = planificarEscritura(wb, cfg, cursos, { hoy: hoyLocal(), decisiones, profesor });
     setRevision({ ...fuente, partes, wb, cursos, plan, decisiones, origen });
   });
+
+  // Si se escribe el nombre con una revisión a la vista, se vuelve a preparar con él.
+  useEffect(() => {
+    if (revision) setRevision({ ...revision, plan: planificarEscritura(revision.wb, cfg, revision.cursos, { hoy: hoyLocal(), decisiones: revision.decisiones, profesor }) });
+  }, [profesor]);
 
   const desdeCarpeta = async () => {
     if (!carpeta || !archivo) throw new Error('Primero elige la carpeta y el archivo del Excel.');
@@ -120,7 +127,7 @@ export function Excel() {
   const decidir = (claves, decision) => {
     const decisiones = new Map(revision.decisiones);
     for (const k of claves) decisiones.set(k, decision);
-    const plan = planificarEscritura(revision.wb, cfg, revision.cursos, { hoy: hoyLocal(), decisiones });
+    const plan = planificarEscritura(revision.wb, cfg, revision.cursos, { hoy: hoyLocal(), decisiones, profesor });
     setRevision({ ...revision, plan, decisiones });
   };
 
@@ -136,7 +143,7 @@ export function Excel() {
     }
     // Se escribe sobre un libro recién leído (el de la revisión se usa para volver a planificar).
     const wb = await abrirLibro(r.bytes);
-    const plan = planificarEscritura(wb, cfg, r.cursos, { hoy: hoyLocal(), decisiones: r.decisiones });
+    const plan = planificarEscritura(wb, cfg, r.cursos, { hoy: hoyLocal(), decisiones: r.decisiones, profesor });
     if (plan.conflictos.length) throw new Error('Quedan celdas editadas a mano sin decidir.');
     aplicarEscritura(wb, cfg, plan, { app: VERSION_APP, ahora: new Date().toISOString(), config: cfg.version });
     const nuevo = new Uint8Array(await wb.xlsx.writeBuffer());
@@ -160,7 +167,7 @@ export function Excel() {
       await w.close();
       // Comprobación final: el archivo guardado ya no tiene nada por escribir.
       const guardado = await r.h.getFile();
-      const despues = planificarEscritura(await abrirLibro(new Uint8Array(await guardado.arrayBuffer())), cfg, r.cursos, { hoy: hoyLocal() });
+      const despues = planificarEscritura(await abrirLibro(new Uint8Array(await guardado.arrayBuffer())), cfg, r.cursos, { hoy: hoyLocal(), profesor });
       await registrarEscritura(db, resumen);
       setEscritura(await ultimaEscritura(db));
       setResultado({ ...resumen, copia, verificado: despues.sinCambios });
@@ -182,6 +189,15 @@ export function Excel() {
           Este navegador no puede guardar sobre el Excel. En el iPhone, exporta el respaldo en «Datos» y envíalo a la Mac por AirDrop;
           en la Mac, abre la app en Chrome y entra aquí.
         <//>`}
+
+      ${profesor === null && html`
+        <div class="tarjeta">
+          <${Aviso} tono="aviso" titulo="Falta tu nombre para las hojas de coordinación">
+            Va en la columna PROFESOR de «${cfg.excel.escritura.hojas_coordinacion[1]}» y «${cfg.excel.escritura.hojas_coordinacion[2]}».
+            Se guarda solo en este dispositivo.
+          <//>
+          <${AjusteProfesor} />
+        </div>`}
 
       <div class="tarjeta">
         <h2>1. Datos de la app</h2>

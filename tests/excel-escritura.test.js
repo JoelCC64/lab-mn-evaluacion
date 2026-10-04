@@ -34,6 +34,7 @@ const cfg = configReal();
 const HOY = '2026-10-20';
 const AHORA = '2026-10-20T18:00:00.000Z';
 const META = { app: 'prueba', ahora: AHORA, config: cfg.version };
+const PROFESOR = 'Prof. Nombre Ficticio';   // ajuste del dispositivo (no está en la configuración)
 const ESC = cfg.excel.escritura;
 const PROPIAS = new Set([ESC.hoja_asistencia, ESC.hoja_detalle, ESC.hojas_coordinacion[1], ESC.hojas_coordinacion[2], ESC.hoja_control]);
 const inflar = async (b) => zlib.inflateRawSync(b);
@@ -109,7 +110,7 @@ async function baseEvaluada() {
 
 /** Escribe con lo que hay en la base: devuelve { plan, buffer }. */
 async function escribir(db, wb, { decisiones } = {}) {
-  const plan = planificarEscritura(wb, cfg, await cargarCursos(db, cfg), { hoy: HOY, decisiones });
+  const plan = planificarEscritura(wb, cfg, await cargarCursos(db, cfg), { hoy: HOY, profesor: PROFESOR, decisiones });
   aplicarEscritura(wb, cfg, plan, META);
   return { plan, buffer: await wb.xlsx.writeBuffer() };
 }
@@ -232,16 +233,30 @@ test('ida y vuelta: fuera de las zonas de la app todo queda idéntico (ExcelJS y
     const filas = [];
     coord.eachRow((f, r) => { if (r > 4 && f.getCell(2).value !== null) filas.push(f); });
     assert.equal(filas.length, 196);
-    assert.ok(filas.every((f) => f.getCell(4).value === cfg.semestre.profesor && f.getCell(3).value === null), 'sin notas: el bimestre no está completo');
+    assert.ok(filas.every((f) => f.getCell(4).value === PROFESOR && f.getCell(3).value === null), 'sin notas: el bimestre no está completo');
     assert.ok(filas.slice(-2).every((f) => f.getCell(1).fill?.fgColor?.argb === 'FFFFF4D6'), 'los pendientes van al final, en ámbar');
   }
+});
+
+test('el nombre del profesor es un ajuste del dispositivo: sin él, la columna PROFESOR queda vacía y se avisa', async () => {
+  assert.equal(cfg.semestre.profesor, undefined, 'el nombre no está en la configuración (el repositorio es público)');
+  const { db } = await baseEvaluada();
+  const { buffer } = await escribir(db, await libro());
+  const sinNombre = planificarEscritura(await libroDeBuffer(buffer), cfg, await cargarCursos(db, cfg), { hoy: HOY });
+  assert.ok(sinNombre.avisos.some((a) => a.includes('PROFESOR') && a.includes('Este dispositivo')), sinNombre.avisos.join('\n'));
+  assert.equal(sinNombre.sinCambios, false, 'cambia la columna PROFESOR de coordinación');
+  const coord = sinNombre.propias.find((p) => p.nombre === ESC.hojas_coordinacion[1]);
+  assert.ok(coord.filas.filter((f) => f.length === 4).every((f) => f[3] === null));
+  const conNombre = planificarEscritura(await libroDeBuffer(buffer), cfg, await cargarCursos(db, cfg), { hoy: HOY, profesor: PROFESOR });
+  assert.equal(conNombre.sinCambios, true);
+  assert.ok(!conNombre.avisos.some((a) => a.includes('PROFESOR')));
 });
 
 test('escribir dos veces seguidas no cambia nada', async () => {
   const { db } = await baseEvaluada();
   const { plan: primero, buffer } = await escribir(db, await libro());
   assert.equal(primero.sinCambios, false);
-  const segundo = planificarEscritura(await libroDeBuffer(buffer), cfg, await cargarCursos(db, cfg), { hoy: HOY });
+  const segundo = planificarEscritura(await libroDeBuffer(buffer), cfg, await cargarCursos(db, cfg), { hoy: HOY, profesor: PROFESOR });
   assert.equal(segundo.sinCambios, true);
   assert.equal(segundo.celdasQueCambian, 0);
   assert.equal(segundo.conflictos.length, 0);
@@ -267,7 +282,7 @@ test('una edición a mano en una celda de la app se detecta; se puede conservar 
   editado.getWorksheet('GR2QB').getRow(h.filas.get(gr2qb.ausente.id)).getCell(colObs).value = 'Justificó con certificado';
   const conEdicion = Buffer.from(await editado.xlsx.writeBuffer());
 
-  const plan2 = planificarEscritura(await libroDeBuffer(conEdicion), cfg, await cargarCursos(db, cfg), { hoy: HOY });
+  const plan2 = planificarEscritura(await libroDeBuffer(conEdicion), cfg, await cargarCursos(db, cfg), { hoy: HOY, profesor: PROFESOR });
   assert.equal(plan2.conflictos.length, 2);
   const cP1 = plan2.conflictos.find((c) => c.codigo === id);
   assert.deepEqual([cP1.tipo, cP1.columna, cP1.actual, cP1.sePuedeConservar], ['editada', 'P1', 9.5, true]);
@@ -277,7 +292,7 @@ test('una edición a mano en una celda de la app se detecta; se puede conservar 
   // Conservar la P1 (queda fijada y cuenta como ajuste «editado en el Excel»); reemplazar la observación.
   const decisiones = new Map([[cP1.clave, 'conservar'], [plan2.conflictos.find((c) => c.codigo !== id).clave, 'reemplazar']]);
   const wb3 = await libroDeBuffer(conEdicion);
-  const plan3 = planificarEscritura(wb3, cfg, await cargarCursos(db, cfg), { hoy: HOY, decisiones });
+  const plan3 = planificarEscritura(wb3, cfg, await cargarCursos(db, cfg), { hoy: HOY, profesor: PROFESOR, decisiones });
   assert.equal(plan3.conflictos.length, 0);
   aplicarEscritura(wb3, cfg, plan3, META);
   const buffer3 = await wb3.xlsx.writeBuffer();
@@ -289,17 +304,17 @@ test('una edición a mano en una celda de la app se detecta; se puede conservar 
   assert.ok(leerControl(escrito3, cfg).fijadas.has(claveCelda('GR2QB', id, 'B1:P1')));
 
   // La siguiente escritura respeta la celda fijada sin volver a preguntar…
-  const plan4 = planificarEscritura(await libroDeBuffer(buffer3), cfg, await cargarCursos(db, cfg), { hoy: HOY });
+  const plan4 = planificarEscritura(await libroDeBuffer(buffer3), cfg, await cargarCursos(db, cfg), { hoy: HOY, profesor: PROFESOR });
   assert.equal(plan4.conflictos.length, 0);
   assert.equal(plan4.sinCambios, true);
   // …y si Joel la vuelve a cambiar, pregunta otra vez; «reemplazar» devuelve la nota de la app.
   const otraVez = await libroDeBuffer(buffer3);
   otraVez.getWorksheet('GR2QB').getRow(h.filas.get(id)).getCell(colP1).value = 9;
   const buffer5 = Buffer.from(await otraVez.xlsx.writeBuffer());
-  const plan5 = planificarEscritura(await libroDeBuffer(buffer5), cfg, await cargarCursos(db, cfg), { hoy: HOY });
+  const plan5 = planificarEscritura(await libroDeBuffer(buffer5), cfg, await cargarCursos(db, cfg), { hoy: HOY, profesor: PROFESOR });
   assert.deepEqual(plan5.conflictos.map((c) => [c.tipo, c.anterior, c.actual]), [['fijada', 9.5, 9]]);
   const wb6 = await libroDeBuffer(buffer5);
-  const plan6 = planificarEscritura(wb6, cfg, await cargarCursos(db, cfg), { hoy: HOY, decisiones: new Map([[plan5.conflictos[0].clave, 'reemplazar']]) });
+  const plan6 = planificarEscritura(wb6, cfg, await cargarCursos(db, cfg), { hoy: HOY, profesor: PROFESOR, decisiones: new Map([[plan5.conflictos[0].clave, 'reemplazar']]) });
   aplicarEscritura(wb6, cfg, plan6, META);
   const escrito6 = await libroDeBuffer(await wb6.xlsx.writeBuffer());
   assert.equal(valorCelda(escrito6.getWorksheet('GR2QB').getRow(h.filas.get(id)).getCell(colP1)), celdaDe((await libroDeBuffer(buffer)).getWorksheet('GR2QB'), plan, id, 'B1:P1'));
@@ -312,7 +327,7 @@ test('un texto escrito a mano en una nota de evento no se puede conservar como n
   const h = plan.hojas.find((x) => x.hoja === 'GR2QB');
   const wb = await libroDeBuffer(buffer);
   wb.getWorksheet('GR2QB').getRow(h.filas.get(gr2qb.controlado.id)).getCell(h.inicio + 1).value = 'revisar';
-  const plan2 = planificarEscritura(await libroDeBuffer(await wb.xlsx.writeBuffer()), cfg, await cargarCursos(db, cfg), { hoy: HOY });
+  const plan2 = planificarEscritura(await libroDeBuffer(await wb.xlsx.writeBuffer()), cfg, await cargarCursos(db, cfg), { hoy: HOY, profesor: PROFESOR });
   assert.equal(plan2.conflictos[0].sePuedeConservar, false);
 });
 
@@ -331,7 +346,7 @@ test('estudiantes que no coinciden, zona movida y hoja propia editada: se avisa 
   // Una celda de la hoja de asistencia editada a mano.
   wb.getWorksheet(cfg.excel.escritura.hoja_asistencia).getRow(5).getCell(6).value = 'X';
 
-  const plan2 = planificarEscritura(await libroDeBuffer(await wb.xlsx.writeBuffer()), cfg, await cargarCursos(db, cfg), { hoy: HOY });
+  const plan2 = planificarEscritura(await libroDeBuffer(await wb.xlsx.writeBuffer()), cfg, await cargarCursos(db, cfg), { hoy: HOY, profesor: PROFESOR });
   assert.deepEqual(plan2.sinApp.map((x) => [x.hoja, x.codigo]), [['GR4EB', '199988888']]);
   assert.deepEqual(plan2.sinFila.map((x) => [x.hoja, x.codigo]), [['GR4EB', codigoBorrado]]);
   assert.ok(plan2.errores.some((e) => e.startsWith('GR7SA') && e.includes('«P1»')));

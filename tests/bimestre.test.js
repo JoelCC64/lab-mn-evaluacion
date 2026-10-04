@@ -33,6 +33,7 @@ import { configReal, copia } from './ayudas.js';
 const cerca = (a, b, msg) => assert.ok(Math.abs(a - b) < 1e-9, `${msg ?? ''} ${a} ≠ ${b}`);
 const AHORA = '2026-11-20T15:00:00.000Z';
 const HOY = '2026-11-20';
+const PROFESOR = 'Prof. Nombre Ficticio';   // ajuste del dispositivo (no está en la configuración)
 
 /** Configuración real más P2, P3 (Clásica y SQI) y T2, T3, copiadas de P1 y T1 (sus guías aún no llegan). */
 function configCompleta() {
@@ -255,12 +256,13 @@ test('estudiante de otro curso que recupera aquí: se califica con su grupo, la 
   ({ ctx } = await k.cargar());
   cerca(notaEvento(ctx, p1, id).valor, 0.95, 'la nota de su grupo');
   assert.ok(!gruposDelEvento(ctx.eventoPorId.get('GR2QB:T1'), ctx.eventos, ctx.reg).porEstudiante.has(id), 'solo aparece en P1');
-  const { texto, final } = textoParaSuProfesor(ctx, p1, v);
+  const { texto, final } = textoParaSuProfesor(ctx, p1, v, PROFESOR);
   assert.equal(final, true);
   for (const linea of ['Estudiante: RUIZ PÉREZ ANA LUCÍA · código 201912345 · paralelo GR5XX', 'Sesión: GR2QB, lunes 5 de octubre de 2026, 09:00–11:00',
-    'Asistencia: Presente', 'Nota de la actividad: 9.5/10 (diseño 3/4 · datos 4/4 · análisis 4/4)', 'Trabajo preparatorio: 2/2', 'Prof. Nombre Ficticio']) {
+    'Asistencia: Presente', 'Nota de la actividad: 9.5/10 (diseño 3/4 · datos 4/4 · análisis 4/4)', 'Trabajo preparatorio: 2/2', PROFESOR]) {
     assert.ok(texto.includes(linea), `falta «${linea}» en:\n${texto}`);
   }
+  assert.ok(!textoParaSuProfesor(ctx, p1, v).texto.includes(PROFESOR), 'sin el nombre en el dispositivo, el texto va sin firma');
   // No va al Excel ni a coordinación, y volver a leer el Excel no lo da de baja.
   const cursos = await cargarCursos(k.db, cfg);
   const wb = crearLibroRespaldo(ExcelJS, cfg, cursos, await exportarRespaldo(k.db, { semestre: '2026B', app: 'prueba', config: cfg.version, ahora: AHORA }), { hoy: HOY });
@@ -299,16 +301,16 @@ test('hojas de coordinación: sus cuatro columnas, notas con 2 decimales, el pro
   const cursos = await cargarCursos(k.db, cfg);
   const respaldo = await exportarRespaldo(k.db, { semestre: '2026B', app: 'prueba', config: cfg.version, ahora: AHORA });
   const wb = new ExcelJS.Workbook();
-  await wb.xlsx.load(await crearLibroRespaldo(ExcelJS, cfg, cursos, respaldo, { hoy: HOY }).xlsx.writeBuffer());
+  await wb.xlsx.load(await crearLibroRespaldo(ExcelJS, cfg, cursos, respaldo, { hoy: HOY, profesor: PROFESOR }).xlsx.writeBuffer());
   const ws = wb.getWorksheet(cfg.excel.escritura.hojas_coordinacion[1]);
   assert.deepEqual(ws.getRow(4).values.slice(1), ['APELLIDOS Y NOMBRES', 'NÚMERO ÚNICO', 'NOTA(/6)', 'PROFESOR']);
   const filas = [];
   ws.eachRow((f, r) => { if (r > 4) filas.push(f.values.slice(1)); });
   assert.deepEqual(filas.slice(0, 4), [
-    ['APELLIDOA SEGUNDO NOMBREA', 'a', 5.01, 'Prof. Nombre Ficticio'],
-    ['APELLIDOB SEGUNDO NOMBREB', 'b', 4.3, 'Prof. Nombre Ficticio'],
-    ['APELLIDOC SEGUNDO NOMBREC', 'c', 5.11, 'Prof. Nombre Ficticio'],
-    ['APELLIDOD SEGUNDO NOMBRED', 'd', 5.28, 'Prof. Nombre Ficticio'],
+    ['APELLIDOA SEGUNDO NOMBREA', 'a', 5.01, PROFESOR],
+    ['APELLIDOB SEGUNDO NOMBREB', 'b', 4.3, PROFESOR],
+    ['APELLIDOC SEGUNDO NOMBREC', 'c', 5.11, PROFESOR],
+    ['APELLIDOD SEGUNDO NOMBRED', 'd', 5.28, PROFESOR],
   ]);
   assert.match(String(filas[4][0]), /^Pendientes de la lista final/);
   assert.equal(filas[5][0], 'APELLIDOP SEGUNDO NOMBREP');

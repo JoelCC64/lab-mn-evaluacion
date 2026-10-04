@@ -3,6 +3,7 @@
 import { useEffect, useState } from '../vendor/preact-htm.js';
 import { exportarRespaldo, nombreArchivoRespaldo } from '../datos/respaldo.js';
 import { cargarCursos } from '../datos/excel-datos.js';
+import { leerProfesor } from '../datos/local.js';
 import { crearLibroRespaldo, leerRespaldoDeLibro } from '../nucleo/respaldo-libro.js';
 import { hoyLocal } from '../nucleo/util.js';
 import { abrirLibro, cargarExcelJS, compartirODescargar, guardarUltimoRespaldo, leerUltimoRespaldo } from './archivos.js';
@@ -18,7 +19,7 @@ export const ACEPTA_RESPALDO = `.xlsx,.json,application/json,${TIPO_XLSX}`;
 export async function exportarRespaldoDelDia({ cfg, db, demo }) {
   const ExcelJS = await cargarExcelJS();
   const respaldo = await exportarRespaldo(db, { semestre: cfg.semestre.semestre, app: VERSION_APP, config: cfg.version });
-  const wb = crearLibroRespaldo(ExcelJS, cfg, await cargarCursos(db, cfg), respaldo, { hoy: hoyLocal(), demo });
+  const wb = crearLibroRespaldo(ExcelJS, cfg, await cargarCursos(db, cfg), respaldo, { hoy: hoyLocal(), demo, profesor: await leerProfesor(db) });
   const buffer = await wb.xlsx.writeBuffer();
   const nombre = nombreArchivoRespaldo(cfg.semestre.semestre + (demo ? '-demo' : ''), new Date(respaldo.creado), 'xlsx');
   const resultado = await compartirODescargar(nombre, buffer, TIPO_XLSX);

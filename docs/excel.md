@@ -53,7 +53,7 @@ Componentes y notas:
 - «Detalle (app)»: una fila por estudiante y evento ya ocurrido, con todo lo registrado. Además de las columnas del Anexo J lleva «Etiquetas».
   - En un TC: «Puntajes» lleva cada pregunta («1a 1 · 1b 2 · 2a-i 0.5 …») o «no entregó», «Nota del grupo» la del TC sobre 10, «Etiquetas» los errores marcados con su pregunta y la observación, la nota del profesor.
 - «Coordinación B1» y «Coordinación B2» (Fase 6), las que se envían a coordinación (1-dic-2026 y 29-ene-2027):
-  - Cuatro columnas: APELLIDOS Y NOMBRES (una sola columna) | NÚMERO ÚNICO | NOTA(/6) | PROFESOR (`semestre-2026B.json → profesor`).
+  - Cuatro columnas: APELLIDOS Y NOMBRES (una sola columna) | NÚMERO ÚNICO | NOTA(/6) | PROFESOR. El nombre del profesor es un ajuste de cada dispositivo (Datos › Este dispositivo), no está en la configuración; sin él, esa columna queda vacía y la revisión lo avisa.
   - Todos los cursos en orden alfabético; los pendientes de nómina van aparte, al final y en ámbar.
   - La nota es la misma de la columna «Nota B1/B2» de la hoja del curso (incluida una celda conservada a mano), con 2 decimales. Vacía mientras el bimestre no esté completo.
   - Los estudiantes de otros docentes que recuperan aquí no aparecen.

@@ -131,10 +131,11 @@ export function ubicarZona(ws, cfg, columnas) {
 /**
  * Prepara la escritura sin modificar el libro.
  * `cursos`: [{ curso, eventos, reg }] con lo registrado en la app. `decisiones`: Map(clave de celda →
- * 'conservar' | 'reemplazar') para las celdas editadas a mano. Devuelve el plan con las celdas de cada
- * hoja, los conflictos aún sin decidir, avisos, errores y el contenido de las hojas propias.
+ * 'conservar' | 'reemplazar') para las celdas editadas a mano. `profesor`: nombre para la columna PROFESOR de
+ * las hojas de coordinación (ajuste del dispositivo; sin él, la columna queda vacía y se avisa). Devuelve el plan
+ * con las celdas de cada hoja, los conflictos aún sin decidir, avisos, errores y el contenido de las hojas propias.
  */
-export function planificarEscritura(wb, cfg, cursos, { hoy, decisiones = new Map() } = {}) {
+export function planificarEscritura(wb, cfg, cursos, { hoy, decisiones = new Map(), profesor = null } = {}) {
   const esc = cfg.excel.escritura;
   const control = leerControl(wb, cfg);
   const plan = {
@@ -238,8 +239,12 @@ export function planificarEscritura(wb, cfg, cursos, { hoy, decisiones = new Map
   }
   plan.propias = [
     hojaAsistencia(cfg, contextos), hojaDetalle(cfg, contextos, hoy),
-    hojaCoordinacion(cfg, contextos, 1, finales), hojaCoordinacion(cfg, contextos, 2, finales),
+    hojaCoordinacion(cfg, contextos, 1, finales, profesor), hojaCoordinacion(cfg, contextos, 2, finales, profesor),
   ];
+  if (!profesor) {
+    plan.avisos.push(`Falta tu nombre para la columna PROFESOR de «${cfg.excel.escritura.hojas_coordinacion[1]}» y «${cfg.excel.escritura.hojas_coordinacion[2]}»: `
+      + 'escríbelo en Datos › Este dispositivo. Mientras tanto, esa columna queda vacía.');
+  }
   for (const p of plan.propias) {
     const ws = wb.getWorksheet(p.nombre);
     p.nueva = !ws;
@@ -312,11 +317,10 @@ const codigoComoValor = (c) => (/^\d{1,15}$/.test(String(c)) ? Number(c) : Strin
 /**
  * «Coordinación B1» o «B2»: APELLIDOS Y NOMBRES | NÚMERO ÚNICO | NOTA(/6) | PROFESOR (formato_coordinacion), todos los
  * cursos por orden alfabético y, aparte, los pendientes de nómina (en ámbar). La nota va con 2 decimales y solo
- * cuando el bimestre está completo; mientras tanto, vacía.
+ * cuando el bimestre está completo; mientras tanto, vacía. `profesor` es el ajuste del dispositivo (o null).
  */
-function hojaCoordinacion(cfg, contextos, b, finales) {
+function hojaCoordinacion(cfg, contextos, b, finales, profesor) {
   const [colNombre, colCodigo, colNota, colProfesor] = cfg.semestre.formato_coordinacion;
-  const profesor = cfg.semestre.profesor ?? null;
   const nomina = [], pendientes = [];
   for (const { ctx } of contextos) {
     for (const e of activos(ctx.reg.estudiantes)) {
@@ -326,7 +330,7 @@ function hojaCoordinacion(cfg, contextos, b, finales) {
     }
   }
   const porNombre = (x, y) => x.e.nombre.localeCompare(y.e.nombre, 'es');
-  const fila = ({ e, nota }) => [e.nombre, codigoComoValor(e.codigo), nota, profesor];
+  const fila = ({ e, nota }) => [e.nombre, codigoComoValor(e.codigo), nota, profesor ?? null];
   const filas = nomina.sort(porNombre).map(fila);
   const ambar = new Set(), resaltadas = new Set();
   if (pendientes.length) {

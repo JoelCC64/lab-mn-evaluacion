@@ -8,6 +8,7 @@ import { ACEPTA_RESPALDO, exportarRespaldoDelDia, leerArchivoDeRespaldo, marcarR
 import { conteoTablas } from '../datos/consultas.js';
 import { guardarLocal } from '../datos/local.js';
 import { ACEPTA_EXCEL, abrirLibro, elegirArchivo } from './archivos.js';
+import { AjusteProfesor } from './dispositivo.js';
 import { VERSION_APP } from '../version.js';
 
 const ARCHIVO_DEMO = 'datos-ejemplo/Cursos_Lab_MN_2026B_EJEMPLO.xlsx';
@@ -100,6 +101,16 @@ export function Datos() {
         <button class="boton primario grande" disabled=${!!ocupado} onClick=${exportar}>Exportar el respaldo del día</button>
         <button class="boton ancho" disabled=${!!ocupado} onClick=${elegirRespaldo}>Restaurar un respaldo…</button>
         <p class="tenue pequeno">Para recuperar todo en otro dispositivo, abre la app ahí y restaura el último respaldo (Excel, o JSON de versiones anteriores).</p>
+      </div>
+
+      <div class="tarjeta">
+        <h2>Este dispositivo</h2>
+        <p class="tenue pequeno">
+          Tu nombre va en la columna PROFESOR de «${cfg.excel.escritura.hojas_coordinacion[1]}» y «${cfg.excel.escritura.hojas_coordinacion[2]}»
+          y firma el texto para el profesor de un estudiante que recupera contigo. Se guarda solo en este dispositivo
+          (no está en la app publicada ni en el respaldo): escríbelo en el iPhone y en la Mac.
+        </p>
+        <${AjusteProfesor} />
       </div>
 
       <div class="tarjeta">

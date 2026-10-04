@@ -3,7 +3,7 @@
   "$id": "semestre.schema.json",
   "title": "Semestre: calendario, feriados y fechas",
   "type": "object",
-  "required": ["semestre", "inicio", "semanas", "metodologias", "feriados", "fin_bimestre_1", "envio_notas", "plic", "formato_coordinacion", "profesor", "redondeo_decimales"],
+  "required": ["semestre", "inicio", "semanas", "metodologias", "feriados", "fin_bimestre_1", "envio_notas", "plic", "formato_coordinacion", "redondeo_decimales"],
   "additionalProperties": false,
   "properties": {
     "semestre": { "type": "string", "pattern": "^\\d{4}[AB]$" },
@@ -43,7 +43,6 @@
         "fin": { "$ref": "comun.schema.json#/$defs/hora" },
         "semana": { "type": "integer", "minimum": 1 } } },
     "formato_coordinacion": { "type": "array", "items": { "type": "string" }, "minItems": 1 },
-    "profesor": { "$ref": "comun.schema.json#/$defs/texto" },
     "dias_aviso_envio": { "type": "integer", "minimum": 0, "maximum": 60 },
     "redondeo_decimales": { "type": "integer", "minimum": 0, "maximum": 4 }
   }

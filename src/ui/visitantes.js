@@ -6,6 +6,7 @@ import { agregarVisitante, quitarVisitante } from '../datos/acciones.js';
 import { notaEvento } from '../nucleo/motor.js';
 import { textoParaSuProfesor, visitantesDelEvento } from '../nucleo/visitantes.js';
 import { sobreDiez } from '../nucleo/motor-vista.js';
+import { AjusteProfesor, useProfesor } from './dispositivo.js';
 
 /** Formulario para agregar a un estudiante de otro curso al grupo `grupo` del evento. */
 export function HojaVisitante({ evento, grupo, grupos, alCerrar }) {
@@ -58,7 +59,8 @@ export function TarjetaVisitantes({ ctx, evento }) {
 
 function HojaTextoProfesor({ ctx, evento, visitante, alCerrar }) {
   const { db, avisar } = useApp();
-  const { texto, final } = textoParaSuProfesor(ctx, evento, visitante);
+  const firma = useProfesor();
+  const { texto, final } = textoParaSuProfesor(ctx, evento, visitante, firma);
   const [quitando, setQuitando] = useState(false);
   const copiar = async () => {
     try { await navigator.clipboard.writeText(texto); avisar('Texto copiado.', 'ok'); } catch { avisar('No se pudo copiar: selecciona el texto y cópialo.', 'mal'); }
@@ -72,6 +74,9 @@ function HojaTextoProfesor({ ctx, evento, visitante, alCerrar }) {
       ${!final && html`<${Aviso} tono="aviso">La nota aún está pendiente: envía el texto cuando esté completa.<//>`}
       ${visitante.visita?.profesor && html`<p class="pequeno">Para: <b>${visitante.visita.profesor}</b></p>`}
       <textarea class="entrada texto-profesor" readonly rows="12" value=${texto}></textarea>
+      ${firma === null && html`
+        <p class="tenue pequeno">El texto va sin firma. Escribe tu nombre (se guarda solo en este dispositivo):</p>
+        <${AjusteProfesor} />`}
       <div class="botones">
         <button class="boton" onClick=${copiar}>Copiar</button>
         ${typeof navigator !== 'undefined' && navigator.share && html`<button class="boton primario" onClick=${compartir}>Compartir</button>`}

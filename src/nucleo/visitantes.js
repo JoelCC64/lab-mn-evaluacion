@@ -1,5 +1,5 @@
 // Estudiantes de otros docentes que recuperan en una sesión de este curso (Fase 6). Se agregan al evento con su
-// código y nombre, se califican con su grupo y la app arma el texto con la nota para su profesor (que Joel envía en
+// código y nombre, se califican con su grupo y la app arma el texto con la nota para su profesor (que se envía en
 // las 24 h siguientes). No van al Excel ni cuentan en el curso. Funciones puras.
 import { asistenciaDe, notaControl, notaEvento, notaPreparatorio } from './motor.js';
 import { esVisitante } from './grupos.js';
@@ -28,9 +28,10 @@ function partesEnTexto(n) {
 
 /**
  * Texto con la nota para el profesor del estudiante: { texto, final }. `final` es falso mientras la nota esté
- * pendiente (falta cerrar el pase o evaluar el grupo): conviene enviarlo cuando esté completa.
+ * pendiente (falta cerrar el pase o evaluar el grupo): conviene enviarlo cuando esté completa. `firma`: el nombre
+ * del profesor que recibe la recuperación (ajuste del dispositivo); sin él, el texto va sin firma.
  */
-export function textoParaSuProfesor(ctx, evento, visitante) {
+export function textoParaSuProfesor(ctx, evento, visitante, firma = null) {
   const cfg = ctx.cfg;
   const curso = ctx.curso;
   const n = notaEvento(ctx, evento, visitante.id);
@@ -58,6 +59,6 @@ export function textoParaSuProfesor(ctx, evento, visitante) {
     lineas.push(`Control oral: ${ctrl.valor !== null && ctrl.valor !== undefined ? `${sobreDiez(ctrl.valor)}/10` : ctrl.aprobado ? 'aprobado' : 'no aprobado'}`);
   }
   if (asis.observacion) lineas.push(`Observación: ${asis.observacion}`);
-  lineas.push('', cfg.semestre.profesor);
+  if (firma) lineas.push('', firma);
   return { texto: lineas.join('\n'), final: n.estado === 'calculada' };
 }

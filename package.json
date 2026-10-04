@@ -1,6 +1,6 @@
 {
   "name": "app-evaluacion-lab-mn",
-  "version": "0.8.0",
+  "version": "0.8.1",
   "private": true,
   "description": "App de evaluación y calificaciones de los laboratorios de Mecánica Newtoniana (EPN, 2026B)",
   "type": "module",
