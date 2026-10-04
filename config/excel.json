@@ -24,6 +24,7 @@
     "hoja_asistencia": "Asistencia (app)",
     "hoja_detalle": "Detalle (app)",
     "hoja_control": "_app",
+    "hojas_coordinacion": { "1": "Coordinación B1", "2": "Coordinación B2" },
     "texto_zona": "lo llena la app"
   },
   "asistencia_semana1": {

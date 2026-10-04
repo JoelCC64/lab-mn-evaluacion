@@ -90,7 +90,7 @@ export function generarEventos(cfg, curso, cambios = []) {
     const e = porId.get(c.evento);
     if (!e) continue;
     e.estado = c.estado;
-    e.motivo = c.motivo ?? null;
+    e.motivo = c.estado === 'normal' ? null : (c.motivo ?? null);
     e.cambio_manual = true;
   }
   // El trabajo en casa sigue a su práctica: si la práctica no se hizo, el TC tampoco cuenta.

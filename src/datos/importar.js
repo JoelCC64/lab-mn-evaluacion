@@ -47,9 +47,10 @@ export async function planificarImportacion(db, lectura) {
     }
   }
 
-  // Bajas: solo en cursos cuya hoja sí se leyó (un archivo incompleto no da de baja a nadie).
+  // Bajas: solo en cursos cuya hoja sí se leyó (un archivo incompleto no da de baja a nadie). Los visitantes de
+  // otros cursos no están en el Excel: no son bajas.
   for (const e of existentes) {
-    if (lectura.cursos[e.curso] && !vistos.has(e.id) && e.estado !== 'baja') {
+    if (lectura.cursos[e.curso] && !vistos.has(e.id) && e.estado !== 'baja' && e.estado !== 'visitante') {
       cambios.push({ tipo: 'baja', antes: e, despues: { ...e, estado: 'baja' } });
       contar(e.curso, 'bajas');
     }

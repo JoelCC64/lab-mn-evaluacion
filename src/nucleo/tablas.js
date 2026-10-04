@@ -5,4 +5,5 @@
 export const TABLAS_REGISTRO = [
   'grupos_evento', 'asistencia', 'pases', 'revisiones_grupo', 'puntajes', 'etiquetas', 'notas',
   'controles', 'revision_preparatorio', 'novedades_preparatorio', 'ajustes', 'retroalimentaciones', 'trabajos_casa',
+  'recuperaciones', 'plic',
 ];

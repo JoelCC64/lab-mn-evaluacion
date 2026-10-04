@@ -2,6 +2,7 @@
 // `grupos` es el Map estudiante → grupo resuelto para el evento (gruposDelEvento); con él se crea la
 // instantánea de grupos la primera vez que se registra algo de grupo en el evento.
 import { ahoraISO } from '../db.js';
+import { idVisitante } from '../nucleo/visitantes.js';
 
 // ---------- Grupos ----------
 
@@ -246,6 +247,93 @@ export async function alternarEtiquetaTrabajo(db, evento, unidad, unidadId, etiq
 export async function borrarTrabajo(db, evento, unidad, unidadId) {
   await db.trabajos_casa.delete([evento, unidad, String(unidadId)]);
 }
+
+// ---------- Calendario: sesiones sin clase (Fase 6) ----------
+// Lo registrado en el evento no se borra: si se deshace el cambio, vuelve a contar.
+
+/** Marca una sesión como «sin clase» (clase suspendida u otro motivo): sus actividades quedan excluidas en el curso. */
+export async function marcarSinClase(db, evento, motivo, ahora = ahoraISO()) {
+  const m = String(motivo ?? '').trim();
+  if (!m) throw new Error('Escribe el motivo (por ejemplo, «Clase suspendida»).');
+  await db.cambios_evento.put({ evento, estado: 'sin_clase', motivo: m, fecha: ahora });
+}
+
+/** Un feriado del calendario en el que sí hubo clase: la actividad vuelve a contar. */
+export async function marcarHuboClase(db, evento, ahora = ahoraISO()) {
+  await db.cambios_evento.put({ evento, estado: 'normal', motivo: 'hubo clase pese al calendario', fecha: ahora });
+}
+
+/** Deshace un cambio manual: el evento vuelve a lo que dice el calendario. */
+export async function quitarCambioEvento(db, evento) {
+  await db.cambios_evento.delete(evento);
+}
+
+// ---------- Recuperaciones (Fase 6) ----------
+
+export const ESTADOS_RECUPERACION = ['solicitada', 'realizada', 'no_asistio'];
+
+/**
+ * Recuperación de un estudiante en otra sesión: `estado` solicitada · realizada (con `nota` 0–1) · no_asistio (0).
+ * `motivo`: 'justificada' (falta con justificación) o 'feriado'. `detalle`: dónde y cuándo (texto libre).
+ */
+export async function guardarRecuperacion(db, evento, estudiante, { estado, nota = null, detalle = null, motivo = 'justificada' }, ahora = ahoraISO()) {
+  if (!ESTADOS_RECUPERACION.includes(estado)) throw new Error(`Estado de recuperación desconocido: ${estado}`);
+  if (estado === 'realizada' && !(nota >= 0 && nota <= 1)) throw new Error('La nota de la recuperación debe estar entre 0 y 10.');
+  await db.recuperaciones.put({
+    evento, estudiante, estado, nota: estado === 'realizada' ? nota : null, motivo,
+    detalle: String(detalle ?? '').trim() || null, fecha: ahora,
+  });
+}
+
+export async function borrarRecuperacion(db, evento, estudiante) {
+  await db.recuperaciones.delete([evento, estudiante]);
+}
+
+// ---------- PLIC (Fase 6) ----------
+
+/** PLIC de un estudiante: completó de forma válida (true), no válido (false) o sin registrar (null). */
+export async function marcarPlic(db, evento, estudiante, valido, ahora = ahoraISO()) {
+  if (valido === null || valido === undefined) await db.plic.delete([evento, estudiante]);
+  else await db.plic.put({ evento, estudiante, completo_valido: Boolean(valido), fecha: ahora });
+}
+
+/** Marca a varios estudiantes de una vez (por ejemplo, a todos los que faltan como «completó»). */
+export async function marcarPlicVarios(db, evento, estudiantes, valido, ahora = ahoraISO()) {
+  await db.plic.bulkPut(estudiantes.map((estudiante) => ({ evento, estudiante, completo_valido: Boolean(valido), fecha: ahora })));
+}
+
+// ---------- Estudiantes de otros cursos que recuperan aquí (Fase 6) ----------
+
+/**
+ * Agrega a un estudiante de otro docente al grupo `grupo` del evento, para calificarlo con su grupo. Queda como
+ * «visitante»: solo aparece en ese evento y no va al Excel. Devuelve su id.
+ */
+export async function agregarVisitante(db, evento, grupos, grupo, { codigo, nombre, paralelo = null, profesor = null }, ahora = ahoraISO()) {
+  const datos = { codigo: String(codigo ?? '').trim(), nombre: limpiar(nombre).toUpperCase(), paralelo: limpiar(paralelo).toUpperCase() || null, profesor: limpiar(profesor) || null };
+  if (!datos.codigo || !datos.nombre) throw new Error('Hacen falta el código y los apellidos y nombres.');
+  if (Object.values(datos).some((v) => String(v ?? '').includes('@'))) throw new Error('La app no guarda correos.');
+  const id = idVisitante(evento, datos.codigo);
+  await db.estudiantes.put({
+    id, codigo: datos.codigo, nombre: datos.nombre, curso: evento.split(':')[0], estado: 'visitante', grupo_excel: null, numero: null,
+    observacion_excel: null, visita: { evento, paralelo: datos.paralelo, profesor: datos.profesor }, actualizado: ahora,
+  });
+  await moverEstudiante(db, evento, grupos, id, grupo, ahora);
+  // Está en la sala para recuperar: queda presente (aunque el pase ya esté cerrado); se corrige como a cualquiera.
+  await marcarAsistencia(db, evento, null, id, 'presente', null, ahora);
+  return id;
+}
+
+/** Quita a un visitante del evento con todo lo que se le registró ahí. */
+export async function quitarVisitante(db, evento, id) {
+  const tablas = [db.estudiantes, db.grupos_evento, db.asistencia, db.controles, db.novedades_preparatorio, db.ajustes, db.notas, db.recuperaciones];
+  await db.transaction('rw', tablas, async () => {
+    await db.estudiantes.delete(id);
+    for (const t of [db.grupos_evento, db.asistencia, db.controles, db.novedades_preparatorio, db.ajustes, db.recuperaciones]) await t.delete([evento, id]);
+    await db.notas.delete([evento, 'estudiante', id]);
+  });
+}
+
+const limpiar = (t) => String(t ?? '').replace(/\s+/g, ' ').trim();
 
 // ---------- Ajuste individual ----------
 

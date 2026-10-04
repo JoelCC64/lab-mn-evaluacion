@@ -4,7 +4,9 @@ import { html, useApp, Chip, Hoja, Aviso, Persona } from './base.js';
 import { borrarAjuste, guardarAjuste } from '../datos/acciones.js';
 import { resumenEvento, unidadTrabajo } from '../nucleo/motor.js';
 import { sobreDiez, textoPuntos } from '../nucleo/motor-vista.js';
-import { eventoBase } from '../nucleo/grupos.js';
+import { esVisitante, eventoBase } from '../nucleo/grupos.js';
+import { RecuperacionDelEstudiante } from './recuperacion.js';
+import { TarjetaVisitantes } from './visitantes.js';
 import { compararGrupos } from '../nucleo/util.js';
 import { controlCalifica, preparatorioCalifica } from '../nucleo/config.js';
 
@@ -41,7 +43,7 @@ export function Resumen({ ctx, evento }) {
         <tbody>
           ${orden.map((f) => html`
             <tr onClick=${() => setDetalle(f)} style="cursor:pointer">
-              <td class="nombre-celda">${apellidos(f.estudiante.nombre)}${f.estudiante.estado === 'pendiente' ? ' ·p' : ''}
+              <td class="nombre-celda">${apellidos(f.estudiante.nombre)}${f.estudiante.estado === 'pendiente' ? ' ·p' : esVisitante(f.estudiante) ? ' ·v' : ''}
                 <span class="nombres">${nombres(f.estudiante.nombre)}</span>
                 ${motivoFila(f) && html`<span class="motivo">${motivoFila(f)}</span>`}</td>
               <td class="num">${f.grupo ?? '–'}</td>
@@ -53,7 +55,8 @@ export function Resumen({ ctx, evento }) {
         </tbody>
       </table>
     </div>
-    <p class="tenue pequeno">As.: P presente · F falta · R se retiró antes. Nota sobre 10 · «…» pendiente · p = pendiente de nómina. Toca una fila para ver el detalle o registrar un ajuste.</p>
+    <p class="tenue pequeno">As.: P presente · F falta · R se retiró antes. Nota sobre 10 · «…» pendiente · p = pendiente de nómina · v = de otro curso (recupera aquí). Toca una fila para ver el detalle, registrar una recuperación o un ajuste.</p>
+    <${TarjetaVisitantes} ctx=${ctx} evento=${evento} />
     ${detalle && html`<${HojaDetalle} fila=${filas.find((f) => f.estudiante.id === detalle.estudiante.id) ?? detalle} evento=${evento} ctx=${ctx} cerrar=${() => setDetalle(null)} />`}`;
 }
 
@@ -103,6 +106,7 @@ function HojaDetalle({ fila, evento, ctx, cerrar }) {
         ${preparatorio.estado !== 'sin_nota' && html`<tr><td>Preparatorio</td><td>${preparatorio.estado === 'calculada' ? `${preparatorio.nivel}/2` : preparatorio.estado}${preparatorio.motivo ? ` · ${preparatorio.motivo}` : ''}</td></tr>`}
         ${control.estado !== 'sin_control' && html`<tr><td>Control oral</td><td>${control.estado === 'calculada' ? (control.valor !== null ? `${sobreDiez(control.valor)}/10 (${(control.puntajes ?? []).join(', ') || control.motivo})` : (control.aprobado ? 'aprobado' : 'no aprobado')) : control.estado}</td></tr>`}
       </tbody></table>
+      ${evento.con_nota && !esVisitante(fila.estudiante) && html`<${RecuperacionDelEstudiante} ctx=${ctx} evento=${evento} estudiante=${fila.estudiante} falta=${asistencia.falta} />`}
       ${evento.con_nota && html`
         <div class="tarjeta">
           <h3>Ajuste individual</h3>

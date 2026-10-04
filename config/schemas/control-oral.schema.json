@@ -11,6 +11,7 @@
     "seleccion": { "const": "aleatoria" },
     "estudiantes_por_sesion": { "type": "array", "minItems": 1, "items": { "type": "integer", "minimum": 1 } },
     "aviso_si_sugerido_mayor_que": { "type": "integer", "minimum": 1 },
+    "aviso_cierre_sesiones": { "type": "integer", "minimum": 0 },
     "meta": { "type": "string" },
     "prioridad": { "const": "sin_control_en_el_bimestre" },
     "sesiones": { "type": "array", "items": { "enum": ["practica", "taller"] }, "minItems": 1 },

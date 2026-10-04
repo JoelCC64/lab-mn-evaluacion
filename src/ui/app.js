@@ -6,6 +6,7 @@ import { Curso } from './curso.js';
 import { Evento } from './evento.js';
 import { Grupo } from './grupo.js';
 import { TrabajoCasa } from './trabajos.js';
+import { Notas } from './notas.js';
 import { Datos } from './datos.js';
 import { Excel } from './excel.js';
 import { escucharVersionNueva } from './pwa.js';
@@ -41,6 +42,7 @@ function Rutas() {
   const [pantalla, a, b, c] = useRuta();
   if (pantalla === 'datos') return html`<${Datos} />`;
   if (pantalla === 'excel') return html`<${Excel} />`;
+  if (pantalla === 'curso' && a && b === 'notas') return html`<${Notas} paralelo=${a} />`;
   if (pantalla === 'curso' && a) return html`<${Curso} paralelo=${a} />`;
   if (pantalla === 'evento' && a && ['grupo', 'estudiante'].includes(b) && c) {
     // Un trabajo en casa se califica por grupo (o por estudiante); lo demás es la pantalla del grupo en clase.

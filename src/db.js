@@ -20,6 +20,8 @@ export const TABLAS = {
   ajustes: '[evento+estudiante], evento, estudiante',
   retroalimentaciones: '[evento+grupo], evento',
   trabajos_casa: '[evento+unidad+unidad_id], evento',
+  recuperaciones: '[evento+estudiante], evento, estudiante',
+  plic: '[evento+estudiante], evento',
   cambios_evento: 'evento',
   importaciones: '++id, fecha',
   meta: 'clave',
@@ -35,9 +37,9 @@ export function nombreBase(semestre, { demo = false } = {}) {
 /**
  * Versiones de la base. Una versión nueva solo agrega tablas o índices: Dexie actualiza la base del
  * dispositivo al abrirla, sin perder datos.
- * 1 (Fases 1–3) · 2 (Fase 4): retroalimentaciones · 3 (Fase 5): trabajos_casa.
+ * 1 (Fases 1–3) · 2 (Fase 4): retroalimentaciones · 3 (Fase 5): trabajos_casa · 4 (Fase 6): recuperaciones y plic.
  */
-export const VERSION_BASE = 3;
+export const VERSION_BASE = 4;
 
 /**
  * Abre la base. `alCambiar(tabla)` (opcional) se llama después de cada escritura que termina bien:

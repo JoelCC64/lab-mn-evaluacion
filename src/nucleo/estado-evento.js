@@ -10,11 +10,11 @@ export function estadoEvento(evento, reg, evaluacion = null) {
   if (evento.estado === 'sin_clase') return { clave: 'sin_clase', texto: 'Sin clase', tono: 'aviso', detalle: evento.motivo };
   const completo = evaluacion && evaluacion.grupos > 0 && evaluacion.evaluados === evaluacion.grupos;
   const avance = evaluacion && evaluacion.grupos > 0 ? `${evaluacion.evaluados}/${evaluacion.grupos} ${evaluacion.nombre ?? 'grupos'}` : null;
-  if (evento.tipo === 'trabajo_casa') {
-    // Un TC no tiene pase propio: está calificado cuando todas sus unidades por calificar tienen nota.
+  if (evento.tipo === 'trabajo_casa' || evento.tipo === 'plic') {
+    // Un TC o el PLIC no tienen pase propio: están calificados cuando todas sus unidades por calificar tienen nota.
     if (!evento.con_nota) return { clave: 'sin_nota', texto: 'Sin nota', tono: '', detalle: null };
     if (completo) return { clave: 'evaluado', texto: 'Calificado', tono: 'ok', detalle: avance };
-    if ((reg.trabajos_casa ?? []).some((f) => f.evento === evento.id)) return { clave: 'en_curso', texto: 'En curso', tono: 'info', detalle: avance };
+    if ((reg[evento.tipo === 'plic' ? 'plic' : 'trabajos_casa'] ?? []).some((f) => f.evento === evento.id)) return { clave: 'en_curso', texto: 'En curso', tono: 'info', detalle: avance };
     return { clave: 'pendiente', texto: 'Pendiente', tono: '', detalle: null };
   }
   const pase = reg.pases.find((p) => p.evento === evento.id && p.cerrado);

@@ -206,7 +206,7 @@ button.fila:active, a.fila:active { background: var(--superficie-2); }
 .velo { position: fixed; inset: 0; z-index: 50; background: rgba(10, 16, 24, .45); display: flex; align-items: flex-end; justify-content: center; }
 .hoja {
   width: 100%; max-width: 760px; max-height: 88vh; overflow-y: auto;
-  background: var(--superficie); border-radius: 18px 18px 0 0;
+  background: var(--superficie); color: var(--texto); text-align: left; font-size: 16px; border-radius: 18px 18px 0 0;
   padding: 10px 16px calc(18px + env(safe-area-inset-bottom));
   box-shadow: 0 -8px 24px rgba(0, 0, 0, .18);
 }
@@ -384,3 +384,19 @@ select.entrada { width: 100%; min-height: 44px; }
 }
 @keyframes avance-auto { from { transform: scaleX(1); } to { transform: scaleX(0); } }
 @media (prefers-reduced-motion: reduce) { .barra-avance { animation: none; } }
+
+/* Nota bimestral (Fase 6): notas, desglose, pendientes, PLIC y recuperaciones */
+.lista-pendientes { margin: 6px 0 0; padding-left: 18px; font-size: 14px; }
+.lista-pendientes li + li { margin-top: 4px; }
+.marca-final { color: var(--ok); font-weight: 800; }
+.tarjeta.desglose { padding: 10px 12px; }
+.desglose-items { list-style: none; margin: 0; padding: 0; font-size: 14px; }
+.desglose-items li { padding: 4px 0; border-top: 1px solid var(--borde); }
+.desglose-items li:first-child { border-top: 0; }
+.desglose-items li.excluido { color: var(--tenue); }
+.desglose-items li.pendiente span:last-child { color: var(--aviso); }
+textarea.entrada.texto-profesor { min-height: 220px; font-size: 14px; line-height: 1.45; white-space: pre-wrap; }
+.tabla-bimestre th { font-size: 11px; letter-spacing: 0; padding: 7px 4px; }
+.tabla-bimestre td { padding: 7px 4px; }
+.tabla-bimestre td.num { font-size: 13.5px; }
+.tabla-bimestre .nombre-celda { max-width: 128px; font-size: 13.5px; }

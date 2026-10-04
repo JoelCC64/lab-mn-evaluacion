@@ -2,7 +2,7 @@
 // Guarda todos los archivos de la app para que funcione sin conexión.
 // En localhost usa primero la red (desarrollo); publicada, usa primero lo guardado (rápido y sin conexión).
 
-const VERSION = '0.7.0-26912d8494';
+const VERSION = '0.8.0-5c4c94938a';
 const CACHE = `lab-mn-${VERSION}`;
 const ARCHIVOS = [
   "./",
@@ -21,6 +21,7 @@ const ARCHIVOS = [
   "src/datos/respaldo.js",
   "src/db.js",
   "src/estilos.css",
+  "src/nucleo/bimestre.js",
   "src/nucleo/calendario.js",
   "src/nucleo/config.js",
   "src/nucleo/estado-evento.js",
@@ -35,6 +36,7 @@ const ARCHIVOS = [
   "src/nucleo/sorteo.js",
   "src/nucleo/tablas.js",
   "src/nucleo/util.js",
+  "src/nucleo/visitantes.js",
   "src/nucleo/zip.js",
   "src/ui/app.js",
   "src/ui/archivos.js",
@@ -49,12 +51,16 @@ const ARCHIVOS = [
   "src/ui/grupo.js",
   "src/ui/grupos.js",
   "src/ui/inicio.js",
+  "src/ui/notas.js",
+  "src/ui/plic.js",
   "src/ui/puerta.js",
   "src/ui/pwa.js",
+  "src/ui/recuperacion.js",
   "src/ui/respaldo-dia.js",
   "src/ui/resumen.js",
   "src/ui/retro.js",
   "src/ui/trabajos.js",
+  "src/ui/visitantes.js",
   "src/vendor/dexie.js",
   "src/vendor/exceljs.min.js",
   "src/vendor/htm.js",

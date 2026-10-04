@@ -4,6 +4,7 @@
   "seleccion": "aleatoria",
   "estudiantes_por_sesion": [3, 4],
   "aviso_si_sugerido_mayor_que": 4,
+  "aviso_cierre_sesiones": 2,
   "meta": "todos_al_menos_una_vez_por_bimestre",
   "prioridad": "sin_control_en_el_bimestre",
   "sesiones": ["practica", "taller"],

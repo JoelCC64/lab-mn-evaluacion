@@ -12,7 +12,8 @@ Plan: [PROYECTO_LABORATORIOS_v4.md](PROYECTO_LABORATORIOS_v4.md). Al empezar una
 | 3. Escritura en el Excel (Mac, Chrome) | ✅ Completa | 3-oct-2026 |
 | 4. Talleres | ✅ Completa | 3-oct-2026 |
 | 5. Trabajos en casa (SQI) | ✅ Completa | 3-oct-2026 |
-| 6–9 | — | |
+| 6. Nota bimestral, excepciones y coordinación | ✅ Completa | 4-oct-2026 |
+| 7–9 | — | |
 
 ## Fase 0 (3-oct-2026)
 
@@ -222,6 +223,65 @@ Detalle en [docs/excel.md](docs/excel.md).
 - **La nota del grupo de un taller se muestra como nivel** («1/2»), no sobre 10: es la mitad grupal de la nota.
 - **El trabajo firmado y la penalización total salen de la configuración** de cada actividad (`cierre`, `penalizacion_total`). Los talleres no tienen penalización total.
 
+## Fase 6 (4-oct-2026) · nota bimestral, excepciones y coordinación · versión 0.8.0
+
+**Hecho**
+- **Base versión 4** con dos tablas nuevas: `recuperaciones` y `plic`. Los estudiantes de otros cursos se guardan como «visitante» en `estudiantes` (ver `docs/modelo-datos.md`).
+- **Notas del bimestre** (Curso › «Notas del bimestre»):
+  - Tabla por estudiante con cada componente y el total. Se elige el 1.er o el 2.º bimestre.
+  - Se ve la nota **acumulada** (lo pendiente cuenta 0) o la **proyectada** (lo pendiente sale como el promedio de lo evaluado), nunca mezcladas. ✓ marca la nota completa, la que va al Excel y a coordinación.
+  - Desglose por estudiante: cada actividad con su peso renormalizado, su nota o el motivo (pendiente, feriado, falta, ajuste, recuperación). En Planificación y conocimiento, los preparatorios y los controles con sus promedios.
+  - Arriba: lo que falta evaluar del bimestre (con el motivo) y el aviso de control oral (ver abajo).
+- **Sesiones sin clase:** en cada sesión, el menú ⋯ permite:
+  - Marcarla «sin clase» con motivo. Sus actividades (y el TC de esa práctica) quedan excluidas en ese curso y los componentes se renormalizan.
+  - Indicar que en un feriado del calendario sí hubo clase.
+  - Deshacer el cambio. Lo registrado nunca se borra.
+- **Recuperaciones de estudiantes del curso:**
+  - En el resumen del evento, quien faltó tiene «Registrar recuperación…», con tres estados: solicitada (nota pendiente), realizada (con la nota recibida) y no asistió (0).
+  - En un feriado o una sesión sin clase, la pantalla del evento busca al estudiante y registra la recuperación, que es opcional.
+  - Con la recuperación realizada, el preparatorio de la sesión que faltó no entra en su promedio. Las observaciones del Excel dicen dónde recuperó.
+- **Estudiantes de otros docentes que recuperan aquí:**
+  - En la pantalla del grupo: «+ Agregar integrante › Estudiante de otro curso». Se piden código, apellidos y nombres y, opcionalmente, su paralelo y su profesor.
+  - Queda presente y se califica con su grupo. Solo aparece en ese evento: no entra en el sorteo ni en el TC, ni en el Excel o coordinación, y volver a leer el Excel no lo da de baja.
+  - En el resumen, «Recuperan aquí» arma el texto con su nota para su profesor (asistencia, nota con su desglose, preparatorio, control y la firma), con «Copiar» y «Compartir».
+- **PLIC** (en su evento, 2.º bimestre):
+  - «Completó · 0.5» o «No válido · 0» por estudiante.
+  - Un botón marca de una vez a los que faltan como «completó»; después se corrigen las excepciones.
+  - En la lista del curso aparece «Calificado» cuando están todos.
+- **Aviso de control oral al cierre:** cuando quedan 2 sesiones o menos del bimestre (`aviso_cierre_sesiones` en `control-oral.json`), el curso y las notas muestran quién sigue sin control.
+- **Recordatorio del envío** en Inicio: los días que faltan para el 1-dic (o el 29-ene) y los eventos que ya pasaron y siguen sin evaluar en todos los cursos. Se destaca a 14 días o menos (`dias_aviso_envio`).
+- **Excel:** hojas «Coordinación B1» y «Coordinación B2» (ver `docs/excel.md`):
+  - APELLIDOS Y NOMBRES | NÚMERO ÚNICO | NOTA(/6) | PROFESOR, con «Prof. Nombre Ficticio» (`semestre-2026B.json → profesor`).
+  - Orden alfabético; los pendientes van aparte, en ámbar.
+  - La nota es la misma de la hoja del curso, con 2 decimales.
+  - La verificación antes de guardar conoce las hojas nuevas.
+- **Pruebas** (111 en total, 9 nuevas):
+  - Un 1.er bimestre completo de Clásica (GR2QB) y otro de SQI (GR1AA) contra el cálculo a mano, con feriado, faltas, «salió», «se retiró antes», recuperación y un estudiante sin control. Las notas dan 5.01, 4.30, 5.11 y 5.28 en Clásica, y 5.46, 4.36 y 3.79 en SQI.
+  - Recuperaciones (los tres estados y el feriado), PLIC, sesión sin clase y deshacer.
+  - Visitantes: nota, texto para su profesor y que no aparezcan en el Excel.
+  - Pendientes y aviso de control.
+  - Hojas de coordinación: cuatro columnas, 2 decimales, profesor y pendientes aparte; también en la prueba de ida y vuelta con el Excel ficticio.
+  - Base de la versión 3 a la 4.
+
+**Verificado en el navegador** (demostración, 375 px):
+- Notas de GR1AA (acumulada y proyectada) y el desglose de un estudiante.
+- PLIC: todos marcados como «completó» y uno corregido a «no válido».
+- Un visitante agregado al grupo 1 de P1 de GR2QB, con su nota y el texto para su profesor; también se probó quitarlo.
+- Recuperación en el T2 de GR2QB (feriado): realizada con 9/10.
+- P3 marcada sin clase y vuelta atrás.
+- La revisión del Excel lista las cuatro hojas propias.
+- Sin errores en la consola.
+
+**Decisiones de implementación**
+- **Recuperación realizada:** la nota recibida reemplaza la del evento y el preparatorio de esa sesión no cuenta.
+- **«No asistió» a la recuperación:** 0 en la actividad y en el preparatorio.
+- **Recuperación de un feriado:** solo cuenta si se realizó; «solicitada» la deja excluida.
+- **Visitantes:**
+  - Se agregan como presentes, porque están en la sala; se corrigen como cualquiera.
+  - No se pueden sortear para el control. Su texto incluye el control si se registró.
+- **Coordinación:** una sola lista por bimestre con todos los cursos, por orden alfabético, y la nota solo cuando el bimestre está completo.
+- **El nombre del profesor está en la configuración del repositorio, que es público.**
+
 ## Fase 5 (3-oct-2026) · trabajos en casa (SQI) · versión 0.7.0
 
 **Hecho**
@@ -323,5 +383,4 @@ Pedido de Joel: un solo archivo por día con todo (notas, asistencia, etc.) para
   - Las primeras que hacen falta:
     - P2 (Clásica y SQI): cronograma A, semana 5, desde el 26-oct.
     - T2: cronograma B, semana 5; cronograma A, semana 6.
-- Antes de la Fase 6: nombre del profesor para la columna PROFESOR de las hojas de coordinación.
-- Fase 6: nota bimestral, excepciones (feriados, recuperaciones, PLIC) y hojas de coordinación.
+- Fase 7: feedback (plantillas por etiqueta y aspecto, texto por grupo, versión corta para la retro del taller y resumen del curso).

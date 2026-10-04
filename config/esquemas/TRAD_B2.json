@@ -2,13 +2,13 @@
   "id": "TRAD_B2", "metodologia": "TRAD", "bimestre": 2, "total": 6,
   "fuente": "Lineamientos estudiantes VF; decisiones de Joel (3-oct-2026)",
   "componentes": [
-    { "id": "planificacion_conocimiento", "nombre": "Planificación y conocimiento", "valor": 1.5, "unidad": "estudiante",
+    { "id": "planificacion_conocimiento", "nombre": "Planificación y conocimiento", "corto": "PyC", "valor": 1.5, "unidad": "estudiante",
       "items": { "trabajo_preparatorio": 0.40, "control_oral": 0.60 },
       "control_varios": "promedio", "sin_control": "avisar; si se cierra asi, solo_trabajo_preparatorio" },
-    { "id": "diseno_datos_analisis", "nombre": "Diseño, datos y análisis", "valor": 3.0, "unidad": "grupo",
+    { "id": "diseno_datos_analisis", "nombre": "Diseño, datos y análisis", "corto": "DDA", "valor": 3.0, "unidad": "grupo",
       "secciones": { "diseno": 0.20, "datos": 0.30, "analisis": 0.50 },
       "items": { "P4": 1, "P5": 1, "P6": 1, "P7": 1 } },
-    { "id": "talleres", "nombre": "Talleres", "valor": 1.0, "items": { "T4": 1, "T5": 1, "T6": 1, "T7": 1 } },
-    { "id": "plic", "nombre": "PLIC", "valor": 0.5, "tipo": "binario", "items": { "PLIC": 1 } }
+    { "id": "talleres", "nombre": "Talleres", "corto": "Talleres", "valor": 1.0, "items": { "T4": 1, "T5": 1, "T6": 1, "T7": 1 } },
+    { "id": "plic", "nombre": "PLIC", "corto": "PLIC", "valor": 0.5, "tipo": "binario", "items": { "PLIC": 1 } }
   ]
 }

@@ -125,6 +125,22 @@ function observaciones(ctx, id, { hoy, fijadas }) {
 const grupoComoValor = (g) => (g === null || g === undefined ? null : /^\d+$/.test(String(g)) ? Number(g) : String(g));
 
 /**
+ * Componentes del bimestre con su valor final (o null si falta algo) y la nota final (o null).
+ */
+function finalDelBimestre(ctx, id, b) {
+  const nb = notaBimestre(ctx, id, b);
+  const terminado = bimestreTerminado(ctx, b);
+  const porId = new Map(nb.componentes.map((c) => [c.id, c]));
+  const finales = nb.componentes.map((c) => valorComponente(c, terminado));
+  return { porId, terminado, nota: finales.every((v) => v !== null && v !== undefined) ? finales.reduce((s, v) => s + v, 0) : null };
+}
+
+/** Nota final del bimestre (la del Excel y de coordinación): solo cuando todo está evaluado; si no, null. */
+export function notaFinalDelBimestre(ctx, id, bimestre) {
+  return finalDelBimestre(ctx, id, bimestre).nota;
+}
+
+/**
  * Valores de las columnas de la app para un estudiante: Map(clave → valor).
  * `grupos`: grupoActual(ctx). `fijadas`: Set de ids de evento con la nota fijada a mano en el Excel.
  */
@@ -132,13 +148,7 @@ export function valoresDelEstudiante(ctx, columnas, id, { hoy, grupos, fijadas =
   const valores = new Map();
   const bimestres = new Map();
   const del = (b) => {
-    if (!bimestres.has(b)) {
-      const nb = notaBimestre(ctx, id, b);
-      const terminado = bimestreTerminado(ctx, b);
-      const porId = new Map(nb.componentes.map((c) => [c.id, c]));
-      const finales = nb.componentes.map((c) => valorComponente(c, terminado));
-      bimestres.set(b, { porId, terminado, nota: finales.every((v) => v !== null && v !== undefined) ? finales.reduce((s, v) => s + v, 0) : null });
-    }
+    if (!bimestres.has(b)) bimestres.set(b, finalDelBimestre(ctx, id, b));
     return bimestres.get(b);
   };
   for (const col of columnas) {

@@ -14,7 +14,7 @@ import { cargarCursos } from '../datos/excel-datos.js';
 import { borrarLocal, guardarLocal, leerLocal, registrarEscritura, ultimaEscritura } from '../datos/local.js';
 import { conteoTablas } from '../datos/consultas.js';
 import { validarRespaldo } from '../datos/respaldo.js';
-import { aplicarEscritura, compararLibros, letra, planificarEscritura, zonasDelPlan } from '../nucleo/excel-escritura.js';
+import { hojasPropiasDelPlan, aplicarEscritura, compararLibros, letra, planificarEscritura, zonasDelPlan } from '../nucleo/excel-escritura.js';
 import { inflarEnNavegador, revisarPartesExcel } from '../nucleo/zip.js';
 import { hoyLocal } from '../nucleo/util.js';
 import { VERSION_APP } from '../version.js';
@@ -142,7 +142,7 @@ export function Excel() {
     const nuevo = new Uint8Array(await wb.xlsx.writeBuffer());
 
     // Verificación: fuera de las zonas de la app, el archivo nuevo debe ser idéntico al original.
-    const propias = new Set([cfg.excel.escritura.hoja_asistencia, cfg.excel.escritura.hoja_detalle, cfg.excel.escritura.hoja_control]);
+    const propias = hojasPropiasDelPlan(cfg, plan);
     const difs = compararLibros(await abrirLibro(r.bytes), await abrirLibro(nuevo), { zonas: zonasDelPlan(plan), propias });
     if (difs.length) {
       console.error(difs);
@@ -240,7 +240,7 @@ function Revision({ revision, decidir, escribir, ocupado }) {
   const bloqueos = [...partes.bloqueos.map((b) => `El Excel tiene ${b}: la app no sabe conservarlo al guardar.`), ...plan.bloqueos];
   const pendientes = plan.conflictos.length;
   const puede = !bloqueos.length && !pendientes && !plan.sinCambios;
-  const hojasPropias = plan.propias.map((p) => `«${p.nombre}»`).join(' y ');
+  const hojasPropias = enLista(plan.propias.map((p) => `«${p.nombre}»`));
   return html`
     <div class="seccion-titulo">Revisión · ${nombre}</div>
     ${bloqueos.length > 0 && html`<${Aviso} tono="mal" titulo="No se puede escribir este archivo" lista=${bloqueos} />`}
@@ -309,4 +309,9 @@ function Conflictos({ conflictos, decidir }) {
           </div>
         </div>`)}
     </div>`;
+}
+
+/** «a», «a y b», «a, b y c». */
+function enLista(xs) {
+  return xs.length <= 1 ? xs.join('') : `${xs.slice(0, -1).join(', ')} y ${xs.at(-1)}`;
 }

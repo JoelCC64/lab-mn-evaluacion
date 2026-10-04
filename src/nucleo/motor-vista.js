@@ -1,6 +1,6 @@
 // Resúmenes del motor de notas para las pantallas.
 import { asistenciaDe, gruposDe, notaGrupo, notaTrabajo, unidadTrabajo } from './motor.js';
-import { listaDeGrupos } from './grupos.js';
+import { activos, listaDeGrupos } from './grupos.js';
 import { redondear } from './util.js';
 
 /** Tipos de evento que se evalúan por grupo con una rúbrica (prácticas) o con la evaluación integral (talleres). */
@@ -17,8 +17,8 @@ export function seCalificaTrabajo(evento) {
 }
 
 /**
- * Avance de la evaluación: { grupos, evaluados } de una práctica o taller, o del TC (con `nombre`, 'grupos' o
- * 'estudiantes'; solo cuentan las unidades por calificar). null si no aplica.
+ * Avance de la evaluación: { grupos, evaluados } de una práctica o taller, o del TC y del PLIC (con `nombre`, 'grupos'
+ * o 'estudiantes'; en un TC solo cuentan las unidades por calificar). null si no aplica.
  */
 export function avanceEvaluacion(ctx, evento) {
   if (seCalificaTrabajo(evento)) {
@@ -28,6 +28,10 @@ export function avanceEvaluacion(ctx, evento) {
       evaluados: unidades.filter((u) => u.nota.completo).length,
       nombre: unidadTrabajo(ctx.cfg.actividades[evento.config]) === 'grupo' ? 'grupos' : 'estudiantes',
     };
+  }
+  if (evento.tipo === 'plic' && evento.estado === 'normal') {
+    const est = activos(ctx.reg.estudiantes);
+    return { grupos: est.length, evaluados: est.filter((e) => ctx.plic.has(e.id)).length, nombre: 'estudiantes' };
   }
   if (!seEvaluaPorGrupo(evento) || evento.estado !== 'normal') return null;
   const { grupos } = listaDeGrupos(gruposDe(ctx, evento), ctx.reg.estudiantes);

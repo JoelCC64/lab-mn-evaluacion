@@ -4,6 +4,7 @@
 // Funciona en el navegador y en Node: recibe ExcelJS y los datos ya cargados.
 
 import { aplicarEscritura, planificarEscritura } from './excel-escritura.js';
+import { activos } from './grupos.js';
 import { crearContexto } from './motor.js';
 import { estadoEvento } from './estado-evento.js';
 import { avanceEvaluacion } from './motor-vista.js';
@@ -38,7 +39,7 @@ export function crearLibroRespaldo(ExcelJS, cfg, cursos, respaldo, { hoy, demo =
       c.style = { font: { bold: true, color: { argb: ARGB.blanco } }, fill: { type: 'pattern', pattern: 'solid', fgColor: { argb: ARGB.azul } } };
     });
     [5, 13, 40].forEach((ancho, i) => { ws.getColumn(i + 1).width = ancho; });
-    const estudiantes = reg.estudiantes.filter((e) => e.estado !== 'baja')
+    const estudiantes = activos(reg.estudiantes)
       .sort((a, b) => (a.numero ?? 999) - (b.numero ?? 999) || a.nombre.localeCompare(b.nombre, 'es'));
     estudiantes.forEach((e, i) => {
       const fila = ws.getRow(5 + i);

@@ -5,7 +5,7 @@ import assert from 'node:assert/strict';
 import { randomUUID } from 'node:crypto';
 import ExcelJS from 'exceljs';
 
-import { Dexie, TABLAS, abrirBase } from '../src/db.js';
+import { Dexie, TABLAS, VERSION_BASE, abrirBase } from '../src/db.js';
 import { leerAsistenciaSemana1, leerExcelSemestre } from '../src/nucleo/excel-lectura.js';
 import { aplicarAsistenciaSemana1, aplicarExcelSemestre, planificarImportacion } from '../src/datos/importar.js';
 import { borrarTodo, exportarRespaldo, restaurarRespaldo, validarRespaldo } from '../src/datos/respaldo.js';
@@ -141,6 +141,8 @@ test('respaldo: exportar, borrar todo, restaurar y obtener datos idénticos', as
   await db.ajustes.put({ evento: ev, estudiante: e.id, valor: 0.5, motivo: 'prueba', fecha: AHORA });
   await db.retroalimentaciones.put({ evento: 'GR2QB:T1', grupo: '1', dada: true, fecha: AHORA });
   await db.trabajos_casa.put({ evento: 'GR1AA:TC1', unidad: 'grupo', unidad_id: '1', entregado: true, puntajes: { '1a': 1, '2a-i': 0.5 }, etiquetas: ['confunde_inc_media'], fecha: AHORA });
+  await db.recuperaciones.put({ evento: ev, estudiante: e.id, estado: 'realizada', nota: 0.8, motivo: 'justificada', detalle: 'GR3QA, jue 15 oct', fecha: AHORA });
+  await db.plic.put({ evento: 'GR2QB:PLIC', estudiante: e.id, completo_valido: true, fecha: AHORA });
   await db.meta.put({ clave: 'prueba', valor: 1 });
 
   const opciones = { semestre: '2026B', app: 'prueba', config: cfg.version, ahora: AHORA };
@@ -179,7 +181,7 @@ async function baseAnterior(version, sinTablas) {
 }
 
 test('una base de la versión 1 (Fases 1–3) se actualiza al abrirla, sin perder datos', async () => {
-  const db = abrirBase(await baseAnterior(1, ['retroalimentaciones', 'trabajos_casa']));
+  const db = abrirBase(await baseAnterior(1, ['retroalimentaciones', 'trabajos_casa', 'recuperaciones', 'plic']));
   await db.open();
   assert.equal(await db.estudiantes.count(), 1);
   assert.equal((await db.asistencia.get(['GR2QB:P1', '199900001'])).estado, 'presente');
@@ -187,10 +189,25 @@ test('una base de la versión 1 (Fases 1–3) se actualiza al abrirla, sin perde
   assert.equal(await db.trabajos_casa.count(), 0);
 });
 
-test('una base de la versión 2 (Fase 4) se actualiza a la 3 (trabajos en casa), sin perder datos', async () => {
-  const db = abrirBase(await baseAnterior(2, ['trabajos_casa']));
+test('una base de la versión 3 (Fase 5) se actualiza a la 4 (recuperaciones y PLIC), sin perder los TC', async () => {
+  const nombre = await baseAnterior(3, ['recuperaciones', 'plic']);
+  const v3 = new Dexie(nombre);
+  v3.version(3).stores(Object.fromEntries(Object.entries(TABLAS).filter(([t]) => !['recuperaciones', 'plic'].includes(t))));
+  await v3.trabajos_casa.put({ evento: 'GR1AA:TC1', unidad: 'grupo', unidad_id: '1', entregado: true, puntajes: { '1a': 1 }, etiquetas: [], fecha: AHORA });
+  v3.close();
+  const db = abrirBase(nombre);
   await db.open();
-  assert.equal(db.verno, 3);
+  assert.equal(db.verno, 4);
+  assert.equal((await db.trabajos_casa.get(['GR1AA:TC1', 'grupo', '1'])).puntajes['1a'], 1);
+  await db.plic.put({ evento: 'GR2QB:PLIC', estudiante: '199900001', completo_valido: false, fecha: AHORA });
+  assert.equal(await db.plic.where('evento').equals('GR2QB:PLIC').count(), 1);
+});
+
+test('una base de la versión 2 (Fase 4) se actualiza a la actual (trabajos en casa, recuperaciones y PLIC), sin perder datos', async () => {
+  const db = abrirBase(await baseAnterior(2, ['trabajos_casa', 'recuperaciones', 'plic']));
+  await db.open();
+  assert.equal(db.verno, VERSION_BASE);
+  assert.deepEqual([await db.recuperaciones.count(), await db.plic.count()], [0, 0]);
   assert.equal((await db.asistencia.get(['GR2QB:P1', '199900001'])).estado, 'presente');
   await db.trabajos_casa.put({ evento: 'GR1AA:TC1', unidad: 'grupo', unidad_id: '2', entregado: false, puntajes: {}, etiquetas: [], fecha: AHORA });
   assert.equal((await db.trabajos_casa.where('evento').equals('GR1AA:TC1').first()).unidad_id, '2');
@@ -199,8 +216,7 @@ test('una base de la versión 2 (Fase 4) se actualiza a la 3 (trabajos en casa),
 test('un respaldo hecho con una versión anterior (sin retroalimentaciones ni trabajos en casa) se puede restaurar', async () => {
   const db = await baseConEjemplo();
   const viejo = await exportarRespaldo(db, { semestre: '2026B', app: '0.3.0', config: cfg.version, ahora: AHORA });
-  delete viejo.tablas.retroalimentaciones;
-  delete viejo.tablas.trabajos_casa;
+  for (const t of ['retroalimentaciones', 'trabajos_casa', 'recuperaciones', 'plic']) delete viejo.tablas[t];
   assert.deepEqual(validarRespaldo(viejo, db, { semestre: '2026B' }), []);
   await restaurarRespaldo(db, viejo);
   assert.equal(await db.estudiantes.count(), 196);

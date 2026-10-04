@@ -18,8 +18,8 @@ export async function conteoPorCurso(db) {
   const todos = await db.estudiantes.toArray();
   const c = {};
   for (const e of todos) {
-    c[e.curso] ??= { nomina: 0, pendiente: 0, baja: 0 };
-    c[e.curso][e.estado] += 1;
+    c[e.curso] ??= { nomina: 0, pendiente: 0, baja: 0, visitante: 0 };
+    c[e.curso][e.estado] = (c[e.curso][e.estado] ?? 0) + 1;
   }
   return c;
 }

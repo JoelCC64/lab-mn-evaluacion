@@ -24,7 +24,7 @@ import { generarEventos } from '../src/nucleo/calendario.js';
 import { gruposDelEvento, listaDeGrupos } from '../src/nucleo/grupos.js';
 import { crearContexto, notaEvento } from '../src/nucleo/motor.js';
 import {
-  aplicarEscritura, claveCelda, compararLibros, leerControl, normal, planificarEscritura, zonasDelPlan,
+  aplicarEscritura, claveCelda, compararLibros, hojasPropiasDelPlan, leerControl, normal, planificarEscritura, zonasDelPlan,
 } from '../src/nucleo/excel-escritura.js';
 import { columnasDeLaApp, RAYA } from '../src/nucleo/resultados.js';
 import { revisarPartesExcel } from '../src/nucleo/zip.js';
@@ -34,7 +34,8 @@ const cfg = configReal();
 const HOY = '2026-10-20';
 const AHORA = '2026-10-20T18:00:00.000Z';
 const META = { app: 'prueba', ahora: AHORA, config: cfg.version };
-const PROPIAS = new Set([cfg.excel.escritura.hoja_asistencia, cfg.excel.escritura.hoja_detalle, cfg.excel.escritura.hoja_control]);
+const ESC = cfg.excel.escritura;
+const PROPIAS = new Set([ESC.hoja_asistencia, ESC.hoja_detalle, ESC.hojas_coordinacion[1], ESC.hojas_coordinacion[2], ESC.hoja_control]);
 const inflar = async (b) => zlib.inflateRawSync(b);
 
 async function libro(ruta = EXCEL_EJEMPLO) {
@@ -221,7 +222,19 @@ test('ida y vuelta: fuera de las zonas de la app todo queda idéntico (ExcelJS y
   const control = nuevo.getWorksheet(cfg.excel.escritura.hoja_control);
   assert.equal(control.state, 'hidden');
   assert.equal(leerControl(nuevo, cfg).formato, 1);
-  assert.deepEqual(nuevo.worksheets.slice(-3).map((w) => w.name), [...PROPIAS]);
+  assert.deepEqual(nuevo.worksheets.slice(-PROPIAS.size).map((w) => w.name), [...PROPIAS]);
+  assert.deepEqual([...hojasPropiasDelPlan(cfg, plan)].sort(), [...PROPIAS].sort(), 'la verificación antes de guardar conoce todas las hojas propias');
+
+  // 5) Coordinación: sus cuatro columnas, todos los estudiantes (194 en nómina y aparte 2 pendientes) y el profesor.
+  for (const b of [1, 2]) {
+    const coord = nuevo.getWorksheet(ESC.hojas_coordinacion[b]);
+    assert.deepEqual(coord.getRow(4).values.slice(1), cfg.semestre.formato_coordinacion);
+    const filas = [];
+    coord.eachRow((f, r) => { if (r > 4 && f.getCell(2).value !== null) filas.push(f); });
+    assert.equal(filas.length, 196);
+    assert.ok(filas.every((f) => f.getCell(4).value === cfg.semestre.profesor && f.getCell(3).value === null), 'sin notas: el bimestre no está completo');
+    assert.ok(filas.slice(-2).every((f) => f.getCell(1).fill?.fgColor?.argb === 'FFFFF4D6'), 'los pendientes van al final, en ámbar');
+  }
 });
 
 test('escribir dos veces seguidas no cambia nada', async () => {

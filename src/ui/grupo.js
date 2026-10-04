@@ -9,6 +9,7 @@ import { gruposDe, notaControl, notaGrupo, rubrica } from '../nucleo/motor.js';
 import { grupoNuevo, listaDeGrupos } from '../nucleo/grupos.js';
 import { seEvaluaPorGrupo, sobreDiez, textoNotaGrupo } from '../nucleo/motor-vista.js';
 import { preparatorioCalifica } from '../nucleo/config.js';
+import { HojaVisitante } from './visitantes.js';
 
 export function Grupo({ id, grupo }) {
   const { curso, ctx, evento, cargando } = useEvento(id);
@@ -294,6 +295,8 @@ export function HojaMover({ ctx, evento, estudiante, cerrar }) {
 
 function HojaAgregar({ ctx, evento, grupo, grupos, cerrar }) {
   const { db } = useApp();
+  const [visitante, setVisitante] = useState(false);
+  if (visitante) return html`<${HojaVisitante} evento=${evento} grupo=${grupo} grupos=${grupos} alCerrar=${cerrar} />`;
   const { grupos: lista, sinGrupo } = listaDeGrupos(grupos, ctx.reg.estudiantes);
   const deOtros = lista.filter((g) => g.grupo !== grupo).flatMap((g) => g.integrantes.map((e) => ({ e, g: g.grupo })));
   const agregar = async (e) => { await moverEstudiante(db, evento.id, grupos, e.id, grupo); cerrar(); };
@@ -304,6 +307,7 @@ function HojaAgregar({ ctx, evento, grupo, grupos, cerrar }) {
         <div class="lista">${sinGrupo.map((e) => html`<button class="fila" onClick=${() => agregar(e)}><${Persona} estudiante=${e} /></button>`)}</div>`}
       <div class="seccion-titulo">De otros grupos</div>
       <div class="lista">${deOtros.map(({ e, g }) => html`<button class="fila" onClick=${() => agregar(e)}><${Persona} estudiante=${e} detalle=${html`<span>· grupo ${g}</span>`} /></button>`)}</div>
+      ${evento.con_nota && html`<button class="boton ancho" onClick=${() => setVisitante(true)}>+ Estudiante de otro curso (recupera aquí)…</button>`}
       <button class="boton ancho" onClick=${cerrar}>Cancelar</button>
     <//>`;
 }

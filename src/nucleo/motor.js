@@ -147,13 +147,14 @@ export function notaEvento(ctx, evento, estudiante) {
   if (!evento.con_nota) return { ...r, estado: 'sin_nota' };
 
   const rec = ctx.recuperaciones.get(`${evento.id}|${estudiante}`);
+  const donde = rec?.detalle ? `: ${rec.detalle}` : '';
   if (evento.estado !== 'normal') {
-    // Feriado: la actividad no cuenta, salvo que el estudiante la recupere (entonces cuenta para él).
-    if (rec?.estado === 'realizada') return conAjuste(ctx, { ...r, estado: 'calculada', valor: rec.nota, motivo: `recuperada (${evento.motivo})`, recuperacion: rec });
+    // Feriado: la actividad no cuenta, salvo que el estudiante la recupere (entonces cuenta en su nota).
+    if (rec?.estado === 'realizada') return conAjuste(ctx, { ...r, estado: 'calculada', valor: rec.nota, motivo: `recuperada (${evento.motivo}${donde})`, recuperacion: rec });
     return { ...r, estado: 'excluido', motivo: evento.motivo };
   }
   if (rec) {
-    if (rec.estado === 'realizada') return conAjuste(ctx, { ...r, estado: 'calculada', valor: rec.nota, motivo: 'recuperación', recuperacion: rec });
+    if (rec.estado === 'realizada') return conAjuste(ctx, { ...r, estado: 'calculada', valor: rec.nota, motivo: `recuperada en otra sesión${donde ? ` (${rec.detalle})` : ''}`, recuperacion: rec });
     if (rec.estado === 'no_asistio') return conAjuste(ctx, { ...r, estado: 'calculada', valor: 0, motivo: 'no asistió a la recuperación', recuperacion: rec });
     return conAjuste(ctx, { ...r, motivo: 'falta justificada: pendiente de la recuperación', recuperacion: rec });
   }
@@ -215,6 +216,12 @@ export function notaPreparatorio(ctx, evento, estudiante) {
   if (!p.aplica_a.includes(evento.tipo) || !p.califica[ctx.curso.metodologia]) return { estado: 'sin_nota' };
   if (evento.estado !== 'normal') return { estado: 'excluido', motivo: evento.motivo };
   const max = Math.max(...p.escala);
+  // Falta justificada con recuperación: el preparatorio de esta sesión no se cuenta (lo revisa la sesión de
+  // recuperación); si no asiste a la recuperación, 0.
+  const rec = ctx.recuperaciones.get(`${evento.id}|${estudiante}`);
+  if (rec?.estado === 'realizada') return { estado: 'excluido', motivo: 'recuperó la sesión en otro curso' };
+  if (rec?.estado === 'no_asistio') return { estado: 'calculada', nivel: p.si_no_vino, valor: p.si_no_vino / max, motivo: 'no asistió a la recuperación' };
+  if (rec) return { estado: 'pendiente', motivo: 'falta justificada: pendiente de la recuperación' };
   const asis = asistenciaDe(ctx, evento, estudiante);
   const nov = ctx.novedades.get(`${evento.id}|${estudiante}`);
   if (!asis.paseCerrado) return { estado: 'pendiente', motivo: 'falta cerrar el pase' };

@@ -1,6 +1,6 @@
 // Evento: encabezado, pestañas de la clase (Puerta · Control · [Retro] · Grupos · Resumen) y avisos de estado.
-import { useMemo } from '../vendor/preact-htm.js';
-import { html, useApp, Pantalla, Aviso, Cargando, enlace } from './base.js';
+import { useMemo, useState } from '../vendor/preact-htm.js';
+import { html, useApp, Pantalla, Aviso, Cargando, Hoja, enlace } from './base.js';
 import { useCurso, textoBimestre } from './curso-datos.js';
 import { Puerta } from './puerta.js';
 import { Control } from './control.js';
@@ -8,6 +8,9 @@ import { Grupos } from './grupos.js';
 import { Resumen } from './resumen.js';
 import { Retro } from './retro.js';
 import { Trabajos } from './trabajos.js';
+import { Plic } from './plic.js';
+import { RecuperacionesDelEvento } from './recuperacion.js';
+import { marcarHuboClase, marcarSinClase, quitarCambioEvento } from '../datos/acciones.js';
 import { retroDelTaller } from '../nucleo/retro.js';
 import { estadoEvento } from '../nucleo/estado-evento.js';
 import { unidadTrabajo } from '../nucleo/motor.js';
@@ -21,7 +24,8 @@ function trabajoCalificado(ctx, evento) {
 }
 
 export function nombreEvento(evento) {
-  return ['INTRO', 'REFUERZO', 'REVISION'].includes(evento.codigo) ? evento.titulo : `${evento.codigo} · ${evento.titulo}`;
+  const soloTitulo = ['INTRO', 'REFUERZO', 'REVISION'].includes(evento.codigo) || evento.titulo.startsWith(evento.codigo);
+  return soloTitulo ? evento.titulo : `${evento.codigo} · ${evento.titulo}`;
 }
 
 export function subtituloEvento(evento) {
@@ -97,8 +101,11 @@ export function Evento({ id, pestana }) {
     </nav>`;
 
   return html`
-    <${Pantalla} titulo=${nombreEvento(evento)} subtitulo=${subtituloEvento(evento)} atras=${enlace('curso', curso.paralelo)} pestanas=${barra}>
+    <${Pantalla} titulo=${nombreEvento(evento)} subtitulo=${subtituloEvento(evento)} atras=${enlace('curso', curso.paralelo)} pestanas=${barra}
+      acciones=${evento.sesion && html`<${MenuEvento} ctx=${ctx} evento=${evento} />`}>
       <${AvisoDeEstado} evento=${evento} estado=${est} eventos=${eventos} />
+      ${evento.tipo === 'plic' && evento.estado === 'normal' && html`<${Plic} ctx=${ctx} evento=${evento} />`}
+      ${evento.estado !== 'normal' && evento.con_nota && html`<${RecuperacionesDelEvento} ctx=${ctx} evento=${evento} />`}
       ${activa === 'puerta' && html`<${Puerta} ctx=${ctx} evento=${evento} />`}
       ${activa === 'control' && html`<${Control} ctx=${ctx} evento=${evento} />`}
       ${activa === 'retro' && html`<${Retro} ctx=${ctx} evento=${evento} />`}
@@ -109,8 +116,8 @@ export function Evento({ id, pestana }) {
 
 export function AvisoDeEstado({ evento, estado, eventos }) {
   const { cfg } = useApp();
-  if (estado.clave === 'feriado') return html`<${Aviso} tono="aviso" titulo="Feriado: ${estado.detalle}">Esta actividad no se hace en este curso y no cuenta en la nota del bimestre.<//>`;
-  if (estado.clave === 'sin_clase') return html`<${Aviso} tono="aviso" titulo="Sin clase: ${estado.detalle}">Esta sesión no cuenta.<//>`;
+  if (estado.clave === 'feriado') return html`<${Aviso} tono="aviso" titulo="Feriado: ${estado.detalle}">Esta actividad no se hace en este curso y no cuenta en la nota del bimestre.${evento.sesion ? ' Si el feriado se movió y sí hubo clase, usa el menú ⋯.' : ''}<//>`;
+  if (estado.clave === 'sin_clase') return html`<${Aviso} tono="aviso" titulo="Sin clase: ${estado.detalle}">Esta sesión no cuenta en la nota${evento.cambio_manual && evento.sesion ? '. Se marcó a mano: se puede deshacer en el menú ⋯' : ''}.<//>`;
   if (evento.tipo === 'trabajo_casa') {
     const practica = eventos.find((e) => e.id === evento.practica);
     const enlacePractica = practica ? html`<a class="negrita" href=${enlace('evento', practica.id)}>${practica.codigo}</a>` : 'su práctica';
@@ -120,7 +127,36 @@ export function AvisoDeEstado({ evento, estado, eventos }) {
     if (!evento.config) return html`<${Aviso} tono="aviso" titulo="Falta la configuración de este TC">Cuando esté cargada, se califica aquí con los grupos de ${enlacePractica}.<//>`;
     return html`<p class="tenue pequeno">Trabajo en casa de ${enlacePractica}: usa sus grupos y su asistencia (quien faltó tiene 0).</p>`;
   }
-  if (evento.tipo === 'plic') return html`<${Aviso} titulo="PLIC (Fase 6)">Examen presencial controlado por un profesor; vale 0.5 si se completa de forma válida.<//>`;
   if (evento.tipo === 'sin_nota') return html`<${Aviso}>Sesión sin nota: solo se registra la asistencia (pase por grupo).<//>`;
   return null;
+}
+
+/** Menú del evento (⋯): marcar la sesión sin clase, indicar que en un feriado sí hubo clase o deshacer el cambio. */
+function MenuEvento({ ctx, evento }) {
+  const { db, avisar } = useApp();
+  const [abierto, setAbierto] = useState(false);
+  const [motivo, setMotivo] = useState('Clase suspendida');
+  const cambio = ctx.reg.cambios_evento.find((c) => c.evento === evento.id) ?? null;
+  const tc = ctx.eventos.find((e) => e.tipo === 'trabajo_casa' && e.practica === evento.id && e.con_nota);
+  const hecho = (texto, tono) => { setAbierto(false); avisar(texto, tono); };
+  return html`
+    <button class="icono-boton" aria-label="Opciones del evento" onClick=${() => setAbierto(true)}>⋯</button>
+    ${abierto && html`
+      <${Hoja} titulo="Opciones de la sesión" alCerrar=${() => setAbierto(false)}>
+        ${cambio
+          ? html`
+            <p>${cambio.estado === 'sin_clase' ? `Se marcó a mano sin clase (${cambio.motivo}).` : 'Se marcó a mano que sí hubo clase pese al calendario.'}</p>
+            <button class="boton ancho" onClick=${async () => { await quitarCambioEvento(db, evento.id); hecho('La sesión vuelve a lo que dice el calendario.'); }}>Deshacer el cambio</button>`
+          : evento.estado === 'feriado'
+            ? html`
+              <p>Según el calendario es feriado (${evento.motivo}). Si el feriado se movió y sí hubo clase, la actividad vuelve a contar.</p>
+              <button class="boton primario ancho" onClick=${async () => { await marcarHuboClase(db, evento.id); hecho('La sesión vuelve a contar.', 'ok'); }}>Sí hubo clase</button>`
+            : html`
+              <p>Si esta sesión no tuvo clase (por ejemplo, una suspensión), sus actividades (${evento.codigo}${tc ? ` y ${tc.codigo}` : ''}) quedan fuera de la nota en ${evento.curso}, como en un feriado: las demás de cada componente se renormalizan.</p>
+              <p class="tenue pequeno">Lo registrado no se borra y se puede deshacer.</p>
+              <div class="campo"><label>Motivo</label><input class="entrada" value=${motivo} onInput=${(e) => setMotivo(e.currentTarget.value)} /></div>
+              <button class="boton peligro-fuerte ancho" disabled=${!motivo.trim()}
+                onClick=${async () => { await marcarSinClase(db, evento.id, motivo); hecho(`${evento.codigo}: sin clase.`); }}>Marcar sin clase</button>`}
+        <button class="boton ancho" onClick=${() => setAbierto(false)}>Cerrar</button>
+      <//>`}`;
 }

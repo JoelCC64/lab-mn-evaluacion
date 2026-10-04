@@ -25,7 +25,7 @@ Claves entre corchetes: compuestas. Todas las tablas de registro llevan `fecha` 
 
 | Tabla | Clave | Campos | Para qué | En el plan (§4) |
 |---|---|---|---|---|
-| `estudiantes` | `id` (= código único) | `codigo`, `nombre` (apellidos y nombres, sin separar), `curso`, `estado` (`nomina` · `pendiente` · `baja`), `grupo_excel`, `observacion_excel` (solo lectura), `numero` (N° en el Excel), `actualizado` | Lista de cada curso | `students` |
+| `estudiantes` | `id` (= código único) | `codigo`, `nombre` (apellidos y nombres, sin separar), `curso`, `estado` (`nomina` · `pendiente` · `baja` · `visitante`), `grupo_excel`, `observacion_excel` (solo lectura), `numero` (N° en el Excel), `actualizado`; un visitante lleva además `visita` (`evento`, `paralelo`, `profesor`) | Lista de cada curso. Un **visitante** es un estudiante de otro docente que recupera en una sesión del curso: su id es `v-<código>-<paralelo>-<actividad>`, solo aparece en ese evento y no va al Excel (Fase 6) | `students` |
 | `grupos_evento` | `[evento+estudiante]` | `grupo` (texto, o `null` = sin grupo) | Grupos del evento (ver abajo) | `event_groups` |
 | `asistencia` | `[evento+estudiante]` | `estado` (`presente` · `no_vino` · `salio` · `se_retiro_antes`), `motivo`, `observacion` | Pase final por grupo, observaciones por estudiante y faltas anotadas antes del pase (no ingresa, salió) | `attendance` |
 | `pases` | `evento` | `cerrado`, `cerrado_en` | Pase cerrado: sin pase cerrado no se calculan notas | (nuevo) |
@@ -38,19 +38,19 @@ Claves entre corchetes: compuestas. Todas las tablas de registro llevan `fecha` 
 | `novedades_preparatorio` | `[evento+estudiante]` | `nivel` (1 incompleto · 0 no lo hizo · `null` en SQI), `no_ingresa`, `observacion` | Solo las excepciones de la revisión en la puerta | `prep_novedades` |
 | `ajustes` | `[evento+estudiante]` | `valor` (0–1), `motivo` (obligatorio) | Ajuste individual explícito de la nota del evento | `overrides` |
 | `retroalimentaciones` | `[evento+grupo]` | `dada` | Retroalimentación de la práctica anterior dada en el taller (`evento` = el taller; `grupo` = el de la práctica). Desde la versión 2 de la base (Fase 4) | (nuevo) |
+| `recuperaciones` | `[evento+estudiante]` | `estado` (`solicitada` · `realizada` · `no_asistio`), `nota` (0–1, si se realizó), `motivo` (`justificada` · `feriado`), `detalle` (dónde y cuándo) | Recuperación de un estudiante del curso en otra sesión. Desde la versión 4 de la base (Fase 6) | `recoveries` |
+| `plic` | `[evento+estudiante]` | `completo_valido` | PLIC del 2.º bimestre (`evento` = `PARALELO:PLIC`). Desde la versión 4 (Fase 6) | `plic` |
 | `trabajos_casa` | `[evento+unidad+unidad_id]` | `unidad` (`grupo` · `estudiante`, según `unidad_calificacion` del TC), `unidad_id` (número de grupo o código), `entregado`, `puntajes` (`{ pregunta: puntos }`), `etiquetas` (ids de la configuración) | TC de SQI pregunta por pregunta. `entregado: false` vale 0 y conserva los puntajes por si fue un toque equivocado. Desde la versión 3 de la base (Fase 5) | `homework` |
 | `cambios_evento` | `evento` | `estado` (`sin_clase` · `normal`), `motivo` | Cambios manuales del calendario (clase suspendida, semana 1 sin clase) | `events.estado` |
 | `importaciones` | autoincremental | `tipo` (`excel_semestre` · `asistencia_semana1` · `respaldo`), `archivo`, `resumen` (solo conteos) | Historial de lecturas del Excel y de restauraciones | (nuevo) |
 | `meta` | `clave` | `valor` | Datos sueltos: último respaldo, versión del modelo | (nuevo) |
 
-El motor de notas ya sabe leer `recuperaciones` y `plic` si existen; sus pantallas y tablas llegan en la Fase 6.
 
 **Versiones de la base** (`VERSION_BASE` en `src/db.js`). Una versión nueva solo agrega tablas o índices; Dexie actualiza la base del dispositivo al abrirla, sin perder datos. Una prueba lo comprueba.
 - 1: Fases 1 a 3.
 - 2: Fase 4, con la tabla `retroalimentaciones`.
 - 3: Fase 5, con la tabla `trabajos_casa`.
-
-Fases siguientes: `plic` y `recuperaciones` (Fase 6).
+- 4: Fase 6, con las tablas `recuperaciones` y `plic`.
 
 **Lo último que se escribió en el Excel** (`excel_writes` en el §4) no va en la base: va en la hoja oculta «_app» del propio Excel (ver `docs/excel.md`). Así viaja con el archivo y no se pierde cuando la Mac importa un respaldo del iPhone, que reemplaza toda la base.
 

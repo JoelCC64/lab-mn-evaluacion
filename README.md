@@ -20,7 +20,7 @@ source .venv/bin/activate       # node, npm y python del proyecto
 
 | Comando | Qué hace |
 |---|---|
-| `npm test` | Pruebas automáticas (configuración, calendario, lectura y escritura del Excel, respaldo, motor de notas, sorteo, talleres, trabajos en casa) |
+| `npm test` | Pruebas automáticas (configuración, calendario, lectura y escritura del Excel, respaldo, motor de notas, sorteo, talleres, trabajos en casa, nota bimestral y coordinación) |
 | `npm run config` | Valida `/config` y actualiza `config/manifest.json` (después de agregar o editar una actividad) |
 | `npm run ejemplo` | Regenera los Excel ficticios de `/datos-ejemplo` |
 | `npm run vendor` | Copia a `src/vendor` las librerías para el navegador |

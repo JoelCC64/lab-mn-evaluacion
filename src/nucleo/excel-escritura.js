@@ -7,10 +7,11 @@
 // Funciona igual en el navegador y en Node: recibe el libro ya abierto, no importa ExcelJS.
 
 import { buscarEncabezados, textoCodigo, valorCelda } from './excel-lectura.js';
-import { huella, limpiarTexto, normalizar, redondear } from './util.js';
+import { activos } from './grupos.js';
+import { fechaLarga, huella, limpiarTexto, normalizar, redondear } from './util.js';
 import {
   COLUMNAS_DETALLE, asistenciaPorSemana, columnasDeLaApp, contextoConFijadas, eventosDelDetalle, filaDetalle,
-  grupoActual, semanasConSesion, valoresDelEstudiante,
+  grupoActual, notaFinalDelBimestre, semanasConSesion, valoresDelEstudiante,
 } from './resultados.js';
 
 export const FORMATO_CONTROL = 1;
@@ -223,13 +224,22 @@ export function planificarEscritura(wb, cfg, cursos, { hoy, decisiones = new Map
       });
     }
     for (const e of reg.estudiantes) {
-      if (e.estado !== 'baja' && !u.filas.has(e.codigo) && !u.repetidos.includes(e.codigo)) plan.sinFila.push({ hoja, codigo: e.codigo, nombre: e.nombre });
+      if (activos([e]).length && !u.filas.has(e.codigo) && !u.repetidos.includes(e.codigo)) plan.sinFila.push({ hoja, codigo: e.codigo, nombre: e.nombre });
     }
     plan.hojas.push({ hoja, paralelo: curso.paralelo, columnas, ...u, celdas });
   }
 
-  // 4) Hojas propias: se reescriben completas.
-  plan.propias = [hojaAsistencia(cfg, contextos), hojaDetalle(cfg, contextos, hoy)];
+  // 4) Hojas propias: se reescriben completas. Coordinación usa la misma nota final que la hoja del curso.
+  const finales = new Map();
+  for (const h of plan.hojas) {
+    for (const c of h.celdas) {
+      if (c.col.tipo === 'nota') finales.set(`${c.codigo}|${c.col.bimestre}`, c.conservar ? c.actual : normal(c.valor));
+    }
+  }
+  plan.propias = [
+    hojaAsistencia(cfg, contextos), hojaDetalle(cfg, contextos, hoy),
+    hojaCoordinacion(cfg, contextos, 1, finales), hojaCoordinacion(cfg, contextos, 2, finales),
+  ];
   for (const p of plan.propias) {
     const ws = wb.getWorksheet(p.nombre);
     p.nueva = !ws;
@@ -252,7 +262,7 @@ function hojaAsistencia(cfg, contextos) {
   const semanas = semanasConSesion(cfg);
   const filas = [], ambar = new Set();
   for (const { curso, ctx } of contextos) {
-    const estudiantes = ctx.reg.estudiantes.filter((e) => e.estado !== 'baja')
+    const estudiantes = activos(ctx.reg.estudiantes)
       .sort((a, b) => (a.numero ?? 999) - (b.numero ?? 999) || a.nombre.localeCompare(b.nombre, 'es'));
     for (const e of estudiantes) {
       const a = asistenciaPorSemana(ctx, e.id, semanas);
@@ -277,7 +287,7 @@ function hojaAsistencia(cfg, contextos) {
 function hojaDetalle(cfg, contextos, hoy) {
   const filas = [], ambar = new Set();
   for (const { ctx } of contextos) {
-    const estudiantes = ctx.reg.estudiantes.filter((e) => e.estado !== 'baja');
+    const estudiantes = activos(ctx.reg.estudiantes);
     for (const evento of eventosDelDetalle(ctx, hoy)) {
       const filasEvento = estudiantes.map((e) => ({ e, fila: filaDetalle(ctx, evento, e) }));
       filasEvento.sort((x, y) => String(x.fila[6] ?? '~').localeCompare(String(y.fila[6] ?? '~'), 'es', { numeric: true })
@@ -294,6 +304,48 @@ function hojaDetalle(cfg, contextos, hoy) {
     subtitulo: `Notas sobre 10 · — el evento no se hizo en el curso. ${cfg.excel.escritura.texto_zona}: se reescribe completa en cada escritura.`,
     columnas: COLUMNAS_DETALLE.map((c, i) => ({ ...c, centrado: [3, 5, 6, 8, 11, 12].includes(i) })),
     filas, ambar, congelarColumnas: 3,
+  };
+}
+
+const codigoComoValor = (c) => (/^\d{1,15}$/.test(String(c)) ? Number(c) : String(c));
+
+/**
+ * «Coordinación B1» o «B2»: APELLIDOS Y NOMBRES | NÚMERO ÚNICO | NOTA(/6) | PROFESOR (formato_coordinacion), todos los
+ * cursos por orden alfabético y, aparte, los pendientes de nómina (en ámbar). La nota va con 2 decimales y solo
+ * cuando el bimestre está completo; mientras tanto, vacía.
+ */
+function hojaCoordinacion(cfg, contextos, b, finales) {
+  const [colNombre, colCodigo, colNota, colProfesor] = cfg.semestre.formato_coordinacion;
+  const profesor = cfg.semestre.profesor ?? null;
+  const nomina = [], pendientes = [];
+  for (const { ctx } of contextos) {
+    for (const e of activos(ctx.reg.estudiantes)) {
+      const k = `${e.codigo}|${b}`;
+      const v = finales.has(k) ? finales.get(k) : notaFinalDelBimestre(ctx, e.id, b);
+      (e.estado === 'pendiente' ? pendientes : nomina).push({ e, nota: typeof v === 'number' ? redondear(v, 2) : null });
+    }
+  }
+  const porNombre = (x, y) => x.e.nombre.localeCompare(y.e.nombre, 'es');
+  const fila = ({ e, nota }) => [e.nombre, codigoComoValor(e.codigo), nota, profesor];
+  const filas = nomina.sort(porNombre).map(fila);
+  const ambar = new Set(), resaltadas = new Set();
+  if (pendientes.length) {
+    filas.push([]);
+    resaltadas.add(filas.length);
+    filas.push([`Pendientes de la lista final (no constan en la nómina): ${pendientes.length}`]);
+    for (const p of pendientes.sort(porNombre)) { ambar.add(filas.length); filas.push(fila(p)); }
+  }
+  const todos = [...nomina, ...pendientes];
+  return {
+    nombre: cfg.excel.escritura.hojas_coordinacion[b],
+    titulo: `Notas para coordinación · ${b === 1 ? '1.er' : '2.º'} bimestre · envío hasta el ${fechaLarga(cfg.semestre.envio_notas[b])}`,
+    subtitulo: `${todos.filter((x) => x.nota !== null).length} de ${todos.length} notas completas (sobre 6, con 2 decimales; vacía mientras falte evaluar algo). `
+      + `Apellidos y nombres en una sola columna. ${cfg.excel.escritura.texto_zona}: se reescribe completa en cada escritura.`,
+    columnas: [
+      { encabezado: colNombre, ancho: 40 }, { encabezado: colCodigo, ancho: 15, centrado: true },
+      { encabezado: colNota, ancho: 11, formato: '0.00', centrado: true }, { encabezado: colProfesor, ancho: 28 },
+    ],
+    filas, ambar, resaltadas, congelarColumnas: 0,
   };
 }
 
@@ -417,6 +469,7 @@ function escribirHojaPropia(wb, p) {
       if (col.formato) estilo.numFmt = col.formato;
       if (col.centrado) estilo.alignment = { horizontal: 'center' };
       if (p.ambar.has(k)) estilo.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: ARGB.ambar } };
+      if (p.resaltadas?.has(k)) estilo.font = { bold: true, italic: true, color: { argb: ARGB.gris } };
       if (Object.keys(estilo).length) celda.style = estilo;
     });
   });
@@ -492,6 +545,11 @@ export function compararLibros(a, b, { zonas, propias }) {
     }
   }
   return difs;
+}
+
+/** Hojas que la app reescribe completas (las propias del plan y la de control), para compararLibros. */
+export function hojasPropiasDelPlan(cfg, plan) {
+  return new Set([...plan.propias.map((p) => p.nombre), cfg.excel.escritura.hoja_control]);
 }
 
 /** Zonas de la app del plan, para compararLibros. */

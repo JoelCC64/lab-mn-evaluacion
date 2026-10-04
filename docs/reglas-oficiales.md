@@ -26,7 +26,7 @@ Si llega un documento oficial nuevo que contradiga algo de aquí, se pregunta a 
 | Tolerancia de 10 minutos (30 solo en la semana 2 para matrícula extraordinaria) | LE-VF, LE-SQI | `config/asistencia.json` (informativo) |
 | El pase se hace al final de la clase, grupo por grupo, al revisar y firmar el trabajo | Joel | Pantalla del grupo |
 | Quien falta pierde todas las calificaciones de esa actividad: no vino, no fue admitido o salió tras el control; incluye el preparatorio y, en SQI, el TC de esa práctica | LE-VF §3; LE-SQI §6–9; Joel | Motor: elegibilidad |
-| Excepciones: recuperación por falta justificada y feriado | LE-VF §13–14; LE-SQI §14–15 | Motor (recuperaciones en la Fase 6) |
+| Excepciones: recuperación por falta justificada y feriado | LE-VF §13–14; LE-SQI §14–15 | Motor y pantallas de recuperación (Fase 6) |
 
 ## Control oral
 
@@ -90,6 +90,11 @@ Si llega un documento oficial nuevo que contradiga algo de aquí, se pregunta a 
 | Falta justificada (Bienestar Estudiantil): pedir la recuperación dentro de 72 h y al menos 24 h antes de la sesión, con evidencia y coloquio al 100 % | LE-VF §13; LE-SQI §14 |
 | Si no asiste a la recuperación programada: 0 | LE-VF; LE-SQI |
 | El profesor que recibe la recuperación envía la nota al profesor del estudiante y al estudiante en 24 h | LP §10 |
+
+En la app:
+- **Estudiantes del curso que recuperan en otra sesión:** se registra la recuperación (solicitada, realizada con su nota o «no asistió» = 0). Mientras está solicitada, la nota queda pendiente. Si la realizó, el preparatorio de la sesión que faltó no entra en su promedio.
+- **En un feriado,** recuperar es opcional: solo cuenta si la realizó.
+- **Estudiantes de otros docentes que recuperan aquí:** se agregan al grupo con código y nombre, se califican con su grupo y la app arma el texto con la nota para su profesor. No van al Excel ni a coordinación.
 
 ## Calendario 2026B
 

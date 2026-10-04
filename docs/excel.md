@@ -41,7 +41,7 @@ Valores:
 - 0 si el estudiante faltó; el motivo va en las observaciones.
 
 Componentes y notas:
-- Los componentes y la nota del bimestre se escriben **solo cuando están completos**, es decir, cuando todo lo del bimestre está evaluado. Mientras tanto quedan vacíos; la nota acumulada y la proyectada se ven en la app (Fase 6).
+- Los componentes y la nota del bimestre se escriben **solo cuando están completos**, es decir, cuando todo lo del bimestre está evaluado. Mientras tanto quedan vacíos; la nota acumulada y la proyectada se ven en la app, en «Notas del bimestre» de cada curso.
 - «Preparatorios» y «Control» muestran el promedio de lo que ya hay.
 - Si el bimestre termina (todas sus sesiones con el pase cerrado) y un estudiante no tuvo control oral, Planificación y conocimiento sale solo de los preparatorios, con la observación «B1: sin control oral».
 
@@ -52,6 +52,11 @@ Componentes y notas:
   - Asistencias (P + R) y % sobre las sesiones con pase.
 - «Detalle (app)»: una fila por estudiante y evento ya ocurrido, con todo lo registrado. Además de las columnas del Anexo J lleva «Etiquetas».
   - En un TC: «Puntajes» lleva cada pregunta («1a 1 · 1b 2 · 2a-i 0.5 …») o «no entregó», «Nota del grupo» la del TC sobre 10, «Etiquetas» los errores marcados con su pregunta y la observación, la nota del profesor.
+- «Coordinación B1» y «Coordinación B2» (Fase 6), las que se envían a coordinación (1-dic-2026 y 29-ene-2027):
+  - Cuatro columnas: APELLIDOS Y NOMBRES (una sola columna) | NÚMERO ÚNICO | NOTA(/6) | PROFESOR (`semestre-2026B.json → profesor`).
+  - Todos los cursos en orden alfabético; los pendientes de nómina van aparte, al final y en ámbar.
+  - La nota es la misma de la columna «Nota B1/B2» de la hoja del curso (incluida una celda conservada a mano), con 2 decimales. Vacía mientras el bimestre no esté completo.
+  - Los estudiantes de otros docentes que recuperan aquí no aparecen.
 - Los pendientes de nómina van en fila ámbar.
 
 **Hoja oculta «_app»**:

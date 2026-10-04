@@ -2,11 +2,14 @@
 import { useState } from '../vendor/preact-htm.js';
 import { html, useApp, Pantalla, Chip, ChipMetodologia, Aviso, Cargando, enlace, Persona } from './base.js';
 import { useCurso, textoBimestre, horario } from './curso-datos.js';
+import { nombreEvento } from './evento.js';
 import { eventoSugerido, semanaDeFecha } from '../nucleo/calendario.js';
 import { estadoEvento } from '../nucleo/estado-evento.js';
 import { avanceEvaluacion } from '../nucleo/motor-vista.js';
 import { fechaCorta, hoyLocal, compararGrupos } from '../nucleo/util.js';
 import { nombreMetodologia } from '../nucleo/config.js';
+import { activos as delCurso } from '../nucleo/grupos.js';
+import { avisoControlCierre, bimestreEnCurso, pendientesDelBimestre } from '../nucleo/bimestre.js';
 
 export function Curso({ paralelo }) {
   const { cfg } = useApp();
@@ -17,7 +20,8 @@ export function Curso({ paralelo }) {
 
   const hoy = hoyLocal();
   const sugerido = eventoSugerido(cfg, eventos, hoy);
-  const activos = reg.estudiantes.filter((e) => e.estado !== 'baja');
+  const activos = delCurso(reg.estudiantes);
+  const enCurso = bimestreEnCurso(cfg, hoy);
   const porBimestre = [1, 2].map((b) => ({ b, eventos: eventos.filter((e) => e.bimestre === b) }));
 
   return html`
@@ -35,6 +39,7 @@ export function Curso({ paralelo }) {
           <h2>${sugerido.codigo} · ${sugerido.titulo}</h2>
           <div class="tenue pequeno">Semana ${sugerido.semana} · ${sugerido.lugar === 'lab' ? 'laboratorio' : 'aula'} · ${textoBimestre(sugerido.bimestre)}</div>
         </a>`}
+      ${activos.length > 0 && html`<${TarjetaNotas} ctx=${ctx} paralelo=${paralelo} enCurso=${enCurso} hoy=${hoy} />`}
       ${porBimestre.map(({ b, eventos: lista }) => html`
         <div class="seccion-titulo">${textoBimestre(b)}</div>
         <div class="lista">${lista.map((e) => html`<${FilaEvento} evento=${e} ctx=${ctx} />`)}</div>`)}
@@ -65,16 +70,29 @@ function FilaEvento({ evento, ctx }) {
     <a class=${`fila ${secundaria ? 'atenuada' : ''} ${evento.tipo === 'trabajo_casa' ? 'sangria' : ''}`} href=${enlace('evento', evento.id)}>
       ${evento.tipo === 'trabajo_casa' ? null : html`<span class="semana"><b>${evento.semana}</b>sem</span>`}
       <div class="principal">
-        <div class="linea1">${evento.codigo === 'INTRO' || evento.codigo === 'REFUERZO' || evento.codigo === 'REVISION' ? evento.titulo : html`${evento.codigo} · ${evento.titulo}`}</div>
+        <div class="linea1">${nombreEvento(evento)}</div>
         <div class="linea2">${detalle}${est.detalle ? ` · ${est.detalle}` : ''}</div>
       </div>
       <${Chip} tono=${est.tono}>${est.texto}<//>
     </a>`;
 }
 
+/** Acceso a las notas del bimestre, con lo que falta evaluar y el aviso de control oral al cierre. */
+function TarjetaNotas({ ctx, paralelo, enCurso, hoy }) {
+  const b = enCurso?.bimestre ?? 2;
+  const { pendientes } = pendientesDelBimestre(ctx, b, hoy);
+  const aviso = avisoControlCierre(ctx, b, hoy);
+  return html`
+    <a class="tarjeta" href=${enlace('curso', paralelo, 'notas')}>
+      <div class="separado"><h2>Notas del ${textoBimestre(b)}</h2><span class="flecha">›</span></div>
+      <div class="tenue pequeno">${pendientes.length ? `Faltan por evaluar: ${pendientes.map((p) => p.evento.codigo).join(', ')}` : 'Al día con lo que ya pasó'}${enCurso ? ` · envío: ${fechaCorta(enCurso.envio)}` : ''}</div>
+      ${aviso && html`<div class="texto-aviso pequeno">${aviso.sinControl.length} sin control oral ${aviso.quedan ? `y quedan ${aviso.quedan} sesiones` : 'al cierre'}</div>`}
+    </a>`;
+}
+
 function Estudiantes({ estudiantes }) {
   const [abierto, setAbierto] = useState(false);
-  const activos = estudiantes.filter((e) => e.estado !== 'baja');
+  const activos = delCurso(estudiantes);
   const bajas = estudiantes.filter((e) => e.estado === 'baja');
   const orden = [...activos].sort((a, b) => compararGrupos(a.grupo_excel ?? '999', b.grupo_excel ?? '999') || a.nombre.localeCompare(b.nombre, 'es'));
   return html`

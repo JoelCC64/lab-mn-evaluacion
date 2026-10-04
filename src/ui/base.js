@@ -105,6 +105,7 @@ export function Persona({ estudiante, detalle, children }) {
           <span>${estudiante.codigo}</span>
           ${estudiante.estado === 'pendiente' && html`<${Chip} tono="aviso">pendiente<//>`}
           ${estudiante.estado === 'baja' && html`<${Chip} tono="mal">baja<//>`}
+          ${estudiante.estado === 'visitante' && html`<${Chip} tono="info">otro curso${estudiante.visita?.paralelo ? ` · ${estudiante.visita.paralelo}` : ''}<//>`}
           ${detalle}
         </div>
       </div>

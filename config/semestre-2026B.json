@@ -20,5 +20,7 @@
   "registro_saew": { "1": "2026-12-04", "2": "2027-02-04" },
   "plic": { "fecha": "2027-01-21", "inicio": "11:00", "fin": "13:00", "semana": 17 },
   "formato_coordinacion": ["APELLIDOS Y NOMBRES", "NÚMERO ÚNICO", "NOTA(/6)", "PROFESOR"],
+  "profesor": "Prof. Nombre Ficticio",
+  "dias_aviso_envio": 14,
   "redondeo_decimales": 2
 }

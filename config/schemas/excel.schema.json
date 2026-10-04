@@ -23,11 +23,13 @@
     "hojas_ignoradas": { "type": "array", "items": { "type": "string" } },
     "hojas_app": { "type": "array", "items": { "type": "string" } },
     "escritura": {
-      "type": "object", "required": ["hoja_asistencia", "hoja_detalle", "hoja_control", "texto_zona"], "additionalProperties": false,
+      "type": "object", "required": ["hoja_asistencia", "hoja_detalle", "hoja_control", "hojas_coordinacion", "texto_zona"], "additionalProperties": false,
       "properties": {
         "hoja_asistencia": { "type": "string", "minLength": 1 },
         "hoja_detalle": { "type": "string", "minLength": 1 },
         "hoja_control": { "type": "string", "minLength": 1 },
+        "hojas_coordinacion": { "type": "object", "required": ["1", "2"], "additionalProperties": false,
+          "properties": { "1": { "type": "string", "minLength": 1 }, "2": { "type": "string", "minLength": 1 } } },
         "texto_zona": { "type": "string", "minLength": 1 }
       }
     },

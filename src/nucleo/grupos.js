@@ -1,7 +1,11 @@
 // Grupos de trabajo de cada evento (ver «Grupos de un evento» en docs/modelo-datos.md).
 import { agruparPor, compararGrupos } from './util.js';
 
-export const activos = (estudiantes) => estudiantes.filter((e) => e.estado !== 'baja');
+/** ¿Es un estudiante de otro docente que recupera en una sesión de este curso? (solo cuenta en ese evento) */
+export const esVisitante = (e) => e?.estado === 'visitante';
+
+/** Estudiantes del curso: los de la nómina y los pendientes (sin bajas ni visitantes de otros cursos). */
+export const activos = (estudiantes) => estudiantes.filter((e) => e.estado !== 'baja' && !esVisitante(e));
 
 /** Evento cuyos grupos y asistencia usa este evento (un TC usa los de su práctica). */
 export function eventoBase(evento, eventos) {
@@ -32,8 +36,14 @@ export function gruposDelEvento(evento, eventos, reg) {
     porEstudiante.set(e.id, deInstantanea.has(e.id) ? deInstantanea.get(e.id) : (e.grupo_excel ?? null));
   }
   if (fuente?.tipo === 'propia') {
-    // Quien estaba en el evento y después fue dado de baja sigue apareciendo en ese evento.
-    for (const [id, g] of deInstantanea) if (!porEstudiante.has(id)) porEstudiante.set(id, g);
+    // Quien estaba en el evento y después fue dado de baja sigue apareciendo en ese evento. Un visitante solo
+    // aparece en el evento al que vino (no en el TC de esa práctica).
+    const porId = new Map(reg.estudiantes.map((e) => [e.id, e]));
+    for (const [id, g] of deInstantanea) {
+      const e = porId.get(id);
+      if (esVisitante(e) && e.visita?.evento !== evento.id) continue;
+      if (!porEstudiante.has(id)) porEstudiante.set(id, g);
+    }
   }
   return { porEstudiante, fuente: fuente ?? { tipo: 'excel', evento: null } };
 }

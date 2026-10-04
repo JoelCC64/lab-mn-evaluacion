@@ -20,6 +20,7 @@
         "properties": {
           "id": { "enum": ["planificacion_conocimiento", "diseno_datos_analisis", "practicas", "trabajos_casa", "talleres", "plic"] },
           "nombre": { "$ref": "comun.schema.json#/$defs/texto" },
+          "corto": { "$ref": "comun.schema.json#/$defs/texto" },
           "valor": { "type": "number", "minimum": 0 },
           "unidad": { "enum": ["estudiante", "grupo"] },
           "items": {

@@ -74,6 +74,14 @@ export function fechaCorta(iso) {
   return `${dia} ${d.getUTCDate()} ${MESES[d.getUTCMonth()]}`;
 }
 
+const MESES_LARGOS = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'];
+
+/** «martes 1 de diciembre de 2026» */
+export function fechaLarga(iso) {
+  const d = fechaADate(iso);
+  return `${DIAS_TEXTO[diaDeFecha(iso)].toLowerCase()} ${d.getUTCDate()} de ${MESES_LARGOS[d.getUTCMonth()]} de ${d.getUTCFullYear()}`;
+}
+
 /** Suma de números ignorando null/undefined. */
 export function suma(valores) {
   return valores.reduce((s, v) => (v === null || v === undefined ? s : s + v), 0);
