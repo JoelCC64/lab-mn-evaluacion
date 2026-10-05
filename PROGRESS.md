@@ -518,7 +518,8 @@ Pedido de Joel: un solo archivo por día con todo (notas, asistencia, etc.) para
 
 - GitHub CLI (`gh`) se instala **dentro de `.venv`** con `scripts/instalar-gh.sh` (versión fija y suma SHA-256 verificada). Se usa con `scripts/gh.sh`, que guarda su configuración en `.venv/gh`.
 - Repositorio público `JoelCC64/lab-mn-evaluacion`. La app se publica con GitHub Pages desde `main` en https://joelcc64.github.io/lab-mn-evaluacion/.
-- Los commits usan el correo privado de GitHub (`156632030+JoelCC64@users.noreply.github.com`).
+- Los commits van con el autor `JoelCC64` y el correo privado de GitHub (`156632030+JoelCC64@users.noreply.github.com`). Están configurados solo en este repositorio (`git config --local`).
+- El 4-oct-2026 se reescribió el historial con un force push autorizado. Se quitó un nombre real del commit de la Fase 6 y se cambió el autor de todos los commits. El contenido de cada commit quedó idéntico, salvo en la Fase 6.
 - Todo lo de la app usa rutas relativas, así que funciona en la subcarpeta de GitHub Pages. El service worker solo borra sus propias cachés (`lab-mn-…`).
 
 ## Pendiente
