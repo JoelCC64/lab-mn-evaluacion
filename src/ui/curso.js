@@ -1,7 +1,7 @@
 // Curso: el evento de esta semana, todos los eventos por bimestre (con su estado) y los estudiantes.
 import { useState } from '../vendor/preact-htm.js';
-import { html, useApp, Pantalla, Chip, ChipMetodologia, Aviso, Cargando, Hoja, enlace, Persona } from './base.js';
-import { quitarEstudianteNuevo } from '../datos/acciones.js';
+import { html, useApp, Pantalla, Chip, ChipMetodologia, Aviso, Cargando, enlace, Persona } from './base.js';
+import { HojaCorregirNuevo } from './estudiante-nuevo.js';
 import { useCurso, textoBimestre, horario } from './curso-datos.js';
 import { nombreEvento } from './evento.js';
 import { eventoSugerido, semanaDeFecha } from '../nucleo/calendario.js';
@@ -98,7 +98,7 @@ function TarjetaNotas({ ctx, paralelo, enCurso, hoy }) {
 
 function Estudiantes({ estudiantes }) {
   const [abierto, setAbierto] = useState(false);
-  const [quitando, setQuitando] = useState(null);
+  const [corrigiendo, setCorrigiendo] = useState(null);
   const activos = delCurso(estudiantes);
   const bajas = estudiantes.filter((e) => e.estado === 'baja');
   const orden = [...activos].sort((a, b) => compararGrupos(a.grupo_excel ?? '999', b.grupo_excel ?? '999') || a.nombre.localeCompare(b.nombre, 'es'));
@@ -112,27 +112,10 @@ function Estudiantes({ estudiantes }) {
         ${[...orden, ...bajas].map((e) => html`
           <div class="fila">
             <${Persona} estudiante=${e} detalle=${e.agregado ? null : e.grupo_excel ? html`<span>· grupo del Excel ${e.grupo_excel}</span>` : html`<span>· sin grupo en el Excel</span>`} />
-            ${e.agregado && html`<button class="boton chico" onClick=${() => setQuitando(e)}>Quitar</button>`}
+            ${e.agregado && html`<button class="boton chico" onClick=${() => setCorrigiendo(e)}>Corregir</button>`}
           </div>`)}
       </div>
-      ${quitando && html`<${HojaQuitarNuevo} estudiante=${quitando} alCerrar=${() => setQuitando(null)} />`}
+      ${corrigiendo && html`<${HojaCorregirNuevo} estudiante=${corrigiendo} alCerrar=${() => setCorrigiendo(null)} />`}
       <p class="tenue pequeno">Los grupos del Excel solo sirven para el primer evento; después mandan los grupos de la app.</p>`}`;
 }
 
-/** Quitar a un estudiante agregado en la app por error (con todo lo que se le registró). */
-function HojaQuitarNuevo({ estudiante, alCerrar }) {
-  const { db, avisar } = useApp();
-  const quitar = async () => {
-    try { await quitarEstudianteNuevo(db, estudiante.id); avisar('Quitado del curso.'); alCerrar(); } catch (e) { avisar(e.message, 'mal'); }
-  };
-  return html`
-    <${Hoja} titulo="¿Quitarlo del curso?" alCerrar=${alCerrar}>
-      <${Persona} estudiante=${estudiante} />
-      <p>Se agregó en la app. Si fue por error, se quita del curso con todo lo que se le registró (grupos, asistencia, controles, notas).
-        Si dejó de venir, no lo quites: marca su asistencia como siempre.</p>
-      <div class="botones">
-        <button class="boton" onClick=${alCerrar}>Cancelar</button>
-        <button class="boton peligro-fuerte" onClick=${quitar}>Quitar</button>
-      </div>
-    <//>`;
-}

@@ -409,6 +409,44 @@ export async function agregarEstudianteNuevo(db, evento, grupos, grupo, { codigo
   return datos.codigo;
 }
 
+/**
+ * Corrige el código o el nombre de un estudiante agregado en la app. Si cambia el código (que es su id), todo lo que
+ * se le registró pasa al código nuevo. Devuelve el id (nuevo o el mismo).
+ */
+export async function corregirEstudianteNuevo(db, id, { codigo, nombre }, ahora = ahoraISO()) {
+  const e = await db.estudiantes.get(id);
+  if (!e?.agregado) throw new Error('Solo se corrigen aquí los estudiantes agregados en la app; los demás, en el Excel.');
+  const datos = { codigo: String(codigo ?? '').replace(/\s+/g, ''), nombre: limpiar(nombre).toUpperCase() };
+  if (!datos.codigo || !datos.nombre) throw new Error('Hacen falta el código y los apellidos y nombres.');
+  if (datos.nombre.includes('@')) throw new Error('La app no guarda correos.');
+  if (!/^\d{6,12}$/.test(datos.codigo)) throw new Error('El código único lleva solo números (por ejemplo, 202620123).');
+  if (datos.codigo === id) {
+    await db.estudiantes.update(id, { nombre: datos.nombre, actualizado: ahora });
+    return id;
+  }
+  const otro = await db.estudiantes.get(datos.codigo);
+  if (otro) throw new Error(`El código ${datos.codigo} ya es de ${otro.nombre} (${otro.curso}).`);
+  const tablas = TABLAS_DE_EVENTO.filter((t) => t !== 'cambios_evento');
+  await db.transaction('rw', [db.estudiantes, ...tablas.map((t) => db.table(t))], async () => {
+    await db.estudiantes.delete(id);
+    await db.estudiantes.put({ ...e, id: datos.codigo, codigo: datos.codigo, nombre: datos.nombre, actualizado: ahora });
+    for (const t of tablas) {
+      const tabla = db.table(t);
+      const filas = await tabla.filter((f) => f.evento?.startsWith(`${e.curso}:`) && (f.estudiante === id || (f.unidad === 'estudiante' && f.unidad_id === id))).toArray();
+      if (!filas.length) continue;
+      await tabla.bulkDelete(filas.map((f) => clavePrimaria(tabla, f)));
+      await tabla.bulkPut(filas.map((f) => (f.estudiante === id ? { ...f, estudiante: datos.codigo } : { ...f, unidad_id: datos.codigo })));
+    }
+  });
+  return datos.codigo;
+}
+
+/** Clave primaria de una fila (simple o compuesta), según el esquema de la tabla. */
+function clavePrimaria(tabla, fila) {
+  const pk = tabla.schema.primKey.keyPath;
+  return Array.isArray(pk) ? pk.map((k) => fila[k]) : fila[pk];
+}
+
 /** Quita a un estudiante agregado en la app (por error) con todo lo que se le registró, en todos los eventos. */
 export async function quitarEstudianteNuevo(db, id) {
   const e = await db.estudiantes.get(id);

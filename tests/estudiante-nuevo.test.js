@@ -1,6 +1,6 @@
 // Estudiante nuevo agregado en la app (matrícula extraordinaria): entra al curso como pendiente, con su grupo desde
-// el evento en que llegó; leer el Excel no lo da de baja y, si el Excel lo trae, pasa a ser uno más; se quita si fue
-// un error.
+// el evento en que llegó; leer el Excel no lo da de baja y, si el Excel lo trae, pasa a ser uno más; se corrige su
+// código o su nombre, y se quita si fue un error.
 import 'fake-indexeddb/auto';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
@@ -9,7 +9,10 @@ import { randomUUID } from 'node:crypto';
 import { abrirBase } from '../src/db.js';
 import { registrosDelCurso } from '../src/datos/consultas.js';
 import { aplicarExcelSemestre, planificarImportacion } from '../src/datos/importar.js';
-import { agregarEstudianteNuevo, cerrarPase, guardarPuntaje, quitarEstudianteNuevo } from '../src/datos/acciones.js';
+import {
+  agregarEstudianteNuevo, agregarAlControl, cerrarPase, corregirEstudianteNuevo, guardarAjuste, guardarObservacion, guardarPuntaje,
+  puntuarPregunta, quitarEstudianteNuevo,
+} from '../src/datos/acciones.js';
 import { generarEventos } from '../src/nucleo/calendario.js';
 import { activos, gruposDelEvento } from '../src/nucleo/grupos.js';
 import { configReal } from './ayudas.js';
@@ -96,4 +99,36 @@ test('estudiante nuevo agregado por error: se quita con lo que se le registró; 
   assert.equal(await k.db.asistencia.where('evento').equals('GR2QB:P1').count(), 3, 'el pase de los demás sigue');
   assert.equal(await k.db.puntajes.count(), 1);
   await assert.rejects(quitarEstudianteNuevo(k.db, 'a'), /agregados en la app/);
+});
+
+test('estudiante nuevo mal escrito: se corrige el nombre y el código, y lo registrado pasa al código nuevo', async () => {
+  const k = await curso();
+  const id = await agregarEstudianteNuevo(k.db, 'GR2QB:P1', await k.grupos('P1'), '2', { codigo: '202621999', nombre: 'PERES' }, AHORA);
+  assert.equal(await corregirEstudianteNuevo(k.db, id, { codigo: id, nombre: ' pérez  ruiz ana ' }, AHORA), id);
+  assert.equal((await k.db.estudiantes.get(id)).nombre, 'PÉREZ RUIZ ANA');
+
+  await guardarObservacion(k.db, 'GR2QB:P1', id, 'llegó tarde', AHORA);
+  await agregarAlControl(k.db, 'GR2QB:P1', [id], {}, AHORA);
+  await puntuarPregunta(k.db, 'GR2QB:P1', id, 0, 2, AHORA);
+  await guardarAjuste(k.db, 'GR2QB:P1', id, 0.8, 'prueba', AHORA);
+  await cerrarPase(k.db, 'GR2QB:P1', await k.grupos('P1'), 'sin grupo', AHORA);
+
+  const nuevo = await corregirEstudianteNuevo(k.db, id, { codigo: '202621998', nombre: 'PÉREZ RUIZ ANA' }, AHORA);
+  assert.equal(nuevo, '202621998');
+  assert.equal(await k.db.estudiantes.get(id), undefined);
+  const e = await k.db.estudiantes.get(nuevo);
+  assert.deepEqual([e.codigo, e.estado, e.agregado, e.curso], [nuevo, 'pendiente', AHORA, 'GR2QB']);
+  for (const t of ['grupos_evento', 'asistencia', 'controles', 'ajustes']) {
+    assert.equal(await k.db.table(t).where('estudiante').equals(id).count(), 0, `${t}: nada con el código viejo`);
+    assert.equal(await k.db.table(t).where('estudiante').equals(nuevo).count(), 1, `${t}: pasó al código nuevo`);
+  }
+  const a = await k.db.asistencia.get(['GR2QB:P1', nuevo]);
+  assert.deepEqual([a.estado, a.observacion], ['presente', 'llegó tarde']);
+  assert.deepEqual((await k.db.controles.get(['GR2QB:P1', nuevo])).puntajes[0], 2);
+  assert.equal((await k.grupos('P1')).get(nuevo), '2');
+  assert.equal((await k.grupos('T1')).get(nuevo), '2');
+
+  await assert.rejects(corregirEstudianteNuevo(k.db, nuevo, { codigo: 'a', nombre: 'X' }), /solo números/);
+  await assert.rejects(corregirEstudianteNuevo(k.db, nuevo, { codigo: '202620777', nombre: 'X' }), /ya es de OTRO CURSO/);
+  await assert.rejects(corregirEstudianteNuevo(k.db, 'a', { codigo: 'a', nombre: 'X' }), /en el Excel/);
 });

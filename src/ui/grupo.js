@@ -10,6 +10,7 @@ import { grupoNuevo, listaDeGrupos } from '../nucleo/grupos.js';
 import { seEvaluaPorGrupo, sobreDiez, textoNotaGrupo } from '../nucleo/motor-vista.js';
 import { preparatorioCalifica } from '../nucleo/config.js';
 import { HojaVisitante } from './visitantes.js';
+import { HojaCorregirNuevo } from './estudiante-nuevo.js';
 
 export function Grupo({ id, grupo }) {
   const { curso, ctx, evento, cargando } = useEvento(id);
@@ -207,6 +208,7 @@ function Integrante({ ctx, evento, estudiante, grupos, alMover }) {
   const [verObs, setVerObs] = useState(Boolean(a?.observacion));
   const novedad = ctx.novedades.get(`${evento.id}|${estudiante.id}`);
   const control = notaControl(ctx, evento, estudiante.id);
+  const [corrigiendo, setCorrigiendo] = useState(false);
   const falta = estado === 'no_vino' || estado === 'salio';
   const marcar = (nuevo) => {
     if (nuevo === estado) return;
@@ -218,8 +220,10 @@ function Integrante({ ctx, evento, estudiante, grupos, alMover }) {
         <${Persona} estudiante=${estudiante} detalle=${html`
           ${novedad && preparatorioCalifica(cfg, ctx.curso.metodologia) && novedad.nivel !== null ? html`<${Chip} tono="aviso">prep. ${novedad.nivel}<//>` : null}
           ${control.estado === 'calculada' ? html`<${Chip} tono="info">control ${control.valor !== null ? sobreDiez(control.valor) : (control.aprobado ? '✓' : '✗')}<//>` : null}`} />
+        ${estudiante.agregado && html`<button class="boton chico" onClick=${() => setCorrigiendo(true)}>Corregir</button>`}
         <button class="boton chico" onClick=${alMover}>Mover</button>
       </div>
+      ${corrigiendo && html`<${HojaCorregirNuevo} estudiante=${estudiante} alCerrar=${() => setCorrigiendo(false)} />`}
       ${estado === 'salio'
         ? html`<div class="separado"><${Chip} tono="mal">Salió (${a.motivo ?? 'control'})<//><span class="tenue pequeno">Se corrige en «Control»</span></div>`
         : html`
