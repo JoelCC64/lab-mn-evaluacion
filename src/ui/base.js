@@ -103,7 +103,7 @@ export function Persona({ estudiante, detalle, children }) {
         <div class="nombre">${estudiante.nombre}</div>
         <div class="codigo fila-flex">
           <span>${estudiante.codigo}</span>
-          ${estudiante.estado === 'pendiente' && html`<${Chip} tono="aviso">pendiente<//>`}
+          ${estudiante.estado === 'pendiente' && html`<${Chip} tono="aviso">${estudiante.agregado ? 'pendiente · agregado en la app' : 'pendiente'}<//>`}
           ${estudiante.estado === 'baja' && html`<${Chip} tono="mal">baja<//>`}
           ${estudiante.estado === 'visitante' && html`<${Chip} tono="info">otro curso${estudiante.visita?.paralelo ? ` · ${estudiante.visita.paralelo}` : ''}<//>`}
           ${detalle}

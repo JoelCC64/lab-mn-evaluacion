@@ -3,7 +3,7 @@ import { useEffect, useRef, useState } from '../vendor/preact-htm.js';
 import { html, useApp, Pantalla, Chip, Hoja, Aviso, Cargando, Persona, enlace, ir } from './base.js';
 import { useEvento, nombreEvento } from './evento.js';
 import {
-  alternarEtiqueta, guardarNotaProfesor, guardarObservacion, guardarPuntaje, marcarAsistencia, moverEstudiante, revisarGrupo,
+  agregarEstudianteNuevo, alternarEtiqueta, guardarNotaProfesor, guardarObservacion, guardarPuntaje, marcarAsistencia, moverEstudiante, revisarGrupo,
 } from '../datos/acciones.js';
 import { gruposDe, notaControl, notaGrupo, rubrica } from '../nucleo/motor.js';
 import { grupoNuevo, listaDeGrupos } from '../nucleo/grupos.js';
@@ -296,7 +296,9 @@ export function HojaMover({ ctx, evento, estudiante, cerrar }) {
 function HojaAgregar({ ctx, evento, grupo, grupos, cerrar }) {
   const { db } = useApp();
   const [visitante, setVisitante] = useState(false);
+  const [nuevo, setNuevo] = useState(false);
   if (visitante) return html`<${HojaVisitante} evento=${evento} grupo=${grupo} grupos=${grupos} alCerrar=${cerrar} />`;
+  if (nuevo) return html`<${HojaEstudianteNuevo} evento=${evento} grupo=${grupo} grupos=${grupos} alCerrar=${cerrar} />`;
   const { grupos: lista, sinGrupo } = listaDeGrupos(grupos, ctx.reg.estudiantes);
   const deOtros = lista.filter((g) => g.grupo !== grupo).flatMap((g) => g.integrantes.map((e) => ({ e, g: g.grupo })));
   const agregar = async (e) => { await moverEstudiante(db, evento.id, grupos, e.id, grupo); cerrar(); };
@@ -307,8 +309,37 @@ function HojaAgregar({ ctx, evento, grupo, grupos, cerrar }) {
         <div class="lista">${sinGrupo.map((e) => html`<button class="fila" onClick=${() => agregar(e)}><${Persona} estudiante=${e} /></button>`)}</div>`}
       <div class="seccion-titulo">De otros grupos</div>
       <div class="lista">${deOtros.map(({ e, g }) => html`<button class="fila" onClick=${() => agregar(e)}><${Persona} estudiante=${e} detalle=${html`<span>· grupo ${g}</span>`} /></button>`)}</div>
+      <button class="boton ancho" onClick=${() => setNuevo(true)}>+ Estudiante nuevo en este curso (no está en el Excel)…</button>
       ${evento.con_nota && html`<button class="boton ancho" onClick=${() => setVisitante(true)}>+ Estudiante de otro curso (recupera aquí)…</button>`}
       <button class="boton ancho" onClick=${cerrar}>Cancelar</button>
+    <//>`;
+}
+
+/** Estudiante que se suma al curso y no está en el Excel (por ejemplo, de matrícula extraordinaria). */
+function HojaEstudianteNuevo({ evento, grupo, grupos, alCerrar }) {
+  const { db, avisar } = useApp();
+  const [datos, setDatos] = useState({ codigo: '', nombre: '' });
+  const campo = (k, etiqueta, extra = {}) => html`
+    <div class="campo"><label>${etiqueta}</label>
+      <input class="entrada" value=${datos[k]} onInput=${(e) => setDatos({ ...datos, [k]: e.currentTarget.value })} ...${extra} /></div>`;
+  const guardar = async () => {
+    try {
+      await agregarEstudianteNuevo(db, evento.id, grupos, grupo, datos);
+      avisar(`Agregado a ${evento.curso}, grupo ${grupo}.`, 'ok');
+      alCerrar();
+    } catch (e) { avisar(e.message, 'mal'); }
+  };
+  return html`
+    <${Hoja} titulo=${`Estudiante nuevo · grupo ${grupo}`} alCerrar=${alCerrar}>
+      <p class="tenue pequeno">Se suma a ${evento.curso} desde esta sesión (por ejemplo, de matrícula extraordinaria). Queda <b>pendiente de nómina</b>:
+        se evalúa como los demás, sigue en los eventos siguientes con su grupo y va a las hojas de la app en ámbar.
+        Leer el Excel no lo da de baja; cuando aparezca en el Excel, pasa a ser uno más.</p>
+      ${campo('codigo', 'Código único', { inputmode: 'numeric', autocomplete: 'off' })}
+      ${campo('nombre', 'Apellidos y nombres', { autocapitalize: 'characters', autocomplete: 'off' })}
+      <div class="botones">
+        <button class="boton" onClick=${alCerrar}>Cancelar</button>
+        <button class="boton primario" disabled=${!datos.codigo.trim() || !datos.nombre.trim()} onClick=${guardar}>Agregar</button>
+      </div>
     <//>`;
 }
 

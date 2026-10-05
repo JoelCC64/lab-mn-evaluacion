@@ -1,7 +1,7 @@
 // Escrituras de la clase: cada toque guarda su fila de inmediato (no hay botón «guardar»).
 // `grupos` es el Map estudiante → grupo resuelto para el evento (gruposDelEvento); con él se crea la
 // instantánea de grupos la primera vez que se registra algo de grupo en el evento.
-import { ahoraISO } from '../db.js';
+import { ahoraISO, TABLAS_DE_EVENTO } from '../db.js';
 import { idVisitante } from '../nucleo/visitantes.js';
 
 // ---------- Grupos ----------
@@ -378,6 +378,49 @@ export async function quitarVisitante(db, evento, id) {
 }
 
 const limpiar = (t) => String(t ?? '').replace(/\s+/g, ' ').trim();
+
+// ---------- Estudiante nuevo del curso (matrícula extraordinaria) ----------
+
+/**
+ * Agrega al curso a un estudiante que no está en el Excel (por ejemplo, de matrícula extraordinaria) y lo pone en el
+ * grupo `grupo` del evento, presente. Queda «pendiente» de nómina, con `agregado` (cuándo se agregó en la app): cuenta
+ * en el curso y en las hojas de la app (en ámbar), pero leer el Excel no lo da de baja mientras no aparezca en él.
+ * Cuando el Excel lo trae, pasa a ser uno más. Devuelve su id (el código).
+ */
+export async function agregarEstudianteNuevo(db, evento, grupos, grupo, { codigo, nombre }, ahora = ahoraISO()) {
+  const datos = { codigo: String(codigo ?? '').replace(/\s+/g, ''), nombre: limpiar(nombre).toUpperCase() };
+  if (!datos.codigo || !datos.nombre) throw new Error('Hacen falta el código y los apellidos y nombres.');
+  if (datos.nombre.includes('@')) throw new Error('La app no guarda correos.');
+  if (!/^\d{6,12}$/.test(datos.codigo)) throw new Error('El código único lleva solo números (por ejemplo, 202620123).');
+  const curso = evento.split(':')[0];
+  const antes = await db.estudiantes.get(datos.codigo);
+  if (antes && antes.estado !== 'baja') {
+    throw new Error(antes.curso === curso
+      ? `${antes.nombre} ya está en este curso: búscalo en «Sin grupo» o en otro grupo.`
+      : `El código ${datos.codigo} ya está en ${antes.curso} (${antes.nombre}).`);
+  }
+  await db.estudiantes.put({
+    id: datos.codigo, codigo: datos.codigo, nombre: datos.nombre, curso, estado: 'pendiente', grupo_excel: null, numero: null,
+    observacion_excel: null, agregado: ahora, actualizado: ahora,
+  });
+  await moverEstudiante(db, evento, grupos, datos.codigo, grupo, ahora);
+  // Está en la sala: queda presente (aunque el pase ya esté cerrado); se corrige como a cualquiera.
+  await marcarAsistencia(db, evento, null, datos.codigo, 'presente', null, ahora);
+  return datos.codigo;
+}
+
+/** Quita a un estudiante agregado en la app (por error) con todo lo que se le registró, en todos los eventos. */
+export async function quitarEstudianteNuevo(db, id) {
+  const e = await db.estudiantes.get(id);
+  if (!e?.agregado) throw new Error('Solo se quitan así los estudiantes agregados en la app.');
+  const tablas = TABLAS_DE_EVENTO.filter((t) => t !== 'cambios_evento');
+  await db.transaction('rw', [db.estudiantes, ...tablas.map((t) => db.table(t))], async () => {
+    await db.estudiantes.delete(id);
+    for (const t of tablas) {
+      await db.table(t).filter((f) => f.evento?.startsWith(`${e.curso}:`) && (f.estudiante === id || (f.unidad === 'estudiante' && f.unidad_id === id))).delete();
+    }
+  });
+}
 
 // ---------- Ajuste individual ----------
 

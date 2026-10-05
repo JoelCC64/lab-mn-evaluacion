@@ -1,7 +1,7 @@
 // Aplica una lectura del Excel a la base local, sin tocar las evaluaciones.
 import { ahoraISO } from '../db.js';
 
-const CAMPOS_COMPARADOS = ['nombre', 'curso', 'estado', 'grupo_excel', 'observacion_excel', 'numero'];
+const CAMPOS_COMPARADOS = ['nombre', 'curso', 'estado', 'grupo_excel', 'observacion_excel', 'numero', 'agregado'];
 
 /**
  * Compara la lectura con lo guardado. No escribe nada: sirve para mostrar qué cambiará.
@@ -30,6 +30,7 @@ export async function planificarImportacion(db, lectura) {
         grupo_excel: f.grupo,
         observacion_excel: f.observacion,
         numero: f.numero,
+        agregado: null,   // si se había agregado en la app, desde ahora viene del Excel
       };
       contar(paralelo, 'total');
       if (f.pendiente) contar(paralelo, 'pendientes');
@@ -48,9 +49,9 @@ export async function planificarImportacion(db, lectura) {
   }
 
   // Bajas: solo en cursos cuya hoja sí se leyó (un archivo incompleto no da de baja a nadie). Los visitantes de
-  // otros cursos no están en el Excel: no son bajas.
+  // otros cursos y los estudiantes agregados en la app (matrícula extraordinaria) no están en el Excel: no son bajas.
   for (const e of existentes) {
-    if (lectura.cursos[e.curso] && !vistos.has(e.id) && e.estado !== 'baja' && e.estado !== 'visitante') {
+    if (lectura.cursos[e.curso] && !vistos.has(e.id) && e.estado !== 'baja' && e.estado !== 'visitante' && !e.agregado) {
       cambios.push({ tipo: 'baja', antes: e, despues: { ...e, estado: 'baja' } });
       contar(e.curso, 'bajas');
     }

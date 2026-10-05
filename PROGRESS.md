@@ -225,6 +225,15 @@ Detalle en [docs/excel.md](docs/excel.md).
 - **La nota del grupo de un taller se muestra como nivel** («1/2»), no sobre 10: es la mitad grupal de la nota.
 - **El trabajo firmado y la penalización total salen de la configuración** de cada actividad (`cierre`, `penalizacion_total`). Los talleres no tienen penalización total.
 
+## Estudiante nuevo en la app (5-oct-2026) · versión 0.11.1
+
+Pedido en clase: al GR2QB llegaron estudiantes de matrícula extraordinaria que no están en el Excel.
+- En un grupo › «+ Agregar integrante» › **«Estudiante nuevo en este curso (no está en el Excel)…»**: código y nombre. Entra al curso como **pendiente** (con `agregado`), en ese grupo y presente; sigue con su grupo en los eventos siguientes y va a las hojas de la app en ámbar.
+- Leer el Excel no lo da de baja. Cuando el Excel lo trae, pasa a ser uno más.
+- Se rechazan códigos que no son números, códigos que ya están en otro curso y correos.
+- Curso › Estudiantes › «Quitar» (solo los agregados en la app): lo quita con todo lo que se le registró, por si fue un error.
+- `tests/estudiante-nuevo.test.js` (4 pruebas); 147 en total. Probado en la demostración.
+
 ## Fase 9 (4-oct-2026) · respaldo completo y varios dispositivos · versión 0.11.0
 
 Detalle en [docs/respaldo.md](docs/respaldo.md).
