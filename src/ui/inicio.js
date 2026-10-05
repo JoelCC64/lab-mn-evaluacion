@@ -43,10 +43,13 @@ export function Inicio() {
     <//>`;
 }
 
-/** Recordatorio del respaldo del día: visible cuando hay registros que aún no están en un respaldo. */
+/**
+ * Recordatorio del respaldo del día: visible cuando hay registros que aún no están en un respaldo. Si pasaron más de
+ * `recordatorio_dias` (config/respaldo.json) desde el último respaldo, se vuelve urgente.
+ */
 function AvisoRespaldo() {
   const { cfg, db, demo, avisar } = useApp();
-  const { ultimoRespaldo, ultimoCambio, pendiente } = useEstadoRespaldo(db.name);
+  const { ultimoRespaldo, ultimoCambio, pendiente, dias, vencido } = useEstadoRespaldo(db.name, cfg.respaldo.recordatorio_dias);
   const [ocupado, setOcupado] = useState(false);
   const cuando = (iso) => {
     const d = new Date(iso);
@@ -62,9 +65,13 @@ function AvisoRespaldo() {
     } catch (e) { console.error(e); avisar(e.message || String(e), 'mal'); } finally { setOcupado(false); }
   };
   return html`
-    <div class="tarjeta aviso-respaldo">
-      <div class="negrita">${ultimoRespaldo ? 'Hay registros sin respaldar' : 'Aún no hay un respaldo de este dispositivo'}</div>
-      <p class="pequeno">${ultimoCambio ? `Último cambio: ${cuando(ultimoCambio).replace(/\.$/, '')}. ` : ''}Exporta el respaldo del día y súbelo a Drive.</p>
+    <div class=${`tarjeta aviso-respaldo ${vencido ? 'vencido' : ''}`} role=${vencido ? 'alert' : undefined}>
+      <div class="negrita">${vencido
+        ? (ultimoRespaldo ? `Hace ${dias} días que no respaldas` : `Hace ${dias} días que hay registros sin ningún respaldo`)
+        : ultimoRespaldo ? 'Hay registros sin respaldar' : 'Aún no hay un respaldo de este dispositivo'}</div>
+      <p class="pequeno">${vencido && ultimoRespaldo ? `Último respaldo: ${cuando(ultimoRespaldo).replace(/\.$/, '')}. ` : ''}${ultimoCambio ? `Último cambio: ${cuando(ultimoCambio).replace(/\.$/, '')}. ` : ''}${vencido
+        ? 'Si algo le pasa a este dispositivo, eso se pierde: exporta el respaldo del día y súbelo a Drive.'
+        : 'Exporta el respaldo del día y súbelo a Drive.'}</p>
       <button class="boton primario ancho" disabled=${ocupado} onClick=${exportar}>${ocupado ? 'Preparando…' : 'Exportar el respaldo del día'}</button>
     </div>`;
 }

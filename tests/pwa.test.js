@@ -1,7 +1,8 @@
 // La PWA está completa y al día: sw.js con todos los archivos, íconos y manifiesto.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { existsSync, readFileSync } from 'node:fs';
+import { spawnSync } from 'node:child_process';
+import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 
 import { generar } from '../scripts/precache.mjs';
@@ -31,6 +32,14 @@ test('el service worker guarda todo lo necesario para trabajar sin conexión', (
       assert.ok(archivos.includes(destino), `${f} importa ${destino}, que no está en sw.js`);
     }
   }
+});
+
+test('nada de lo que la app publica ni de la configuración está ignorado por git (si no, faltaría en GitHub Pages)', (t) => {
+  const { archivos } = generar();
+  const config = readdirSync(path.join(RAIZ, 'config'), { recursive: true }).filter((f) => f.endsWith('.json')).map((f) => `config/${f}`);
+  const r = spawnSync('git', ['check-ignore', '--no-index', ...new Set([...archivos, ...config])], { cwd: RAIZ, encoding: 'utf8' });
+  if (r.error || r.status > 1) { t.skip('git no está disponible'); return; }
+  assert.equal(r.stdout.trim(), '', `ignorados por el .gitignore: ${r.stdout.trim()}`);
 });
 
 test('manifiesto e índice listos para instalar en el iPhone', () => {

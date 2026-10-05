@@ -1,12 +1,15 @@
-// Datos: leer el Excel del semestre (con vista previa), asistencia de la semana 1, respaldo y restauración.
-import { useState } from '../vendor/preact-htm.js';
+// Datos: leer el Excel del semestre (con vista previa), asistencia de la semana 1, respaldo y restauración, y pasar
+// eventos entre dispositivos.
+import { useEffect, useState } from '../vendor/preact-htm.js';
 import { html, useApp, useVivo, Pantalla, Aviso, Hoja, Chip, enlace } from './base.js';
 import { leerAsistenciaSemana1, leerExcelSemestre } from '../nucleo/excel-lectura.js';
 import { aplicarAsistenciaSemana1, aplicarExcelSemestre, planificarImportacion } from '../datos/importar.js';
-import { borrarTodo, contarRespaldo, restaurarRespaldo, validarRespaldo } from '../datos/respaldo.js';
-import { ACEPTA_RESPALDO, exportarRespaldoDelDia, leerArchivoDeRespaldo, marcarRespaldo, useEstadoRespaldo } from './respaldo-dia.js';
+import { borrarTodo, contarRespaldo, restaurarRespaldo } from '../datos/respaldo.js';
+import { ACEPTA_RESPALDO, exportarRespaldoDelDia, marcarRespaldo, prepararRespaldoCompleto, useEstadoRespaldo } from './respaldo-dia.js';
+import { AvisoPerdidas, EnviarEventos, VistaPaquete, abrirArchivoDeDatos, useEntrega } from './paquetes.js';
+import { cambiosQueSePierdenAlRestaurar } from '../datos/paquete.js';
 import { conteoTablas } from '../datos/consultas.js';
-import { guardarLocal } from '../datos/local.js';
+import { guardarLocal, leerLocal } from '../datos/local.js';
 import { ACEPTA_EXCEL, abrirLibro, elegirArchivo } from './archivos.js';
 import { AjusteProfesor } from './dispositivo.js';
 import { simularClases } from '../datos/simulacion.js';
@@ -20,7 +23,8 @@ export function Datos() {
   const conteo = useVivo(() => conteoTablas(db), []);
   const [vista, setVista] = useState(null);       // vista previa pendiente de confirmar
   const [ocupado, setOcupado] = useState(null);
-  const { ultimoRespaldo: ultimo, pendiente } = useEstadoRespaldo(db.name);
+  const { ultimoRespaldo: ultimo, pendiente, dias, vencido } = useEstadoRespaldo(db.name, cfg.respaldo.recordatorio_dias);
+  const { entregar, hoja } = useEntrega();
 
   async function conOcupado(texto, f) {
     setOcupado(texto);
@@ -57,16 +61,24 @@ export function Datos() {
     if (resultado !== 'cancelado') avisar(resultado === 'compartido' ? 'Respaldo compartido.' : `Respaldo guardado: ${nombre}`, 'ok');
   });
 
+  const exportarCompleto = () => conOcupado('Preparando el respaldo completo…', async () => {
+    const archivo = await prepararRespaldoCompleto({ cfg, db, demo });
+    await entregar({
+      ...archivo,
+      detalle: 'Un .zip con todo en JSON (para restaurar) y un CSV por tabla (para Excel, Sheets, Python o R). Tiene datos de estudiantes.',
+      alEntregar: () => marcarRespaldo(db.name, archivo.creado),
+    });
+  });
+
   const simular = (hastaSemana) => conOcupado('Simulando clases…', async () => {
     const r = await simularClases(db, cfg, { hastaSemana });
     avisar(r.eventos ? `Listo: ${r.eventos} eventos ficticios en ${r.cursos} cursos.` : 'No quedaban eventos sin registrar hasta esa semana.', 'ok');
   });
 
-  const elegirRespaldo = () => conOcupado('Leyendo el respaldo…', async () => {
-    const f = await elegirArchivo(ACEPTA_RESPALDO);
-    if (!f) return;
-    const obj = await leerArchivoDeRespaldo(f);
-    setVista({ tipo: 'respaldo', nombre: f.name, obj, errores: validarRespaldo(obj, db, { semestre: cfg.semestre.semestre }) });
+  // Un respaldo o un paquete de eventos: cada uno abre su vista, venga del botón que venga.
+  const elegirArchivoDeDatos = (texto, acepta) => conOcupado(texto, async () => {
+    const f = await elegirArchivo(acepta);
+    if (f) setVista(await abrirArchivoDeDatos(f, { cfg, db, demo }));
   });
 
   return html`
@@ -103,10 +115,24 @@ export function Datos() {
           Tiene datos de estudiantes: guárdalo en un lugar seguro.
         </p>
         <p class="pequeno">Último respaldo en este dispositivo: <b>${ultimo ? new Date(ultimo).toLocaleString('es-EC', { dateStyle: 'medium', timeStyle: 'short' }) : 'nunca'}</b>
-          ${pendiente ? html` · <span class="texto-aviso">hay registros sin respaldar</span>` : ''}</p>
+          ${pendiente ? html` · <span class=${vencido ? 'texto-mal' : 'texto-aviso'}>${vencido ? `hay registros sin respaldar desde hace ${dias} días` : 'hay registros sin respaldar'}</span>` : ''}</p>
         <button class="boton primario grande" disabled=${!!ocupado} onClick=${exportar}>Exportar el respaldo del día</button>
-        <button class="boton ancho" disabled=${!!ocupado} onClick=${elegirRespaldo}>Restaurar un respaldo…</button>
-        <p class="tenue pequeno">Para recuperar todo en otro dispositivo, abre la app ahí y restaura el último respaldo (Excel, o JSON de versiones anteriores).</p>
+        <button class="boton ancho" disabled=${!!ocupado} onClick=${exportarCompleto}>Respaldo completo en CSV y JSON (.zip)</button>
+        <button class="boton ancho" disabled=${!!ocupado} onClick=${() => elegirArchivoDeDatos('Leyendo el respaldo…', ACEPTA_RESPALDO)}>Restaurar un respaldo…</button>
+        <p class="tenue pequeno">
+          El respaldo completo trae cada tabla en CSV, para abrirla en Excel, Sheets, Python o R; también se puede restaurar.
+          Para recuperar todo en otro dispositivo, abre la app ahí y restaura el último respaldo (Excel, .zip o JSON).
+        </p>
+      </div>
+
+      <div class="tarjeta">
+        <h2>Pasar eventos a otro dispositivo</h2>
+        <p class="tenue pequeno">
+          Lleva lo registrado en uno o varios eventos, por ejemplo los TC calificados en la Mac, al iPhone. El otro dispositivo
+          muestra qué cambia y, al confirmar, reemplaza solo esos eventos. Los dos deben tener la nómina (el Excel del semestre leído).
+        </p>
+        <button class="boton ancho" disabled=${!!ocupado} onClick=${() => setVista({ tipo: 'enviar' })}>Enviar eventos…</button>
+        <button class="boton ancho" disabled=${!!ocupado} onClick=${() => elegirArchivoDeDatos('Leyendo el paquete…', '.json,application/json')}>Recibir eventos…</button>
       </div>
 
       ${demo && html`
@@ -153,7 +179,9 @@ export function Datos() {
 
       ${vista?.tipo === 'semestre' && html`<${VistaSemestre} vista=${vista} cerrar=${() => setVista(null)} />`}
       ${vista?.tipo === 'semana1' && html`<${VistaSemana1} vista=${vista} cerrar=${() => setVista(null)} />`}
-      ${vista?.tipo === 'respaldo' && html`<${VistaRespaldo} vista=${vista} cerrar=${() => setVista(null)} />`}
+      ${(vista?.tipo === 'respaldo' || vista?.tipo === 'paquete') && html`<${VistaArchivo} vista=${vista} cerrar=${() => setVista(null)} />`}
+      ${vista?.tipo === 'enviar' && html`<${EnviarEventos} cerrar=${() => setVista(null)} />`}
+      ${hoja}
       ${vista?.tipo === 'borrar' && html`
         <${Hoja} titulo="¿Borrar los datos de la demostración?" alCerrar=${() => setVista(null)}>
           <p>Se borra todo lo de la base de demostración. Tus datos reales no se tocan (están en otra base).</p>
@@ -234,10 +262,24 @@ function VistaSemana1({ vista, cerrar }) {
     <//>`;
 }
 
-export function VistaRespaldo({ vista, cerrar }) {
+/** Vista de un archivo abierto en «Restaurar un respaldo…» o «Recibir eventos…» (también en la pantalla del Excel). */
+export function VistaArchivo({ vista, cerrar }) {
+  return vista.tipo === 'paquete' ? html`<${VistaPaquete} vista=${vista} cerrar=${cerrar} />` : html`<${VistaRespaldo} vista=${vista} cerrar=${cerrar} />`;
+}
+
+function VistaRespaldo({ vista, cerrar }) {
   const { db, avisar } = useApp();
   const { obj, errores, nombre } = vista;
   const conteo = errores.length ? {} : contarRespaldo(obj);
+  // Cambios de este dispositivo que el respaldo no trae (se perderían al reemplazar todo).
+  const [perdidas, setPerdidas] = useState(null);
+  useEffect(() => {
+    if (errores.length) return;
+    (async () => {
+      const desde = (await leerLocal(db, 'respaldo_importado'))?.creado ?? null;
+      setPerdidas(await cambiosQueSePierdenAlRestaurar(db, obj, { desde }));
+    })().catch((e) => { console.error(e); setPerdidas([]); });
+  }, []);
   const restaurar = async () => {
     await restaurarRespaldo(db, obj);
     await guardarLocal(db, 'respaldo_importado', { creado: obj.creado, app: obj.app, archivo: nombre, importado: new Date().toISOString() });
@@ -250,6 +292,7 @@ export function VistaRespaldo({ vista, cerrar }) {
       <p class="tenue pequeno">${nombre}</p>
       ${errores.length ? html`<${Aviso} tono="mal" titulo="No se puede restaurar" lista=${errores} />` : html`
         <p>Creado el <b>${new Date(obj.creado).toLocaleString('es-EC', { dateStyle: 'medium', timeStyle: 'short' })}</b> (app ${obj.app}). Tiene ${conteo.estudiantes ?? 0} estudiantes y ${Object.entries(conteo).filter(([k]) => !['estudiantes', 'importaciones', 'meta'].includes(k)).reduce((s, [, v]) => s + v, 0)} registros de clase.</p>
+        <${AvisoPerdidas} perdidas=${perdidas} />
         <${Aviso} tono="mal" titulo="Reemplaza todo lo de este dispositivo">Lo que hay ahora en la app se pierde. Si dudas, exporta antes un respaldo de lo actual.<//>`}
       <div class="botones">
         <button class="boton" onClick=${cerrar}>Cancelar</button>

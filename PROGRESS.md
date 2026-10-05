@@ -15,7 +15,7 @@ Plan: [PROYECTO_LABORATORIOS_v4.md](PROYECTO_LABORATORIOS_v4.md). Al empezar una
 | 6. Nota bimestral, excepciones y coordinación | ✅ Completa | 4-oct-2026 |
 | 7. Feedback | ✅ Completa | 4-oct-2026 |
 | 8. Métricas | ✅ Completa | 4-oct-2026 |
-| 9 | — | |
+| 9. Respaldo completo y varios dispositivos | ✅ Completa | 4-oct-2026 |
 
 ## Fase 0 (3-oct-2026)
 
@@ -224,6 +224,44 @@ Detalle en [docs/excel.md](docs/excel.md).
 **Decisiones de implementación**
 - **La nota del grupo de un taller se muestra como nivel** («1/2»), no sobre 10: es la mitad grupal de la nota.
 - **El trabajo firmado y la penalización total salen de la configuración** de cada actividad (`cierre`, `penalizacion_total`). Los talleres no tienen penalización total.
+
+## Fase 9 (4-oct-2026) · respaldo completo y varios dispositivos · versión 0.11.0
+
+Detalle en [docs/respaldo.md](docs/respaldo.md).
+
+**Hecho**
+- **Respaldo completo** (Datos › «Respaldo completo en CSV y JSON (.zip)»):
+  - Un .zip con el JSON (se restaura), un CSV por tabla y un LEEME, todo con la fecha en el nombre.
+  - CSV en UTF-8 con BOM, separador coma y punto decimal. La clave de la tabla va primero, y las listas y los objetos van como JSON en su celda.
+  - El zip lo arma la app (`crearZip`, con CRC-32 y deflate del navegador). «Restaurar un respaldo…» acepta el .zip.
+- **Paquete de eventos:**
+  - Datos › «Enviar eventos…» (por curso, con los cambiados aquí ya marcados) y el menú ⋯ de cada evento, ahora también en los TC.
+  - Datos › «Recibir eventos…». La pantalla del Excel en la Mac también lo acepta.
+  - El paquete lleva las filas de esos eventos y sus visitantes. Se valida: semestre, demostración, eventos conocidos, filas propias y estudiantes presentes.
+  - Muestra qué cambia en cada evento y, al confirmar, reemplaza solo esos eventos.
+- **Aviso de lo que se perdería** (`src/nucleo/sincronia.js`), al recibir un paquete y al restaurar un respaldo completo: filas de aquí más recientes o posteriores al último respaldo restaurado. En la Mac, avisa si restaurar el respaldo del iPhone borraría TC calificados ahí.
+- **Recordatorio:** el aviso de Inicio se vuelve urgente (rojo) si hay registros sin respaldar y pasaron más de `recordatorio_dias` desde el último respaldo (`config/respaldo.json`, 2 días).
+- **Pruebas** (143 en total, 10 nuevas: 9 en `tests/respaldo.test.js` y 1 en `tests/pwa.test.js`):
+  - Listo cuando: el .zip se exporta, se borra todo, se restaura y los datos quedan idénticos. Se comprueban también cada celda de cada CSV, el BOM y el CRC.
+  - Listo cuando: un paquete pasa de la Mac al iPhone y los eventos quedan idénticos, con las mismas notas; lo demás no cambia.
+  - Pérdidas, validación, recordatorio, CSV y zip, y claves de las tablas.
+  - Ningún archivo publicado ni de `/config` está ignorado por git. La regla `respaldo*.json` del `.gitignore` ignoraba `config/respaldo.json`, y la app publicada no habría podido cargar la configuración. Ahora hay una excepción explícita y esta prueba lo vigila.
+- El .zip se comprobó además con `unzip -t` y con `zipfile` y `csv` de Python.
+
+**Verificado en el navegador** (demostración; 375 px, Mac y modo oscuro):
+- Enviar eventos: lista por curso, «Todos / Ninguno», botón fijo al pie y «Archivo listo» con el paquete (1 KB).
+- Recibir un paquete con cambios y un conflicto: la comparación por evento y el aviso en rojo; reemplazar; volver a recibirlo da «No hay cambios». Un paquete abierto desde «Restaurar un respaldo…» también se reconoce.
+- Respaldo completo de la demostración: 55 KB, 22 archivos con CRC correcto y el JSON idéntico al leerlo de vuelta, en 21 ms.
+- Restaurar un respaldo viejo avisa del TC1 calificado después.
+- El menú ⋯ de un TC y de una sesión, y el aviso urgente de Inicio.
+- Sin errores en la consola.
+
+**Decisiones de implementación**
+- **Un paquete reemplaza eventos enteros**, no fila por fila: es lo predecible. La app no guarda en qué dispositivo se registró cada fila ni lo que se borró, así que en vez de mezclar compara fechas y avisa.
+- **Varios eventos en un paquete:** por ejemplo, los TC de los dos cursos SQI van en un solo archivo.
+- **Los estudiantes no viajan en el paquete**, salvo los visitantes del evento: la nómina se lee del Excel en cada dispositivo.
+- **Los CSV son para leer:** no se restauran. El JSON del mismo .zip es el que se restaura.
+- **Sin registros nuevos no hay recordatorio**, aunque el último respaldo sea viejo.
 
 ## Fase 8 (4-oct-2026) · métricas · versión 0.10.0
 
@@ -497,4 +535,5 @@ Pedido de Joel: un solo archivo por día con todo (notas, asistencia, etc.) para
     - T2: cronograma B, semana 5; cronograma A, semana 6.
 - Plantillas de feedback de TC2–TC7, con sus etiquetas, cuando lleguen sus hojas; las de P2, T2, … con cada guía (ver `docs/feedback.md`), y sus `conceptos_control` (ver `docs/metricas.md`).
 - Revisar con Joel los umbrales de riesgo (`config/metricas.json`) y los conceptos del control de P1 y T1.
-- Fase 9: respaldo completo y varios dispositivos. Solo cuando Joel la pida.
+- Revisar con Joel los días del recordatorio de respaldo (`config/respaldo.json`, 2 por defecto).
+- Probar en el iPhone real: «Respaldo completo» y «Enviar eventos…» con la hoja de compartir (AirDrop a la Mac), y «Recibir eventos…» desde Archivos.

@@ -1,8 +1,8 @@
 // Base local (IndexedDB con Dexie). El modelo está documentado en docs/modelo-datos.md.
 import Dexie from './vendor/dexie.js';
-import { TABLAS_REGISTRO } from './nucleo/tablas.js';
+import { TABLAS_DE_EVENTO } from './nucleo/tablas.js';
 
-export { Dexie };
+export { Dexie, TABLAS_DE_EVENTO };
 
 /** Tablas y claves (la primera entrada es la clave primaria; las demás, índices). */
 export const TABLAS = {
@@ -27,9 +27,6 @@ export const TABLAS = {
   importaciones: '++id, fecha',
   meta: 'clave',
 };
-
-/** Tablas cuyas filas pertenecen a un evento (clave o índice «evento» = «PARALELO:CÓDIGO»). */
-export const TABLAS_DE_EVENTO = [...TABLAS_REGISTRO, 'cambios_evento'];
 
 export function nombreBase(semestre, { demo = false } = {}) {
   return `lab-mn-${semestre}${demo ? '-demo' : ''}`;

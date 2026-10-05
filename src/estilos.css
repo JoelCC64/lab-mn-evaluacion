@@ -307,7 +307,7 @@ textarea.entrada { min-height: 84px; resize: vertical; }
 .frases button.elegida { border-style: solid; background: var(--azul-suave); }
 
 .interruptor { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 48px; cursor: pointer; }
-.interruptor input { width: 24px; height: 24px; accent-color: var(--azul-2); }
+.interruptor input { width: 24px; height: 24px; flex-shrink: 0; accent-color: var(--azul-2); }
 
 .pie-fijo {
   position: sticky; bottom: 0; z-index: 12; margin: 0 -16px calc(-28px - env(safe-area-inset-bottom));
@@ -356,6 +356,25 @@ select.entrada { width: 100%; min-height: 44px; }
 .aviso-respaldo { border-color: var(--aviso); background: var(--aviso-suave); }
 .aviso-respaldo .negrita { color: var(--aviso); }
 .texto-aviso { color: var(--aviso); font-weight: 600; }
+/* Recordatorio urgente: más de N días sin respaldar (config/respaldo.json) */
+.aviso-respaldo.vencido { border-color: var(--mal); background: var(--mal-suave); }
+.aviso-respaldo.vencido .negrita { color: var(--mal); }
+.texto-mal { color: var(--mal); font-weight: 600; }
+.separador { border: 0; border-top: 1px solid var(--borde); margin: 4px 0; }
+
+/* Pasar eventos entre dispositivos */
+.lista-eleccion { display: flex; flex-direction: column; }
+.lista-eleccion .interruptor + .interruptor { border-top: 1px solid var(--borde); }
+.lista-eleccion .interruptor { padding: 6px 0; }
+.lista-paquete { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+.lista-paquete li { padding: 10px 12px; border: 1px solid var(--borde); border-radius: 10px; background: var(--superficie-2); }
+.lista-paquete li .texto-mal { margin-top: 4px; }
+/* Botones fijos al pie de una hoja larga */
+.hoja .pie-hoja {
+  position: sticky; bottom: calc(-18px - env(safe-area-inset-bottom)); z-index: 1;   /* cubre el relleno inferior de la hoja */
+  margin: 8px -16px calc(-18px - env(safe-area-inset-bottom)); padding: 10px 16px calc(12px + env(safe-area-inset-bottom));
+  background: var(--superficie); border-top: 1px solid var(--borde);
+}
 
 /* Trabajos en casa (SQI): suma en la barra, preguntas, integrantes y avance automático */
 .suma-tc { flex: none; display: flex; flex-direction: column; align-items: flex-end; padding: 0 6px; line-height: 1.1; }

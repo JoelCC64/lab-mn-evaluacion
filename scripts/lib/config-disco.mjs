@@ -46,6 +46,7 @@ export function construirManifiesto(raiz = DIR_CONFIG) {
     excel: 'excel.json',
     feedback: 'feedback.json',
     metricas: 'metricas.json',
+    respaldo: 'respaldo.json',
   };
   const h = createHash('sha256');
   for (const ruta of archivosDelManifiesto(m)) {
@@ -59,7 +60,7 @@ export function construirManifiesto(raiz = DIR_CONFIG) {
 export function archivosDelManifiesto(m) {
   return [m.semestre, m.cursos, m.catalogo, ...m.cronogramas, ...m.esquemas, ...m.actividades,
     m.sqi_aspectos, m.sqi_aspectos_por_practica, m.control_oral, m.trabajo_preparatorio,
-    m.planificacion_conocimiento, m.asistencia, m.excel, m.feedback, m.metricas];
+    m.planificacion_conocimiento, m.asistencia, m.excel, m.feedback, m.metricas, m.respaldo];
 }
 
 /** Esquema JSON que valida cada archivo del manifiesto. */
@@ -80,6 +81,7 @@ export function esquemaParaArchivo(ruta, m) {
     [m.excel]: 'excel.schema.json',
     [m.feedback]: 'feedback.schema.json',
     [m.metricas]: 'metricas.schema.json',
+    [m.respaldo]: 'respaldo.schema.json',
   }[ruta];
 }
 
@@ -119,6 +121,7 @@ export function leerConfigDisco(raiz = DIR_CONFIG) {
       excel: leer(m.excel),
       feedback: leer(m.feedback),
       metricas: leer(m.metricas),
+      respaldo: leer(m.respaldo),
     }),
   };
 }

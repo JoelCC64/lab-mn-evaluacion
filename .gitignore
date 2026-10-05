@@ -9,6 +9,12 @@ node_modules/
 *.psv
 respaldo*.json
 *.respaldo.json
+respaldo-lab-mn-*.zip
+respaldo-lab-mn-*/
+eventos-lab-mn-*.json
+# …salvo la configuración del recordatorio de respaldo (no tiene datos)
+!config/respaldo.json
+!config/schemas/respaldo.schema.json
 
 # Sistema
 .DS_Store

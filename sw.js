@@ -2,7 +2,7 @@
 // Guarda todos los archivos de la app para que funcione sin conexión.
 // En localhost usa primero la red (desarrollo); publicada, usa primero lo guardado (rápido y sin conexión).
 
-const VERSION = '0.10.0-bf2c5109e9';
+const VERSION = '0.11.0-6359370ea9';
 const CACHE = `lab-mn-${VERSION}`;
 const ARCHIVOS = [
   "./",
@@ -18,6 +18,7 @@ const ARCHIVOS = [
   "src/datos/excel-datos.js",
   "src/datos/importar.js",
   "src/datos/local.js",
+  "src/datos/paquete.js",
   "src/datos/respaldo.js",
   "src/datos/simulacion.js",
   "src/db.js",
@@ -25,6 +26,7 @@ const ARCHIVOS = [
   "src/nucleo/bimestre.js",
   "src/nucleo/calendario.js",
   "src/nucleo/config.js",
+  "src/nucleo/csv.js",
   "src/nucleo/estado-evento.js",
   "src/nucleo/excel-escritura.js",
   "src/nucleo/excel-lectura.js",
@@ -35,9 +37,11 @@ const ARCHIVOS = [
   "src/nucleo/motor-vista.js",
   "src/nucleo/motor.js",
   "src/nucleo/pdf.js",
+  "src/nucleo/respaldo-completo.js",
   "src/nucleo/respaldo-libro.js",
   "src/nucleo/resultados.js",
   "src/nucleo/retro.js",
+  "src/nucleo/sincronia.js",
   "src/nucleo/sorteo.js",
   "src/nucleo/tablas.js",
   "src/nucleo/tablero.js",
@@ -62,6 +66,7 @@ const ARCHIVOS = [
   "src/ui/inicio.js",
   "src/ui/metricas.js",
   "src/ui/notas.js",
+  "src/ui/paquetes.js",
   "src/ui/plic.js",
   "src/ui/puerta.js",
   "src/ui/pwa.js",
@@ -106,6 +111,7 @@ const ARCHIVOS = [
   "config/manifest.json",
   "config/metricas.json",
   "config/planificacion-conocimiento.json",
+  "config/respaldo.json",
   "config/semestre-2026B.json",
   "config/sqi/aspectos-por-practica.json",
   "config/sqi/aspectos.json",

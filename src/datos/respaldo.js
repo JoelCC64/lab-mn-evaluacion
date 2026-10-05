@@ -1,4 +1,5 @@
-// Respaldo completo en un JSON: exportar, validar y restaurar. Es también el archivo que pasa del iPhone a la Mac.
+// Respaldo completo (todas las tablas) como objeto JSON: exportar, validar y restaurar. Viaja dentro del respaldo del día
+// (Excel), del respaldo completo (.zip, con un CSV por tabla) o solo, como .json.
 import { ahoraISO } from '../db.js';
 
 export const FORMATO = 'lab-mn-respaldo';
@@ -12,10 +13,14 @@ export async function exportarRespaldo(db, { semestre, app, config, ahora = ahor
   return { formato: FORMATO, version: VERSION, semestre, creado: ahora, app, config, tablas };
 }
 
-export function nombreArchivoRespaldo(semestre, fecha = new Date(), extension = 'json') {
+/** Fecha y hora local para los nombres de archivo: «2026-10-04-1530». */
+export function selloDeFecha(fecha = new Date()) {
   const p = (n) => String(n).padStart(2, '0');
-  const f = `${fecha.getFullYear()}-${p(fecha.getMonth() + 1)}-${p(fecha.getDate())}-${p(fecha.getHours())}${p(fecha.getMinutes())}`;
-  return `respaldo-lab-mn-${semestre}-${f}.${extension}`;
+  return `${fecha.getFullYear()}-${p(fecha.getMonth() + 1)}-${p(fecha.getDate())}-${p(fecha.getHours())}${p(fecha.getMinutes())}`;
+}
+
+export function nombreArchivoRespaldo(semestre, fecha = new Date(), extension = 'json') {
+  return `respaldo-lab-mn-${semestre}-${selloDeFecha(fecha)}.${extension}`;
 }
 
 /** Errores que impiden restaurar (lista vacía si el archivo sirve). */

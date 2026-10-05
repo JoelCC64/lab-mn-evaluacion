@@ -11,6 +11,8 @@ import { Trabajos } from './trabajos.js';
 import { Plic } from './plic.js';
 import { Feedback } from './feedback.js';
 import { RecuperacionesDelEvento } from './recuperacion.js';
+import { prepararPaquete, useEntrega } from './paquetes.js';
+import { TABLAS_DE_EVENTO } from '../nucleo/tablas.js';
 import { marcarHuboClase, marcarSinClase, quitarCambioEvento } from '../datos/acciones.js';
 import { retroDelTaller } from '../nucleo/retro.js';
 import { tieneFeedback } from '../nucleo/feedback.js';
@@ -107,7 +109,7 @@ export function Evento({ id, pestana }) {
 
   return html`
     <${Pantalla} titulo=${nombreEvento(evento)} subtitulo=${subtituloEvento(evento)} atras=${enlace('curso', curso.paralelo)} pestanas=${barra}
-      acciones=${evento.sesion && html`<${MenuEvento} ctx=${ctx} evento=${evento} />`}>
+      acciones=${html`<${MenuEvento} ctx=${ctx} evento=${evento} />`}>
       <${AvisoDeEstado} evento=${evento} estado=${est} eventos=${eventos} />
       ${evento.tipo === 'plic' && evento.estado === 'normal' && html`<${Plic} ctx=${ctx} evento=${evento} />`}
       ${evento.estado !== 'normal' && evento.con_nota && html`<${RecuperacionesDelEvento} ctx=${ctx} evento=${evento} />`}
@@ -137,19 +139,37 @@ export function AvisoDeEstado({ evento, estado, eventos }) {
   return null;
 }
 
-/** Menú del evento (⋯): marcar la sesión sin clase, indicar que en un feriado sí hubo clase o deshacer el cambio. */
+/**
+ * Menú del evento (⋯): enviarlo a otro dispositivo y, en las sesiones, marcarla sin clase, indicar que en un feriado sí
+ * hubo clase o deshacer el cambio.
+ */
 function MenuEvento({ ctx, evento }) {
-  const { db, avisar } = useApp();
+  const { cfg, db, demo, avisar } = useApp();
   const [abierto, setAbierto] = useState(false);
   const [motivo, setMotivo] = useState('Clase suspendida');
+  const { entregar, hoja } = useEntrega();
   const cambio = ctx.reg.cambios_evento.find((c) => c.evento === evento.id) ?? null;
   const tc = ctx.eventos.find((e) => e.tipo === 'trabajo_casa' && e.practica === evento.id && e.con_nota);
   const hecho = (texto, tono) => { setAbierto(false); avisar(texto, tono); };
+  const registros = TABLAS_DE_EVENTO.reduce((n, t) => n + ctx.reg[t].filter((f) => f.evento === evento.id).length, 0);
+  const enviar = async () => {
+    try {
+      const archivo = await prepararPaquete({ cfg, db, demo, ids: [evento.id] });
+      setAbierto(false);
+      await entregar(archivo);
+    } catch (e) { console.error(e); avisar(e.message || String(e), 'mal'); }
+  };
   return html`
     <button class="icono-boton" aria-label="Opciones del evento" onClick=${() => setAbierto(true)}>⋯</button>
+    ${hoja}
     ${abierto && html`
-      <${Hoja} titulo="Opciones de la sesión" alCerrar=${() => setAbierto(false)}>
-        ${cambio
+      <${Hoja} titulo=${evento.sesion ? 'Opciones de la sesión' : 'Opciones del evento'} alCerrar=${() => setAbierto(false)}>
+        <p class="tenue pequeno">${registros
+          ? 'Para seguir en otro dispositivo (por ejemplo, calificar en la Mac y pasarlo al iPhone):'
+          : 'Aún no hay nada registrado aquí en este evento.'}</p>
+        <button class="boton ancho" disabled=${!registros} onClick=${enviar}>Enviar este evento a otro dispositivo</button>
+        ${evento.sesion && html`<hr class="separador" />`}
+        ${!evento.sesion ? null : cambio
           ? html`
             <p>${cambio.estado === 'sin_clase' ? `Se marcó a mano sin clase (${cambio.motivo}).` : 'Se marcó a mano que sí hubo clase pese al calendario.'}</p>
             <button class="boton ancho" onClick=${async () => { await quitarCambioEvento(db, evento.id); hecho('La sesión vuelve a lo que dice el calendario.'); }}>Deshacer el cambio</button>`

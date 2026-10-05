@@ -1,0 +1,18 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "respaldo.schema.json",
+  "title": "Respaldo (Fase 9): recordatorio cuando pasan más de N días sin respaldar",
+  "type": "object",
+  "required": ["id", "recordatorio_dias"],
+  "additionalProperties": false,
+  "properties": {
+    "id": { "const": "respaldo" },
+    "fuente": { "type": "string" },
+    "recordatorio_dias": {
+      "description": "Si hay registros sin respaldar y pasaron más de estos días desde el último respaldo, el aviso de Inicio se vuelve urgente.",
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 30
+    }
+  }
+}

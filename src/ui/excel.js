@@ -8,12 +8,12 @@ import {
   ACEPTA_EXCEL, abrirLibro, descargar, elegirArchivo, elegirCarpeta, excelAbierto, excelsDeLaCarpeta,
   permisoCarpeta, puedeGuardarSobreArchivos,
 } from './archivos.js';
-import { ACEPTA_RESPALDO, leerArchivoDeRespaldo } from './respaldo-dia.js';
-import { VistaRespaldo } from './datos.js';
+import { ACEPTA_RESPALDO } from './respaldo-dia.js';
+import { VistaArchivo } from './datos.js';
+import { abrirArchivoDeDatos } from './paquetes.js';
 import { cargarCursos } from '../datos/excel-datos.js';
 import { borrarLocal, guardarLocal, leerLocal, registrarEscritura, ultimaEscritura } from '../datos/local.js';
 import { conteoTablas } from '../datos/consultas.js';
-import { validarRespaldo } from '../datos/respaldo.js';
 import { hojasPropiasDelPlan, aplicarEscritura, compararLibros, letra, planificarEscritura, zonasDelPlan } from '../nucleo/excel-escritura.js';
 import { inflarEnNavegador, revisarPartesExcel } from '../nucleo/zip.js';
 import { enLista, hoyLocal } from '../nucleo/util.js';
@@ -84,9 +84,7 @@ export function Excel() {
 
   const importarRespaldo = () => conOcupado('Leyendo el respaldo…', async () => {
     const f = await elegirArchivo(ACEPTA_RESPALDO);
-    if (!f) return;
-    const obj = await leerArchivoDeRespaldo(f);
-    setVistaRespaldo({ nombre: f.name, obj, errores: validarRespaldo(obj, db, { semestre: cfg.semestre.semestre }) });
+    if (f) setVistaRespaldo(await abrirArchivoDeDatos(f, { cfg, db, demo }));   // también acepta un paquete de eventos
   });
 
   /** Lee el Excel (carpeta de la Mac, Excel ficticio o archivo elegido) y prepara la escritura. */
@@ -206,6 +204,10 @@ export function Excel() {
           ? html`Último respaldo importado: <b>${fechaHora(respaldo.creado)}</b> (creado en el otro dispositivo; importado el ${fechaHora(respaldo.importado)}).`
           : 'Aún no se importó un respaldo aquí: se escriben los datos registrados en este dispositivo.'}</p>
         <button class="boton ancho" disabled=${!!ocupado} onClick=${importarRespaldo}>Importar el respaldo del iPhone…</button>
+        <p class="tenue pequeno">
+          Si calificaste algo aquí (por ejemplo, los TC), envíalo antes al iPhone con Datos › «Enviar eventos…»: importar un
+          respaldo reemplaza todo lo de este dispositivo. La app avisa si se perdería algo.
+        </p>
       </div>
 
       <div class="tarjeta">
@@ -245,7 +247,7 @@ export function Excel() {
               ${resultado.verificado ? ' Comprobado: el archivo guardado está al día.' : ''}`}
         <//>`}
 
-      ${vistaRespaldo && html`<${VistaRespaldo} vista=${vistaRespaldo} cerrar=${() => { setVistaRespaldo(null); leerLocal(db, 'respaldo_importado').then(setRespaldo); }} />`}
+      ${vistaRespaldo && html`<${VistaArchivo} vista=${vistaRespaldo} cerrar=${() => { setVistaRespaldo(null); leerLocal(db, 'respaldo_importado').then(setRespaldo); }} />`}
     <//>`;
 }
 

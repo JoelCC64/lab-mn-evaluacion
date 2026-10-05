@@ -94,12 +94,18 @@ El respaldo es **un solo archivo Excel** (`respaldo-lab-mn-2026B-AAAA-MM-DD-HHMM
   - «Asistencia (app)» y «Detalle (app)».
 - **Para restaurar:** la hoja muy oculta `_respaldo` guarda el respaldo completo, que es el mismo JSON de abajo. Va partido en celdas de hasta 30 000 caracteres; los emojis y U+FFFE/U+FFFF se guardan como escapes de JSON.
 
-«Restaurar un respaldo…» acepta este Excel y también el JSON de las versiones anteriores. Una prueba comprueba que el Excel guarda exactamente los mismos datos que el JSON.
+«Restaurar un respaldo…» acepta este Excel, el .zip del respaldo completo y el JSON. Una prueba comprueba que el Excel guarda exactamente los mismos datos que el JSON.
 
 La app avisa en Inicio cuando hay registros sin respaldar:
 - Cada escritura en la base anota la hora en el dispositivo, con un middleware de Dexie (`abrirBase(nombre, { alCambiar })`).
 - Exportar el respaldo anota la hora del respaldo.
 - Restaurar también la anota, porque los datos quedan iguales a un archivo de respaldo.
+- Desde la Fase 9, si pasaron más de `recordatorio_dias` (`config/respaldo.json`) el aviso es urgente.
+
+**Fase 9** (ver `docs/respaldo.md`):
+- El **respaldo completo** (.zip) lleva el JSON y un CSV por tabla.
+- El **paquete de eventos** pasa uno o varios eventos de un dispositivo a otro.
+- Al restaurar o recibir eventos, la app avisa si se perderían cambios de este dispositivo.
 
 ## Respaldo (formato JSON)
 
@@ -115,8 +121,9 @@ La app avisa en Inicio cuando hay registros sin respaldar:
 }
 ```
 
-- Contiene todas las tablas y es el archivo que pasa del iPhone a la Mac.
+- Contiene todas las tablas y es el archivo que pasa del iPhone a la Mac. Viaja dentro del respaldo del día (Excel), dentro del respaldo completo (.zip) o solo.
 - Restaurar **reemplaza todo** lo del dispositivo, previa confirmación.
 - Un respaldo de una versión anterior de la app (sin alguna tabla nueva) se puede restaurar: la tabla que falta queda vacía. Uno de una versión más nueva, con tablas que esta versión no conoce, se rechaza.
-- Nombre del archivo: `respaldo-lab-mn-2026B-AAAA-MM-DD-HHMM.json`.
+- Nombre del archivo: `respaldo-lab-mn-2026B-AAAA-MM-DD-HHMM.json` (en el .zip, con la misma base).
+- La clave de cada tabla está también en `CLAVES` (`src/nucleo/tablas.js`). Sirve para reconocer la misma fila en dos dispositivos y para ordenar las columnas de los CSV, y una prueba la compara con `TABLAS`.
 - Tiene datos de estudiantes: el `.gitignore` impide que entre al repositorio.
