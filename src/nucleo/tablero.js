@@ -9,11 +9,6 @@ const tonoDe = (m) => (m === 'SQI' ? 'sqi' : 'trad');
 const plural = (n, uno, varios) => `${n} ${n === 1 ? uno : varios}`;
 const subtitulo = (t, ancho) => parrafo(t, { ancho, tam: 12.5, peso: 700, tono: 'tenue' });
 
-/** «1.er bimestre», «2.º bimestre» o «Semestre». */
-export function textoPeriodo(bimestre) {
-  return bimestre === 1 ? '1.er bimestre' : bimestre === 2 ? '2.º bimestre' : 'Semestre';
-}
-
 /** Segmentos de una escala (de lo más bajo a lo más alto), con su color. */
 function segmentosEscala(niveles, textos = null) {
   return niveles.map((n, i) => {
@@ -51,7 +46,7 @@ export function seccionesDelTablero(m, cfg) {
     dibujar: (ancho) => numeros([
       { valor: g.cursos, texto: g.cursos === 1 ? 'curso' : 'cursos' },
       { valor: g.estudiantes, texto: 'estudiantes' },
-      { valor: g.sesiones, texto: 'sesiones con pase' },
+      { valor: g.sesiones, texto: g.abiertas ? 'sesiones' : 'sesiones con pase' },
       { valor: pct(g.asistencia), texto: 'asistencia' },
       { valor: g.grupos, texto: 'notas de grupo' },
       ...(m.trabajos.length ? [{ valor: g.trabajos, texto: 'TC calificados' }] : []),

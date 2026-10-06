@@ -5,7 +5,9 @@ El tablero agrega **solo lo registrado** en la app: pases, rúbricas, etiquetas,
 ## Cómo se elige qué ver
 
 - **Cursos:** todos, una metodología (Clásica o SQI) o un curso.
-- **Periodo:** 1.er bimestre, 2.º bimestre o semestre. Por defecto, el bimestre en curso.
+- **Periodo:** día, semana del semestre (de lunes a domingo), mes, bimestre o semestre, con flechas para ir al anterior o al siguiente. Por defecto, la semana en curso (desde la 0.12.0; antes, el bimestre). Cada evento cuenta en el periodo de su fecha. La cobertura del control y el riesgo, que son del bimestre, usan el bimestre de esas fechas.
+- **Se actualizan durante el día:** no hace falta terminar el día ni cerrar el pase. Una sesión ya empezada (con algo registrado y fecha hasta hoy) cuenta con asistencia provisional: quien está en un grupo y no tiene falta marcada cuenta como presente, y quien no tiene grupo aún no cuenta. Al cerrar el pase pasa a ser la definitiva. «Antes de leer» avisa cuántas sesiones siguen abiertas.
+- **Nada se guarda aparte:** las métricas se calculan cada vez desde lo registrado, así que un periodo más no ocupa espacio.
 - **Vista:**
   - **Para presentar** (la de inicio): solo datos agregados, sin nombres ni códigos. Es la única que se exporta.
   - **Profesor (con nombres):** agrega quién falta, quién está en riesgo y los grupos por revisar. No se proyecta ni se exporta.
@@ -16,7 +18,7 @@ El tablero agrega **solo lo registrado** en la app: pases, rúbricas, etiquetas,
 |---|---|---|
 | Resumen | Cursos, estudiantes, sesiones con pase, asistencia, notas de grupo, TC calificados, controles | Conteos del periodo |
 | Antes de leer | Advertencias obligatorias (ver abajo) | Desde la configuración y los cursos del alcance |
-| Asistencia por curso, grupo o sesión | Asistencia y permanencia | Asistencia = vinieron (presentes y quienes se retiraron antes) / registrados en el pase. Permanencia = se quedaron hasta el final / vinieron. Solo sesiones con el pase cerrado y estudiantes activos (ni bajas ni visitantes) |
+| Asistencia por curso, grupo o sesión | Asistencia y permanencia | Asistencia = vinieron (presentes y quienes se retiraron antes) / registrados en el pase. Permanencia = se quedaron hasta el final / vinieron. Sesiones con el pase cerrado o ya empezadas (provisional), y estudiantes activos (ni bajas ni visitantes) |
 | Asistencia por día y franja | Lo mismo, agrupado por día y franja horaria | Cada franja dice si solo tiene cursos de una metodología |
 | Evolución entre eventos | Nota media y asistencia de cada actividad, en orden | Columnas: nota de grupo normalizada (0–100 %) en prácticas y talleres, y la de cada unidad en los TC. Línea: asistencia de la sesión. Cada metodología va en su propio gráfico |
 | Rúbricas | Distribución de puntajes por criterio (Clásica), por aspecto (SQI) o de la evaluación integral (talleres), por actividad | Un grupo con penalización total cuenta en la nota media, pero no en la distribución. Los talleres se separan por metodología |

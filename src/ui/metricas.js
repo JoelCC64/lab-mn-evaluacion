@@ -5,14 +5,14 @@ import { useEffect, useLayoutEffect, useMemo, useRef, useState } from '../vendor
 import { html, useApp, useVivo, Pantalla, Aviso, Cargando, Chip, Hoja, enlace } from './base.js';
 import { cargarCursos } from '../datos/excel-datos.js';
 import { alcances, calcularMetricas } from '../nucleo/metricas.js';
-import { laminaContinua, laminaEnPaginas, seccionesDelTablero, textoPeriodo } from '../nucleo/tablero.js';
+import { laminaContinua, laminaEnPaginas, seccionesDelTablero } from '../nucleo/tablero.js';
+import { moverPeriodo, periodoDe } from '../nucleo/periodos.js';
 import { documento } from '../nucleo/graficos.js';
-import { bimestreEnCurso } from '../nucleo/bimestre.js';
 import { fechaLarga, hoyLocal } from '../nucleo/util.js';
 import { compartirODescargar } from './archivos.js';
 import { pdfDeLamina, pngDeLamina } from './exportar-lamina.js';
 
-const PERIODOS = [{ id: 1, texto: '1.er bim.' }, { id: 2, texto: '2.º bim.' }, { id: null, texto: 'Semestre' }];
+const PERIODOS = [{ id: 'dia', texto: 'Día' }, { id: 'semana', texto: 'Semana' }, { id: 'mes', texto: 'Mes' }, { id: 'bimestre', texto: 'Bimestre' }, { id: 'semestre', texto: 'Semestre' }];
 const apellidos = (n) => String(n).split(' ').filter(Boolean).slice(0, 2).join(' ');
 
 export function Metricas({ alcance: inicial }) {
@@ -20,20 +20,21 @@ export function Metricas({ alcance: inicial }) {
   const hoy = hoyLocal();
   const opciones = alcances(cfg);
   const [alcance, setAlcance] = useState(opciones.some((o) => o.id === inicial) ? inicial : 'todos');
-  const [bimestre, setBimestre] = useState(() => bimestreEnCurso(cfg, hoy)?.bimestre ?? null);
+  // Por defecto, la semana en curso; las flechas pasan al periodo anterior o al siguiente.
+  const [periodo, setPeriodo] = useState(() => periodoDe(cfg, 'semana', hoy));
   const [vista, setVista] = useState('presentar');
   const cursos = useVivo(() => cargarCursos(db, cfg), []);
-  const m = useMemo(() => (cursos ? calcularMetricas(cfg, cursos, { alcance, bimestre, hoy }) : null), [cursos, alcance, bimestre]);
+  const m = useMemo(() => (cursos ? calcularMetricas(cfg, cursos, { alcance, periodo, hoy }) : null), [cursos, alcance, periodo]);
   const elegido = opciones.find((o) => o.id === alcance);
   const atras = cfg.cursoPorId[inicial] ? enlace('curso', inicial) : '#/';
-  const subtitulo = `${elegido.texto} · ${textoPeriodo(bimestre)}`;
+  const subtitulo = `${elegido.texto} · ${periodo.texto}`;
   if (!m) return html`<${Pantalla} titulo="Métricas" subtitulo=${subtitulo} atras=${atras}><${Cargando} /><//>`;
 
   const secciones = seccionesDelTablero(m, cfg);
   const profesor = vista === 'profesor';
   const cabecera = {
     titulo: `Métricas · Lab. MN ${cfg.semestre.semestre}`,
-    detalle: `${elegido.id === 'todos' ? 'Todos los cursos' : elegido.texto}${elegido.id === 'todos' ? '' : ` (${elegido.detalle})`} · ${textoPeriodo(bimestre)}`,
+    detalle: `${elegido.id === 'todos' ? 'Todos los cursos' : elegido.texto}${elegido.id === 'todos' ? '' : ` (${elegido.detalle})`} · ${periodo.texto}`,
     fecha: fechaLarga(hoy).replace(/^\S+ /, ''),
     demo,
     presentar: cfg.metricas.advertencias.presentar,
@@ -49,8 +50,14 @@ export function Metricas({ alcance: inicial }) {
           </select>
         </div>
         <div class="segmentado" role="group" aria-label="Periodo">
-          ${PERIODOS.map((p) => html`<button class=${bimestre === p.id ? 'elegido ok' : ''} onClick=${() => setBimestre(p.id)}>${p.texto}</button>`)}
+          ${PERIODOS.map((p) => html`<button class=${periodo.tipo === p.id ? 'elegido ok' : ''} onClick=${() => setPeriodo(periodoDe(cfg, p.id, hoy))}>${p.texto}</button>`)}
         </div>
+        ${periodo.tipo !== 'semestre' && html`
+          <div class="separado">
+            <button class="boton chico" aria-label="Periodo anterior" onClick=${() => setPeriodo(moverPeriodo(cfg, periodo, -1))}>‹</button>
+            <span class="negrita centro">${periodo.texto}</span>
+            <button class="boton chico" aria-label="Periodo siguiente" onClick=${() => setPeriodo(moverPeriodo(cfg, periodo, 1))}>›</button>
+          </div>`}
         <div class="segmentado" role="group" aria-label="Vista">
           <button class=${!profesor ? 'elegido ok' : ''} onClick=${() => setVista('presentar')}>Para presentar</button>
           <button class=${profesor ? 'elegido aviso' : ''} onClick=${() => setVista('profesor')}>Profesor (con nombres)</button>
@@ -62,7 +69,7 @@ export function Metricas({ alcance: inicial }) {
 
       ${m.vacio && html`
         <${Aviso} tono="aviso" titulo="Aún no hay nada registrado aquí">
-          Las métricas se arman con los pases cerrados, las rúbricas, los TC y los controles de este alcance y periodo.
+          Las métricas se arman con lo registrado en las sesiones (también las que siguen con el pase abierto), las rúbricas, los TC y los controles de este alcance y periodo.
           ${demo ? html` Para probarlas, simula clases ficticias en <a class="negrita" href=${enlace('datos')}>Datos</a>.` : ''}
         <//>`}
 
@@ -77,7 +84,7 @@ export function Metricas({ alcance: inicial }) {
             ${profesor && s.id === 'riesgo' && html`<${Riesgo} m=${m} />`}
           </div>`))}
 
-      ${!m.vacio && html`<${Exportar} secciones=${secciones} cabecera=${cabecera} nombre=${`metricas-lab-mn-${cfg.semestre.semestre}-${alcance}-${bimestre ? `B${bimestre}` : 'semestre'}-${hoy}`} />`}
+      ${!m.vacio && html`<${Exportar} secciones=${secciones} cabecera=${cabecera} nombre=${`metricas-lab-mn-${cfg.semestre.semestre}-${alcance}-${periodo.clave}-${hoy}`} />`}
     <//>`;
 }
 
@@ -122,7 +129,7 @@ function FaltasPorEstudiante({ m }) {
         </table>
       </div>
       ${filas.length > 12 && html`<button class="boton chico" onClick=${() => setTodos(!todos)}>${todos ? 'Ver menos' : `Ver los ${filas.length}`}</button>`}
-      <p class="tenue pequeno">r = se retiró antes. Cuenta todas las sesiones con pase cerrado del periodo, también las sin nota.</p>
+      <p class="tenue pequeno">r = se retiró antes. Cuenta las sesiones del periodo, también las sin nota y las que siguen con el pase abierto (solo las faltas ya marcadas).</p>
     </div>`;
 }
 

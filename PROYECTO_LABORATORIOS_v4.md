@@ -214,6 +214,8 @@ QR de cada paralelo (semana 1)
 | P6 | Respuestas/planificación; Ejecución/registro; Análisis; Discusión; Comunicación | 8 |
 | P7 | Análisis; Comunicación | 3 |
 
+> **Cambio del profesor (6-oct-2026).** La escala oficial resultó muy cerrada: en la app, los aspectos objetivos van de 0 a 3 y la discusión de 0 a 2. **Comunicación y colaboración no se usa** (no hay ese registro en clase): P3 y P6 quedan sin ese aspecto, P5 con respuestas, ejecución y análisis, y P7 solo con análisis. Máximos en la app: P1 8, P2 11, P3 11, P4 9, P5 9, P6 11, P7 3. El TC6 sigue sin nota propia y se evalúa en P7. Ver `config/sqi/`.
+
 Cálculo (**confirmado por el usuario**): primero, nota de la práctica = `puntos obtenidos / máximo de los aspectos aplicables` (valor entre 0 y 1); después se aplican la ponderación interna y el valor del componente. Ejemplo del 1.er bimestre: P1 vale el 20 % de 3 puntos = 0.60, P2 = 0.90 y P3 = 1.50. Si un grupo obtiene 4 de 5 en P1 (0.8), aporta 0.8 × 0.60 = 0.48 puntos. Las notas de práctica son **grupales**.
 
 **Trabajos en casa (TC).** Son tareas cortas después de cada práctica. Se resuelven a mano en el diario de laboratorio y se suben como PDF al aula virtual.

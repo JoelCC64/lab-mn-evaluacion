@@ -10,6 +10,7 @@ import { conControlEnBimestre, sesionesDeControl } from './sorteo.js';
 import { avisoControlCierre } from './bimestre.js';
 import { controlCalifica, nombreMetodologia, preparatorioCalifica } from './config.js';
 import { DIAS, DIAS_TEXTO, agruparPor, compararGrupos, enLista } from './util.js';
+import { enPeriodo, periodoDe } from './periodos.js';
 
 export const METODOLOGIAS = ['TRAD', 'SQI'];
 const ESTADOS = ['presente', 'se_retiro_antes', 'no_vino', 'salio'];
@@ -48,22 +49,34 @@ function conTasas(c) {
   return { ...c, asistencia: c.n ? vinieron / c.n : null, permanencia: vinieron ? c.presentes / vinieron : null };
 }
 
-function metricasAsistencia(datos, delBimestre, unCurso) {
+/**
+ * Asistencia de las sesiones del periodo. Cuenta las de pase cerrado y, mientras tanto, las ya empezadas (con algo
+ * registrado y fecha hasta hoy): en ellas, quien está en un grupo y no tiene falta marcada cuenta como presente, igual
+ * que al cerrar el pase; quien no tiene grupo aún no cuenta. Así las métricas se actualizan durante el día.
+ */
+function metricasAsistencia(datos, delBimestre, unCurso, hoy = null) {
   const total = nuevaAsistencia();
   const porCurso = new Map(); const porEvento = new Map(); const porDia = new Map(); const porFranja = new Map();
   const porGrupo = new Map(); const porEstudiante = new Map();
   let sesiones = 0;
+  let abiertas = 0;
   const de = (mapa, clave, inicial) => {
     if (!mapa.has(clave)) mapa.set(clave, { clave, ...inicial(), ...nuevaAsistencia() });
     return mapa.get(clave);
   };
   for (const { curso, ctx, est } of datos) {
+    const conRegistro = new Set([...ctx.reg.grupos_evento, ...ctx.reg.asistencia].map((f) => f.evento));
     for (const e of ctx.eventos) {
-      if (!e.sesion || e.estado !== 'normal' || !delBimestre(e) || !ctx.pases.get(e.id)?.cerrado) continue;
+      if (!e.sesion || e.estado !== 'normal' || !delBimestre(e)) continue;
+      const cerrado = Boolean(ctx.pases.get(e.id)?.cerrado);
+      const abierta = !cerrado && hoy !== null && e.fecha <= hoy && conRegistro.has(e.id);
+      if (!cerrado && !abierta) continue;
       sesiones += 1;
+      if (abierta) abiertas += 1;
       const grupos = gruposDe(ctx, e);
       for (const s of est) {
-        const estado = ctx.asistencia.get(`${e.id}|${s.id}`)?.estado;
+        let estado = ctx.asistencia.get(`${e.id}|${s.id}`)?.estado;
+        if (!estado && abierta && (grupos.get(s.id) ?? null) !== null) estado = 'presente';
         if (!ESTADOS.includes(estado)) continue;
         anotar(total, estado);
         anotar(de(porCurso, curso.paralelo, () => ({ etiqueta: curso.paralelo, metodologia: curso.metodologia })), estado);
@@ -92,6 +105,7 @@ function metricasAsistencia(datos, delBimestre, unCurso) {
   const ordenCursos = new Map(datos.map((d, i) => [d.curso.paralelo, i]));
   return {
     sesiones,
+    abiertas,
     total: conTasas(total),
     porCurso: lista(porCurso, (a, b) => ordenCursos.get(a.clave) - ordenCursos.get(b.clave)),
     porEvento: lista(porEvento, porSemana).map((x) => ({ ...x, cursos: x.cursos.size })),
@@ -457,16 +471,20 @@ function advertencias(cfg, datos) {
 // ---------- Tablero ----------
 
 /**
- * Todas las métricas de un alcance ('todos', 'TRAD', 'SQI' o un paralelo) y un bimestre (1, 2 o null = semestre).
- * `cursos`: lo que devuelve cargarCursos ([{ curso, reg, eventos }]). `hoy`: 'AAAA-MM-DD' (avisos de control).
+ * Todas las métricas de un alcance ('todos', 'TRAD', 'SQI' o un paralelo) y un periodo: `periodo` (ver periodos.js:
+ * día, semana, mes, bimestre o semestre) o, si no se da, `bimestre` (1, 2 o null = semestre).
+ * `cursos`: lo que devuelve cargarCursos ([{ curso, reg, eventos }]). `hoy`: 'AAAA-MM-DD' (sesiones en curso y avisos).
  */
-export function calcularMetricas(cfg, cursos, { alcance = 'todos', bimestre = null, hoy }) {
+export function calcularMetricas(cfg, cursos, { alcance = 'todos', bimestre = null, periodo = null, hoy }) {
+  periodo ??= bimestre ? periodoDe(cfg, 'bimestre', null, bimestre) : periodoDe(cfg, 'semestre');
   const datos = cursos
     .filter(({ curso }) => enAlcance(curso, alcance))
     .map(({ curso, reg, eventos }) => ({ curso, ctx: crearContexto(cfg, curso, eventos, reg), est: activos(reg.estudiantes) }))
     .filter((d) => d.est.length);
-  const delBimestre = (e) => bimestre === null || e.bimestre === bimestre;
-  const bimestres = bimestre ? [bimestre] : [1, 2];
+  const delBimestre = (e) => enPeriodo(periodo, e);
+  // Bimestres del periodo (cobertura del control, riesgo): el elegido, los dos, o los de las fechas del periodo.
+  const bimestres = periodo.tipo === 'bimestre' ? [periodo.bimestre] : periodo.tipo === 'semestre' ? [1, 2]
+    : [...new Set([periodo.desde, periodo.hasta].map((f) => (f > cfg.semestre.fin_bimestre_1 ? 2 : 1)))];
   const unCurso = datos.length === 1 && alcance === datos[0].curso.paralelo;
   const metodologias = METODOLOGIAS.filter((m) => datos.some((d) => d.curso.metodologia === m));
 
@@ -477,7 +495,7 @@ export function calcularMetricas(cfg, cursos, { alcance = 'todos', bimestre = nu
     return notasPorCurso.get(paralelo)[tipo];
   };
 
-  const asistencia = metricasAsistencia(datos, delBimestre, unCurso);
+  const asistencia = metricasAsistencia(datos, delBimestre, unCurso, hoy);
   const rubricas = metricasRubricas(cfg, datos, delBimestre, notasCurso);
   const trabajos = metricasTrabajos(cfg, datos, delBimestre, notasCurso);
   const control = metricasControl(cfg, datos, bimestres, delBimestre, hoy);
@@ -494,7 +512,7 @@ export function calcularMetricas(cfg, cursos, { alcance = 'todos', bimestre = nu
       p.semana = Math.min(p.semana, x.semana);
       return p;
     };
-    const asisM = metricasAsistencia(datos.filter((d) => d.curso.metodologia === m), delBimestre, false);
+    const asisM = metricasAsistencia(datos.filter((d) => d.curso.metodologia === m), delBimestre, false, hoy);
     for (const x of asisM.porEvento) if (x.conNota) punto(x).asistencia = x.asistencia;
     for (const x of [...rubricas, ...trabajos]) if (x.metodologia === m) punto(x).notas.push(...x.notas);
     return {
@@ -535,7 +553,8 @@ export function calcularMetricas(cfg, cursos, { alcance = 'todos', bimestre = nu
 
   return {
     alcance,
-    bimestre,
+    bimestre: periodo.bimestre,
+    periodo,
     unCurso,
     metodologias,
     cursos: datos.map((d) => d.curso.paralelo),
@@ -544,12 +563,16 @@ export function calcularMetricas(cfg, cursos, { alcance = 'todos', bimestre = nu
       cursos: datos.length,
       estudiantes: datos.reduce((s, d) => s + d.est.length, 0),
       sesiones: asistencia.sesiones,
+      abiertas: asistencia.abiertas,
       asistencia: asistencia.total.asistencia,
       grupos: rubricas.reduce((s, r) => s + r.grupos, 0),
       trabajos: trabajos.reduce((s, t) => s + t.calificados + t.noEntregaron, 0),
       controles: control.controles,
     },
-    advertencias: advertencias(cfg, datos),
+    advertencias: [
+      ...(asistencia.abiertas ? [{ id: 'en_curso', texto: `${asistencia.abiertas === 1 ? 'Una sesión tiene' : `${asistencia.abiertas} sesiones tienen`} el pase abierto: su asistencia es provisional (quien está en un grupo cuenta como presente) hasta cerrarlo.` }] : []),
+      ...advertencias(cfg, datos),
+    ],
     asistencia,
     evolucion,
     rubricas,

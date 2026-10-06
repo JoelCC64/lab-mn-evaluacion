@@ -20,6 +20,7 @@ import {
 import { generarEventos } from '../src/nucleo/calendario.js';
 import { gruposDelEvento } from '../src/nucleo/grupos.js';
 import { alcances, calcularMetricas, franjasDeUnaMetodologia } from '../src/nucleo/metricas.js';
+import { moverPeriodo, periodoDe } from '../src/nucleo/periodos.js';
 import { laminaContinua, laminaEnPaginas, seccionesDelTablero, textoDeSvg } from '../src/nucleo/tablero.js';
 import { anchoTexto, envolver, esc, recortar } from '../src/nucleo/graficos.js';
 import { pdfDeImagenes, textoPdf } from '../src/nucleo/pdf.js';
@@ -352,4 +353,44 @@ test('configuración: conceptos del control con ids únicos y métricas válidas
   mala.actividades['P1-TRAD'].conceptos_control.push({ id: 'propagacion', texto: 'Repetido' });
   assert.ok(validarSemantica(mala).some((e) => /conceptos del control repetidos/.test(e)));
   assert.ok(c.metricas.riesgo.faltas >= 1 && c.metricas.advertencias.franjas.includes('{detalle}'));
+});
+
+test('periodos: día, semana del semestre, mes y bimestre, con anterior y siguiente', () => {
+  const s = periodoDe(cfg, 'semana', '2026-10-07');
+  assert.deepEqual([s.desde, s.hasta, s.texto, s.clave], ['2026-10-05', '2026-10-11', 'Semana 2 · 5–11 oct', 'S2']);
+  assert.equal(moverPeriodo(cfg, s, -1).texto, 'Semana 1 · 28 sep – 4 oct');
+  const m = periodoDe(cfg, 'mes', '2026-10-07');
+  assert.deepEqual([m.desde, m.hasta, m.texto], ['2026-10-01', '2026-10-31', 'Octubre de 2026']);
+  assert.deepEqual([moverPeriodo(cfg, m, 1).desde, moverPeriodo(cfg, m, 1).hasta], ['2026-11-01', '2026-11-30']);
+  assert.equal(moverPeriodo(cfg, periodoDe(cfg, 'mes', '2026-12-15'), 1).texto, 'Enero de 2027');
+  const d = periodoDe(cfg, 'dia', '2026-10-05');
+  assert.deepEqual([d.texto, moverPeriodo(cfg, d, 1).desde], ['Lunes 5 de octubre de 2026', '2026-10-06']);
+  assert.equal(periodoDe(cfg, 'bimestre', '2026-12-01').bimestre, 2);
+  assert.equal(periodoDe(cfg, 'bimestre', '2026-10-06').bimestre, 1);
+});
+
+test('métricas de la semana en curso: la sesión de hoy cuenta con el pase abierto (provisional) y al cerrarlo', async () => {
+  const db = abrirBase(`met-${randomUUID()}`);
+  const k = await curso(db, 'GR2QB', { a: '1', b: '1', c: '2', d: '2', e: null });
+  const { e: p1, grupos } = await k.evento('P1');   // lunes 5 de octubre (semana 2)
+  assert.equal(p1.fecha, '2026-10-05');
+  await marcarAsistencia(db, p1.id, grupos, k.id('b'), 'no_vino', null, AHORA);
+  const semana = periodoDe(cfg, 'semana', '2026-10-06');
+  const enLaSemana = async (hoy, periodo = semana) => calcularMetricas(cfg, await cargarCursos(db, cfg), { alcance: 'GR2QB', periodo, hoy });
+
+  let m = await enLaSemana('2026-10-06');
+  assert.deepEqual([m.generales.sesiones, m.generales.abiertas], [1, 1]);
+  cerca(m.asistencia.total.asistencia, 3 / 4, 'a, c y d presentes (en grupo); b no vino; e sin grupo aún no cuenta');
+  assert.ok(m.advertencias.some((a) => a.id === 'en_curso'));
+  assert.equal((await enLaSemana('2026-10-04')).generales.sesiones, 0, 'antes de su fecha no cuenta');
+  assert.equal((await enLaSemana('2026-10-06', moverPeriodo(cfg, semana, -1))).generales.sesiones, 0, 'la semana anterior no la incluye');
+  assert.equal((await enLaSemana('2026-10-06', periodoDe(cfg, 'dia', '2026-10-05'))).generales.sesiones, 1);
+  assert.equal((await enLaSemana('2026-10-06', periodoDe(cfg, 'dia', '2026-10-06'))).generales.sesiones, 0);
+  assert.equal((await enLaSemana('2026-10-06', periodoDe(cfg, 'mes', '2026-10-06'))).generales.sesiones, 1);
+
+  await cerrarPase(db, p1.id, grupos, SIN_GRUPO, AHORA);
+  m = await enLaSemana('2026-10-06');
+  assert.deepEqual([m.generales.sesiones, m.generales.abiertas], [1, 0]);
+  cerca(m.asistencia.total.asistencia, 3 / 5, 'al cerrar, e (sin grupo) queda como «no vino»');
+  assert.ok(!m.advertencias.some((a) => a.id === 'en_curso'));
 });

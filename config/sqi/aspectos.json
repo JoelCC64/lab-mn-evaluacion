@@ -21,9 +21,5 @@
     "descriptores": {
       "2": "Participa activamente y registra la discusión, reflexión, estrategia ética, lluvia de ideas o retroalimentación solicitada.",
       "1": "Participa poco o el registro de la discusión es incompleto.",
-      "0": "No participa o no registra la actividad solicitada." } },
-  "comunicacion": { "nombre": "Comunicación y colaboración", "corto": "comunicación", "tipo": "subjetiva", "escala": [0,  1],
-    "descriptores": {
-      "1": "Realiza la presentación o reporte solicitado y existe evidencia de participación en el trabajo grupal.",
-      "0": "No realiza la presentación o no existe evidencia de participación." } }
+      "0": "No participa o no registra la actividad solicitada." } }
 }

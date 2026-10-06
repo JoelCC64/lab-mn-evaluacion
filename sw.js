@@ -2,7 +2,7 @@
 // Guarda todos los archivos de la app para que funcione sin conexión.
 // En localhost usa primero la red (desarrollo); publicada, usa primero lo guardado (rápido y sin conexión).
 
-const VERSION = '0.11.3-dfb6b331de';
+const VERSION = '0.12.0-17b0535ea0';
 const CACHE = `lab-mn-${VERSION}`;
 const ARCHIVOS = [
   "./",
@@ -37,6 +37,7 @@ const ARCHIVOS = [
   "src/nucleo/motor-vista.js",
   "src/nucleo/motor.js",
   "src/nucleo/pdf.js",
+  "src/nucleo/periodos.js",
   "src/nucleo/respaldo-completo.js",
   "src/nucleo/respaldo-libro.js",
   "src/nucleo/resultados.js",

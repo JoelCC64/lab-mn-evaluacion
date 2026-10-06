@@ -1,9 +1,9 @@
 {
   "P1": ["resp_pred_plan", "ejec_registro", "discusion"],
   "P2": ["resp_pred_plan", "ejec_registro", "analisis", "discusion"],
-  "P3": ["resp_pred_plan", "ejec_registro", "analisis", "discusion", "comunicacion"],
+  "P3": ["resp_pred_plan", "ejec_registro", "analisis", "discusion"],
   "P4": ["resp_pred_plan", "ejec_registro", "analisis"],
-  "P5": ["resp_pred_plan", "ejec_registro", "analisis", "comunicacion"],
-  "P6": ["resp_pred_plan", "ejec_registro", "analisis", "discusion", "comunicacion"],
-  "P7": ["analisis", "comunicacion"]
+  "P5": ["resp_pred_plan", "ejec_registro", "analisis"],
+  "P6": ["resp_pred_plan", "ejec_registro", "analisis", "discusion"],
+  "P7": ["analisis"]
 }

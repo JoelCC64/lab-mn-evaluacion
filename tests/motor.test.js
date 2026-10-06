@@ -289,9 +289,9 @@ test('Curso SQI sin P2 (caso hipotético) → Prácticas = (0.2 × P1 + 0.5 × P
   cfg3.actividades['P3-SQI'] = { ...copia(cfg.actividades['P1-SQI']), id: 'P3-SQI', codigo: 'P3', aspectos_aplicables: cfg.sqi.porPractica.P3, indicadores: {}, etiquetas: [] };
   const s3 = escenario('GR1AA', { a: '1' }, { cfgUsada: cfg3, cambios: s.reg.cambios_evento });
   Object.assign(s3.reg, s.reg);
-  s3.pase('P3').puntos('P3', '1', { resp_pred_plan: 3, ejec_registro: 3, analisis: 1, discusion: 2, comunicacion: 0 }); // 9/12
+  s3.pase('P3').puntos('P3', '1', { resp_pred_plan: 3, ejec_registro: 3, analisis: 1, discusion: 2 }); // 9/11
   const practicas = notaBimestre(s3.ctx(), 'a', 1).componentes.find((c) => c.id === 'practicas');
-  cerca(practicas.acumulada, ((0.2 * 0.75 + 0.5 * 0.75) / 0.7) * 3);
+  cerca(practicas.acumulada, ((0.2 * 0.75 + 0.5 * (9 / 11)) / 0.7) * 3);
   assert.equal(practicas.items.find((i) => i.codigo === 'P2').estado, 'excluido');
   // El TC2 también queda excluido (sigue a su práctica).
   assert.equal(notaBimestre(s3.ctx(), 'a', 1).componentes.find((c) => c.id === 'trabajos_casa').items.find((i) => i.codigo === 'TC2').estado, 'excluido');
