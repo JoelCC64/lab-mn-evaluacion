@@ -225,13 +225,13 @@ Detalle en [docs/excel.md](docs/excel.md).
 - **La nota del grupo de un taller se muestra como nivel** («1/2»), no sobre 10: es la mitad grupal de la nota.
 - **El trabajo firmado y la penalización total salen de la configuración** de cada actividad (`cierre`, `penalizacion_total`). Los talleres no tienen penalización total.
 
-## Métricas por día, semana y mes (6-oct-2026) · versión 0.12.0
+## Métricas por día, semana y mes (6-oct-2026) · versiones 0.12.0 y 0.12.1
 
 - Pedido: las métricas mostraban la asistencia de la semana anterior porque el periodo era el bimestre y solo contaban las sesiones con el pase cerrado.
 - Periodo: **día, semana, mes, bimestre o semestre** (`src/nucleo/periodos.js`), con flechas ‹ ›. Por defecto, la semana en curso.
 - Las sesiones ya empezadas cuentan **con el pase abierto**, de forma provisional (quien está en un grupo = presente, como al cerrar el pase); «Antes de leer» lo avisa. Ya no hace falta terminar el día.
 - Sin almacenamiento extra: todo se calcula al abrir la pantalla desde lo registrado.
-- **Comunicación y colaboración** (SQI) se quitó: el profesor no la usa. P3 y P6 sin ese aspecto, P5 con tres, P7 solo análisis (`config/sqi/`, `config/feedback.json`); nota en el plan (`PROYECTO_LABORATORIOS_v4.md`).
+- **Comunicación y colaboración** (SQI) se quitó y se **volvió a poner** el mismo día (0.12.1): está en los lineamientos oficiales (P3, P5, P6 y P7, y el TC6 se evalúa ahí). Sigue con la escala oficial 1/0.
 - 2 pruebas nuevas (periodos y sesión abierta); 150 en total. Probado en la demostración.
 
 ## Escala SQI más amplia (6-oct-2026) · versión 0.11.3
