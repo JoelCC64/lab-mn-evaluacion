@@ -45,13 +45,13 @@ function escenario(paralelo, grupos, { estados = {}, cfgUsada = cfg, cambios = [
   return api;
 }
 
-test('SQI P1: grupo con 4/5 → 0.8 × 0.60 = 0.48 puntos en Prácticas', () => {
-  const s = escenario('GR1AA', { a: '1', b: '1', c: '1' }).pase('P1').puntos('P1', '1', { resp_pred_plan: 2, ejec_registro: 1, discusion: 1 });
+test('SQI P1: grupo con 6/8 → 0.75 × 0.60 = 0.45 puntos en Prácticas', () => {
+  const s = escenario('GR1AA', { a: '1', b: '1', c: '1' }).pase('P1').puntos('P1', '1', { resp_pred_plan: 3, ejec_registro: 1, discusion: 2 });
   const ctx = s.ctx();
-  cerca(notaGrupo(ctx, s.e('P1'), '1').valor, 0.8);
+  cerca(notaGrupo(ctx, s.e('P1'), '1').valor, 0.75);
   const practicas = notaBimestre(ctx, 'a', 1).componentes.find((c) => c.id === 'practicas');
-  cerca(practicas.acumulada, 0.48);
-  cerca(practicas.proyectada, 2.4, 'proyectada: 0.8 × 3');
+  cerca(practicas.acumulada, 0.45);
+  cerca(practicas.proyectada, 2.25, 'proyectada: 0.75 × 3');
 });
 
 test('TC1 del grupo con 8.5/10 → 0.85 × 0.80 = 0.68 para cada integrante presente en P1', () => {
@@ -66,7 +66,7 @@ test('TC1 del grupo con 8.5/10 → 0.85 × 0.80 = 0.68 para cada integrante pres
 
 test('SQI: quien «no vino» a P1 tiene 0 en P1 y 0 en TC1, aunque su grupo tenga nota', () => {
   const s = escenario('GR1AA', { a: '1', b: '1', c: '1' }).pase('P1', { c: 'no_vino' })
-    .puntos('P1', '1', { resp_pred_plan: 2, ejec_registro: 2, discusion: 1 });
+    .puntos('P1', '1', { resp_pred_plan: 3, ejec_registro: 3, discusion: 2 });
   s.reg.trabajos_casa.push({ evento: 'GR1AA:TC1', unidad: 'grupo', unidad_id: '1', entregado: true,
     puntajes: { '1a': 1, '1b': 2, '2a-i': 1, '2a-ii': 1, '2b-i': 1, '2b-ii': 1, '2c': 1, '2d': 2 } });
   const ctx = s.ctx();
@@ -284,14 +284,14 @@ test('Preparatorio de una sesión sin la revisión marcada: pendiente, no entra 
 
 test('Curso SQI sin P2 (caso hipotético) → Prácticas = (0.2 × P1 + 0.5 × P3) / 0.7 × 3', () => {
   const s = escenario('GR1AA', { a: '1' }, { cambios: [{ evento: 'GR1AA:P2', estado: 'sin_clase', motivo: 'Suspensión' }] });
-  s.pase('P1').puntos('P1', '1', { resp_pred_plan: 2, ejec_registro: 1, discusion: 1 });   // 0.8
+  s.pase('P1').puntos('P1', '1', { resp_pred_plan: 3, ejec_registro: 1, discusion: 2 });   // 6/8 = 0.75
   const cfg3 = copia(cfg);
   cfg3.actividades['P3-SQI'] = { ...copia(cfg.actividades['P1-SQI']), id: 'P3-SQI', codigo: 'P3', aspectos_aplicables: cfg.sqi.porPractica.P3, indicadores: {}, etiquetas: [] };
   const s3 = escenario('GR1AA', { a: '1' }, { cfgUsada: cfg3, cambios: s.reg.cambios_evento });
   Object.assign(s3.reg, s.reg);
-  s3.pase('P3').puntos('P3', '1', { resp_pred_plan: 2, ejec_registro: 2, analisis: 1, discusion: 1, comunicacion: 0 }); // 6/8
+  s3.pase('P3').puntos('P3', '1', { resp_pred_plan: 3, ejec_registro: 3, analisis: 1, discusion: 2, comunicacion: 0 }); // 9/12
   const practicas = notaBimestre(s3.ctx(), 'a', 1).componentes.find((c) => c.id === 'practicas');
-  cerca(practicas.acumulada, ((0.2 * 0.8 + 0.5 * 0.75) / 0.7) * 3);
+  cerca(practicas.acumulada, ((0.2 * 0.75 + 0.5 * 0.75) / 0.7) * 3);
   assert.equal(practicas.items.find((i) => i.codigo === 'P2').estado, 'excluido');
   // El TC2 también queda excluido (sigue a su práctica).
   assert.equal(notaBimestre(s3.ctx(), 'a', 1).componentes.find((c) => c.id === 'trabajos_casa').items.find((i) => i.codigo === 'TC2').estado, 'excluido');

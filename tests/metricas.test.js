@@ -213,7 +213,7 @@ test('rúbricas: distribución por criterio y aspecto, etiquetas, penalización 
   await revisarGrupo(db, p1.id, grupos, '3', { penalizacion_total: true, motivo_penalizacion: 'Equipo no ordenado' }, AHORA);
   await trad.sesion('T1', { niveles: { 1: [2], 2: [1], 3: [0] } });
   const sqi = await curso(db, 'GR1AA', { a: '1', b: '1', c: '2', d: '2' });
-  await sqi.sesion('P1', { niveles: { 1: [2, 2, 1], 2: [1, 0, 0] } });
+  await sqi.sesion('P1', { niveles: { 1: [3, 3, 2], 2: [1, 0, 0] } });
   await sqi.sesion('T1', { niveles: { 1: [2], 2: [2] } });
 
   const m = await metricas(db, {});
@@ -225,9 +225,9 @@ test('rúbricas: distribución por criterio y aspecto, etiquetas, penalización 
   // Nota media de P1 Clásica: grupo 1 = 1; grupo 2 = 0.2·0.5 + 0.3·0.75 + 0.5·0.25 = 0.45; grupo 3 = 0 (penalización).
   cerca(rP1.media, (1 + 0.45 + 0) / 3);
   assert.deepEqual(rP1.etiquetas.map((t) => [t.id, t.n, t.de]), [['h_mal_medida', 1, 3], ['montaje_ok', 1, 3], ['propagacion_mal', 1, 3]]);
-  // SQI: escalas distintas por aspecto (2/1/0 y 1/0), una barra por aspecto.
+  // SQI: escalas distintas por aspecto (0–3 y 0–2), una barra por aspecto.
   const rSqi = m.rubricas.find((x) => x.clave === 'P1-SQI|SQI');
-  assert.deepEqual(rSqi.partes.map((p) => p.niveles.map((n) => n.nivel).join()), ['0,1,2', '0,1,2', '0,1']);
+  assert.deepEqual(rSqi.partes.map((p) => p.niveles.map((n) => n.nivel).join()), ['0,1,2,3', '0,1,2,3', '0,1,2']);
   // T1 por metodología, sin mezclar.
   assert.deepEqual(m.rubricas.filter((x) => x.codigo === 'T1').map((x) => [x.metodologia, x.grupos]), [['TRAD', 3], ['SQI', 2]]);
 
@@ -235,7 +235,7 @@ test('rúbricas: distribución por criterio y aspecto, etiquetas, penalización 
   const [practicas, talleres] = m.comparacion;
   assert.deepEqual([practicas.id, talleres.id], ['practicas', 'talleres']);
   const sq = practicas.porMetodologia.find((x) => x.metodologia === 'SQI');
-  cerca(sq.media, (5 / 5 + 1 / 5) / 2);   // P1 SQI: 5 y 1 de los 5 puntos posibles (2 + 2 + 1)
+  cerca(sq.media, (8 / 8 + 1 / 8) / 2);   // P1 SQI: 8 y 1 de los 8 puntos posibles (3 + 3 + 2)
   cerca(talleres.porMetodologia.find((x) => x.metodologia === 'TRAD').media, (1 + 0.5 + 0) / 3);
   assert.equal(m.comparacion.flatMap((c) => c.porMetodologia).some((x) => 'total' in x), false);
   // Un grupo con promedio bajo (grupo 3 de GR2QB: P1 penalizada y T1 en 0) aparece por revisar.

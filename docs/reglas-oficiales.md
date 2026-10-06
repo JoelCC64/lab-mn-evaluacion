@@ -43,7 +43,7 @@ Si llega un documento oficial nuevo que contradiga algo de aquí, se pregunta a 
 |---|---|---|
 | Clásica: diseño 20 %, toma de datos 30 % y análisis 50 % dentro de 3.5 (B1) o 3.0 (B2) | LE-VF | `config/esquemas/TRAD_B*.json` |
 | Clásica: escala 0–4 por sección; el análisis es una sola sección; todas las prácticas pesan igual | Joel | `config/actividades/P1-TRAD.json` |
-| SQI: aspectos 2/1/0 (objetivos) y 1/0 (subjetivos); qué aspectos aplican depende de la práctica | LE-SQI; Intro-SQI | `config/sqi/` |
+| SQI: aspectos objetivos 0–3 y discusión 0–2 (desde el 6-oct-2026; los lineamientos usan 2/1/0 y 1/0, más cerrados); comunicación sigue 1/0; qué aspectos aplican depende de la práctica | LE-SQI; Intro-SQI; decisión del profesor | `config/sqi/` |
 | SQI: nota = puntos / máximo de los aspectos aplicables; luego ponderación interna y valor del componente | LE-SQI (confirmado) | Motor |
 | Notas de práctica grupales, replicadas a cada integrante presente | LE-VF, LE-SQI | Motor: replicación |
 | Si el grupo no desmonta y guarda el equipo, puede recibir 0 en la práctica (a criterio del profesor) | LE-VF §1; LP §15 | Botón «Penalización total» con motivo |

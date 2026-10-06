@@ -225,6 +225,13 @@ Detalle en [docs/excel.md](docs/excel.md).
 - **La nota del grupo de un taller se muestra como nivel** («1/2»), no sobre 10: es la mitad grupal de la nota.
 - **El trabajo firmado y la penalización total salen de la configuración** de cada actividad (`cierre`, `penalizacion_total`). Los talleres no tienen penalización total.
 
+## Escala SQI más amplia (6-oct-2026) · versión 0.11.3
+
+- Decisión del profesor: la escala 2/1/0 era muy cerrada. Ahora los aspectos objetivos (respuestas, ejecución, análisis) van de **0 a 3** y la discusión de **0 a 2**, con descriptores nuevos para cada nivel (`config/sqi/aspectos.json`). Comunicación sigue 0–1 (no se pidió cambiarla; se usa desde P3).
+- La nota sigue siendo puntos / máximo de los aspectos aplicables: P1 sobre 8 (antes 5), P2 sobre 11, P3 sobre 12.
+- Los puntajes SQI que ya estuvieran guardados con la escala vieja se leen con la nueva (un 2 de 2 pasa a 2 de 3): hay que revisarlos.
+- Pruebas ajustadas a la escala nueva; 148 en total.
+
 ## Corregir al estudiante nuevo (5-oct-2026) · versión 0.11.2
 
 - Botón **«Corregir»** en los agregados en la app: en el grupo (junto a «Mover») y en Curso › Estudiantes. Cambia el nombre y también el código; si cambia el código, todo lo registrado pasa al nuevo (grupos, asistencia, controles, ajustes, notas…). Ahí mismo está «Quitar del curso».

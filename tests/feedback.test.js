@@ -173,7 +173,7 @@ test('versión corta (2 o 3 líneas) y resumen del curso con las etiquetas más 
 test('SQI: el tono invita a preguntar («Para explorar»), y sin nada que corregir propone una pregunta del banco', async () => {
   const k = await curso('GR1AA', { 202000001: '1', 202000002: '1', 202000003: '2', 202000004: '2' });
   const p1 = await k.sesion('P1', {
-    niveles: { 1: [2, 1, 1], 2: [2, 2, 1] },
+    niveles: { 1: [3, 1, 2], 2: [3, 3, 2] },
     etiquetas: { 1: ['registro_incompleto', 'justifica_eleccion'] },
     controles: [['202000001', true]],
   });
@@ -181,7 +181,7 @@ test('SQI: el tono invita a preguntar («Para explorar»), y sin nada que correg
   const fb = feedbackDelEvento(ctx, p1);
   assert.equal(fb.titulos.sugerencia, 'Para explorar');
   const g1 = unidad(fb, '1');
-  assert.match(g1.texto, /Nota del grupo: 8\/10 \(respuestas 2\/2 · ejecución 1\/2 · discusión 1\/1\)/);
+  assert.match(g1.texto, /Nota del grupo: 7\.5\/10 \(respuestas 3\/3 · ejecución 1\/3 · discusión 2\/2\)/);
   assert.deepEqual(seccion(g1.texto, 'Lo mejor'), [
     'Justificaron con razonamiento su elección de la medición más confiable.', 'Participaron en la discusión y la registraron.',
     'En el control oral mostraron que prepararon la guía.',
@@ -193,7 +193,7 @@ test('SQI: el tono invita a preguntar («Para explorar»), y sin nada que correg
   const g2 = unidad(fb, '2');
   assert.deepEqual(seccion(g2.texto, 'A mejorar'), ['Nada que corregir en lo registrado.']);
   assert.deepEqual(seccion(g2.texto, 'Para explorar'), [cfg.actividades['P1-SQI'].preguntas_discusion[1]]);
-  assert.equal(seccion(fb.resumen.texto, 'Por aspecto (promedio)')[0], 'Ejecución y registro de datos: 1.5/2');
+  assert.equal(seccion(fb.resumen.texto, 'Por aspecto (promedio)')[0], 'Ejecución y registro de datos: 2/3');
   assert.ok(fb.resumen.texto.includes('Control oral: 1 de 1 aprobados'));
   await sinDatosPersonales(k, fb);
 });

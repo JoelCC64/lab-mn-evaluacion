@@ -141,10 +141,10 @@ test('Clásica, 1.er bimestre completo: la nota de cada estudiante coincide con 
 
 test('SQI, 1.er bimestre completo (GR1AA pierde el T2): prácticas 20/30/50, TC 40/25/35 y talleres', async () => {
   const k = await curso('GR1AA', { a: '1', b: '1', c: '2' });
-  await k.sesion('P1', { niveles: { 1: [2, 1, 1], 2: [2, 2, 1] }, controles: [['a', true]] });
+  await k.sesion('P1', { niveles: { 1: [3, 1, 2], 2: [3, 3, 2] }, controles: [['a', true]] });
   await k.sesion('T1', { niveles: { 1: [2], 2: [1] } });
-  await k.sesion('P2', { niveles: { 1: [2, 2, 1, 1], 2: [1, 1, 1, 0] }, faltan: ['b'] });
-  await k.sesion('P3', { niveles: { 1: [2, 2, 2, 1, 1], 2: [2, 1, 1, 1, 0] } });
+  await k.sesion('P2', { niveles: { 1: [3, 3, 2, 1], 2: [1, 1, 1, 0] }, faltan: ['b'] });
+  await k.sesion('P3', { niveles: { 1: [3, 3, 3, 2, 1], 2: [3, 2, 1, 1, 0] } });
   await k.sesion('T3', { niveles: { 1: [2], 2: [2] } });
   const tc = async (codigo, grupo, puntos) => {
     const ev = await k.evento(codigo);
@@ -161,14 +161,14 @@ test('SQI, 1.er bimestre completo (GR1AA pierde el T2): prácticas 20/30/50, TC 
   const nota = (id) => notaBimestre(ctx, id, 1);
   const comp = (id, c) => nota(id).componentes.find((x) => x.id === c).proyectada;
 
-  cerca(comp('a', 'practicas'), (0.2 * 0.8 + 0.3 * (6 / 7) + 0.5 * 1) * 3);
-  cerca(comp('b', 'practicas'), (0.2 * 0.8 + 0.5 * 1) * 3, 'b faltó a P2: 0');
-  cerca(comp('c', 'practicas'), (0.2 * 1 + 0.3 * (3 / 7) + 0.5 * (5 / 8)) * 3);
+  cerca(comp('a', 'practicas'), (0.2 * (6 / 8) + 0.3 * (9 / 11) + 0.5 * 1) * 3);
+  cerca(comp('b', 'practicas'), (0.2 * (6 / 8) + 0.5 * 1) * 3, 'b faltó a P2: 0');
+  cerca(comp('c', 'practicas'), (0.2 * 1 + 0.3 * (3 / 11) + 0.5 * (7 / 12)) * 3);
   cerca(comp('a', 'trabajos_casa'), (0.4 * 0.85 + 0.25 * 0.65 + 0.35 * 1) * 2);
   cerca(comp('b', 'trabajos_casa'), (0.4 * 0.85 + 0.35 * 1) * 2, 'y 0 en el TC2 de su grupo');
   cerca(comp('c', 'trabajos_casa'), (0.25 * 1 + 0.35 * 0.7) * 2, 'su grupo no entregó el TC1');
   cerca(comp('c', 'talleres'), (0.75 + 1) / 2);
-  assert.deepEqual(['a', 'b', 'c'].map((id) => redondear(notaFinalDelBimestre(ctx, id, 1), 2)), [5.46, 4.36, 3.79]);
+  assert.deepEqual(['a', 'b', 'c'].map((id) => redondear(notaFinalDelBimestre(ctx, id, 1), 2)), [5.39, 4.33, 3.59]);
   // El control oral de SQI no tiene nota, pero sin él queda la observación al cerrar el bimestre.
   const columnas = columnasDeLaApp(cfg, ctx.curso, ctx.eventos);
   const v = (id) => valoresDelEstudiante(ctx, columnas, id, { hoy: HOY, grupos: grupoActual(ctx) });
@@ -221,13 +221,13 @@ test('PLIC (2.º bimestre): 0.5 si lo completó de forma válida, 0 si no y pend
 
 test('sesión sin clase: la actividad (y su TC) queda excluida y el componente se renormaliza; se puede deshacer', async () => {
   const k = await curso('GR1AA', { a: '1' });
-  await k.sesion('P1', { niveles: { 1: [2, 1, 1] } });                 // 0.8
-  await k.sesion('P3', { niveles: { 1: [2, 2, 1, 1, 0] } });           // 6/8
+  await k.sesion('P1', { niveles: { 1: [3, 1, 2] } });                 // 6/8
+  await k.sesion('P3', { niveles: { 1: [3, 3, 1, 2, 0] } });           // 9/12
   await marcarSinClase(k.db, 'GR1AA:P2', 'Suspensión de clases', AHORA);
   let { ctx } = await k.cargar();
   assert.deepEqual([ctx.eventoPorId.get('GR1AA:P2').estado, ctx.eventoPorId.get('GR1AA:TC2').estado], ['sin_clase', 'sin_clase']);
   const practicas = () => notaBimestre(ctx, 'a', 1).componentes.find((c) => c.id === 'practicas');
-  cerca(practicas().proyectada, ((0.2 * 0.8 + 0.5 * 0.75) / 0.7) * 3, 'P1 y P3 pesan 20/70 y 50/70');
+  cerca(practicas().proyectada, ((0.2 * 0.75 + 0.5 * 0.75) / 0.7) * 3, 'P1 y P3 pesan 20/70 y 50/70');
   await assert.rejects(marcarSinClase(k.db, 'GR1AA:P2', '  ', AHORA), /motivo/);
   await quitarCambioEvento(k.db, 'GR1AA:P2');
   ({ ctx } = await k.cargar());

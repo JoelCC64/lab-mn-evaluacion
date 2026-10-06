@@ -47,10 +47,10 @@ test('configuraciones reales de las primeras actividades (Anexos B, C, D y G)', 
   // P1 Clásica: tres secciones 20/30/50 con escala 0–4; el análisis es una sola sección.
   const p1 = configActividad(cfg, 'P1', 'TRAD');
   assert.deepEqual(p1.criterios.map((c) => [c.id, c.peso]), [['diseno', 0.2], ['datos', 0.3], ['analisis', 0.5]]);
-  // P1 SQI: máximo 5 (2 + 2 + 1).
+  // P1 SQI: máximo 8 (3 + 3 + 2).
   const p1s = configActividad(cfg, 'P1', 'SQI');
   const max = p1s.aspectos_aplicables.reduce((s, a) => s + Math.max(...cfg.sqi.aspectos[a].escala), 0);
-  assert.equal(max, 5);
+  assert.equal(max, 8);
 });
 
 test('el bimestre se asigna por actividad, no por fecha', () => {
