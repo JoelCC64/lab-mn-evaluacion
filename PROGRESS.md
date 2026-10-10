@@ -569,4 +569,5 @@ Pedido de Joel: un solo archivo por día con todo (notas, asistencia, etc.) para
 - Revisar con Joel los días del recordatorio de respaldo (`config/respaldo.json`, 2 por defecto).
 - Probar en el iPhone real: «Respaldo completo» y «Enviar eventos…» con la hoja de compartir (AirDrop a la Mac), y «Recibir eventos…» desde Archivos.
 
-- **0.12.2 (10-oct-2026): cambio de planificación de la universidad.** El refuerzo de errores pasa de la semana 3 a la 4; T1 (grupos A) y P1 (grupos B, con TC1 en SQI) pasan de la semana 4 a la 3. Solo cambiaron los 4 cronogramas (`config/cronogramas/`); los eventos se calculan desde ellos, así que no hay migración. Efecto: GR7EB (T1) y GR3QA (P1) caen en la Integración Politécnica de la semana 3 y pierden esa actividad con nota.
+- **0.12.2 (10-oct-2026): cambio de planificación de la universidad.** El refuerzo de errores pasa de la semana 3 a la 4; T1 (grupos A) y P1 (grupos B, con TC1 en SQI) pasan de la semana 4 a la 3. Solo cambiaron los 4 cronogramas (`config/cronogramas/`); los eventos se calculan desde ellos, así que no hay migración. Sin efecto sobre notas: ver la nota siguiente.
+- **0.12.3:** la Integración Politécnica se movió a la semana 4 (20–23-oct; `config/semestre-2026B.json`). Por eso el refuerzo pasó a esa semana: GR7EB y GR3QA solo pierden el refuerzo (sin nota); T1 y P1 se dictan completos en la semana 3.

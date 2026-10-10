@@ -40,8 +40,8 @@ test('las sesiones perdidas coinciden con el Anexo H.3', () => {
     GR2QB: ['T2', 'P5'], GR9EB: ['T2', 'P5'], GR3MB: ['T2', 'P5'],
     GR1AA: ['T2'], GR4EB: ['T2'],
     GR6CD: [], GR7SA: [],
-    GR7EB: ['T1'],
-    GR3QA: ['P1', 'T6'],
+    GR7EB: ['REFUERZO'],
+    GR3QA: ['REFUERZO', 'T6'],
     GR1QA: ['P6'],
   };
   for (const curso of cfg.cursos) {
@@ -54,10 +54,10 @@ test('motivos de los feriados y franjas de la Integración Politécnica', () => 
   const t2 = eventosDe('GR2QB').find((e) => e.codigo === 'T2');
   assert.equal(t2.motivo, 'Día de los Difuntos');
   assert.equal(eventosDe('GR1AA').find((e) => e.codigo === 'T2').motivo, 'Independencia de Cuenca');
-  // Integración Politécnica (13–16 oct): solo 07:00–09:00 y 14:00–16:00 tienen clase.
-  assert.equal(motivoSinClase(cfg, '2026-10-14', cfg.cursoPorId.GR7SA), null);
-  assert.equal(motivoSinClase(cfg, '2026-10-14', cfg.cursoPorId.GR7EB), 'Integración Politécnica');
-  assert.equal(motivoSinClase(cfg, '2026-10-12', cfg.cursoPorId.GR2QB), null); // el lunes 12 es normal
+  // Integración Politécnica (20–23 oct, semana 4): solo 07:00–09:00 y 14:00–16:00 tienen clase.
+  assert.equal(motivoSinClase(cfg, '2026-10-21', cfg.cursoPorId.GR7SA), null);
+  assert.equal(motivoSinClase(cfg, '2026-10-21', cfg.cursoPorId.GR7EB), 'Integración Politécnica');
+  assert.equal(motivoSinClase(cfg, '2026-10-19', cfg.cursoPorId.GR2QB), null); // el lunes 19 es normal
   assert.equal(motivoSinClase(cfg, '2026-12-30', cfg.cursoPorId.GR7SA), 'Receso');
 });
 

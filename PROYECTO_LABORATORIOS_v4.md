@@ -1203,7 +1203,7 @@ Cada TC suma 10 puntos y se registra pregunta por pregunta. En cada pregunta:
 
 ### H.2 Cronogramas (actividad y lugar por semana)
 
-> Cambio de la universidad (10-oct-2026): el refuerzo de errores pasó de la semana 3 a la 4, y T1 (A) y P1 (B) pasaron de la semana 4 a la 3. Tabla ya actualizada.
+> Cambio de la universidad (10-oct-2026): el refuerzo de errores pasó de la semana 3 a la 4, y T1 (A) y P1 (B) pasaron de la semana 4 a la 3. Tabla ya actualizada. La Integración Politécnica también pasó a la semana 4 (20–23/10), así que el refuerzo es la actividad que queda sin clase en GR7EB y GR3QA y T1/P1 se dictan completos.
 
 | Sem. | Fechas | A · Clásica | A · SQI | B · Clásica | B · SQI |
 |---|---|---|---|---|---|
@@ -1237,7 +1237,7 @@ Nombres de las actividades:
 | Fecha | Motivo | Cursos de Joel afectados | Actividad perdida |
 |---|---|---|---|
 | Vie 09/10 (sem. 2) | Independencia de Guayaquil | Ninguno | — |
-| Mar 13 a vie 16/10 (sem. 3) | Integración Politécnica: solo hay clases de 07:00–09:00 y 14:00–16:00 (el lunes 12 es normal) | GR7EB y GR3QA | T1 (GR7EB) y P1 (GR3QA): actividades con nota, por reprogramar |
+| Mar 20 a vie 23/10 (sem. 4) | Integración Politécnica (movida de la semana 3 a la 4 por la universidad): solo hay clases de 07:00–09:00 y 14:00–16:00 (el lunes 19 es normal) | GR7EB y GR3QA | Refuerzo (sin nota) |
 | Lun 02/11 y mar 03/11 (sem. 6) | Día de los Difuntos; Independencia de Cuenca | GR2QB, GR9EB, GR3MB, GR1AA y GR4EB | T2 |
 | Lun 07/12 (sem. 11) | Fundación de Quito | GR2QB, GR9EB y GR3MB | P5 |
 | Jue 24/12 y vie 25/12 (sem. 13) | Navidad | GR1QA y GR3QA | P6 (GR1QA); T6 (GR3QA) |
