@@ -25,11 +25,12 @@ test('cada curso tiene una sesión por semana de clase, en su día, con la activ
   }
 });
 
-test('cronogramas A y B: P1 en la semana 2 (A) o 4 (B); T1 en la 4 (A) o 2 (B)', () => {
+test('cronogramas A y B: P1 en la semana 2 (A) o 3 (B); T1 en la 3 (A) o 2 (B); el refuerzo, en la 4', () => {
   const a = eventosDe('GR2QB'), b = eventosDe('GR3QA');
   const sem = (ev, cod) => ev.find((e) => e.codigo === cod).semana;
-  assert.equal(sem(a, 'P1'), 2); assert.equal(sem(a, 'T1'), 4);
-  assert.equal(sem(b, 'P1'), 4); assert.equal(sem(b, 'T1'), 2);
+  assert.equal(sem(a, 'P1'), 2); assert.equal(sem(a, 'T1'), 3);
+  assert.equal(sem(b, 'P1'), 3); assert.equal(sem(b, 'T1'), 2);
+  assert.equal(sem(a, 'REFUERZO'), 4); assert.equal(sem(b, 'REFUERZO'), 4);
   assert.equal(eventosDe('GR2QB').find((e) => e.codigo === 'P1').fecha, '2026-10-05');
   assert.equal(eventosDe('GR1QA').find((e) => e.codigo === 'P1').fecha, '2026-10-08');
 });
@@ -39,8 +40,8 @@ test('las sesiones perdidas coinciden con el Anexo H.3', () => {
     GR2QB: ['T2', 'P5'], GR9EB: ['T2', 'P5'], GR3MB: ['T2', 'P5'],
     GR1AA: ['T2'], GR4EB: ['T2'],
     GR6CD: [], GR7SA: [],
-    GR7EB: ['REFUERZO'],
-    GR3QA: ['REFUERZO', 'T6'],
+    GR7EB: ['T1'],
+    GR3QA: ['P1', 'T6'],
     GR1QA: ['P6'],
   };
   for (const curso of cfg.cursos) {

@@ -632,7 +632,7 @@ Para un semestre nuevo: copiar `semestre-2026B.json` y `cursos-2026B.json`, actu
 - PLIC: 0.5 o 0.
 - Feriados: la actividad perdida no cuenta; si el estudiante la recupera, cuenta para él.
 - Fechas del archivo de notas para coordinación.
-- La semana 3 («refuerzo de errores») no forma parte de los esquemas de nota. Las tareas de «Refuerzo» de las guías de Clásica quedan fuera de la app.
+- La semana 4 («refuerzo de errores») no forma parte de los esquemas de nota. Las tareas de «Refuerzo» de las guías de Clásica quedan fuera de la app.
 
 **Por Joel (2 y 3 de octubre de 2026)**
 - La app se enfoca en evaluar y guardar calificaciones, en el Excel del semestre.
@@ -1203,12 +1203,14 @@ Cada TC suma 10 puntos y se registra pregunta por pregunta. En cada pregunta:
 
 ### H.2 Cronogramas (actividad y lugar por semana)
 
+> Cambio de la universidad (10-oct-2026): el refuerzo de errores pasó de la semana 3 a la 4, y T1 (A) y P1 (B) pasaron de la semana 4 a la 3. Tabla ya actualizada.
+
 | Sem. | Fechas | A · Clásica | A · SQI | B · Clásica | B · SQI |
 |---|---|---|---|---|---|
 | 1 | 28/09–02/10 | Introducción (aula) | Introducción y creación de grupos (aula) | Introducción (lab) | Introducción y creación de grupos (lab) |
 | 2 | 05/10–09/10 | P1 (lab) | P1 + TC1 (lab) | T1 (aula) | T1 (aula) |
-| 3 | 12/10–16/10 | Refuerzo de errores (aula) | Refuerzo de errores (aula) | Refuerzo de errores (lab) | Refuerzo de errores (lab) |
-| 4 | 19/10–23/10 | T1 (aula) | T1 (aula) | P1 (lab) | P1 + TC1 (lab) |
+| 3 | 12/10–16/10 | T1 (aula) | T1 (aula) | P1 (lab) | P1 + TC1 (lab) |
+| 4 | 19/10–23/10 | Refuerzo de errores (aula) | Refuerzo de errores (aula) | Refuerzo de errores (lab) | Refuerzo de errores (lab) |
 | 5 | 26/10–30/10 | P2 (lab) | P2 + TC2 (lab) | T2 (aula) | T2 (aula) |
 | 6 | 02/11–06/11 | T2 (aula) | T2 (aula) | P2 (lab) | P2 + TC2 (lab) |
 | 7 | 09/11–13/11 | P3 (lab) | P3 + TC3 (lab) | T3 (aula) | T3 (aula) |
@@ -1235,7 +1237,7 @@ Nombres de las actividades:
 | Fecha | Motivo | Cursos de Joel afectados | Actividad perdida |
 |---|---|---|---|
 | Vie 09/10 (sem. 2) | Independencia de Guayaquil | Ninguno | — |
-| Mar 13 a vie 16/10 (sem. 3) | Integración Politécnica: solo hay clases de 07:00–09:00 y 14:00–16:00 (el lunes 12 es normal) | GR7EB y GR3QA | Refuerzo (sin nota) |
+| Mar 13 a vie 16/10 (sem. 3) | Integración Politécnica: solo hay clases de 07:00–09:00 y 14:00–16:00 (el lunes 12 es normal) | GR7EB y GR3QA | T1 (GR7EB) y P1 (GR3QA): actividades con nota, por reprogramar |
 | Lun 02/11 y mar 03/11 (sem. 6) | Día de los Difuntos; Independencia de Cuenca | GR2QB, GR9EB, GR3MB, GR1AA y GR4EB | T2 |
 | Lun 07/12 (sem. 11) | Fundación de Quito | GR2QB, GR9EB y GR3MB | P5 |
 | Jue 24/12 y vie 25/12 (sem. 13) | Navidad | GR1QA y GR3QA | P6 (GR1QA); T6 (GR3QA) |
