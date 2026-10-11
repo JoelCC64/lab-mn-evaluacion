@@ -25,12 +25,11 @@ test('cada curso tiene una sesión por semana de clase, en su día, con la activ
   }
 });
 
-test('cronogramas A y B: P1 en la semana 2 (A) o 3 (B); T1 en la 3 (A) o 2 (B); el refuerzo, en la 4', () => {
+test('cronogramas A y B: P1 en la semana 2 (A) o 4 (B); T1 en la 4 (A) o 2 (B)', () => {
   const a = eventosDe('GR2QB'), b = eventosDe('GR3QA');
   const sem = (ev, cod) => ev.find((e) => e.codigo === cod).semana;
-  assert.equal(sem(a, 'P1'), 2); assert.equal(sem(a, 'T1'), 3);
-  assert.equal(sem(b, 'P1'), 3); assert.equal(sem(b, 'T1'), 2);
-  assert.equal(sem(a, 'REFUERZO'), 4); assert.equal(sem(b, 'REFUERZO'), 4);
+  assert.equal(sem(a, 'P1'), 2); assert.equal(sem(a, 'T1'), 4);
+  assert.equal(sem(b, 'P1'), 4); assert.equal(sem(b, 'T1'), 2);
   assert.equal(eventosDe('GR2QB').find((e) => e.codigo === 'P1').fecha, '2026-10-05');
   assert.equal(eventosDe('GR1QA').find((e) => e.codigo === 'P1').fecha, '2026-10-08');
 });
@@ -54,10 +53,10 @@ test('motivos de los feriados y franjas de la Integración Politécnica', () => 
   const t2 = eventosDe('GR2QB').find((e) => e.codigo === 'T2');
   assert.equal(t2.motivo, 'Día de los Difuntos');
   assert.equal(eventosDe('GR1AA').find((e) => e.codigo === 'T2').motivo, 'Independencia de Cuenca');
-  // Integración Politécnica (20–23 oct, semana 4): solo 07:00–09:00 y 14:00–16:00 tienen clase.
-  assert.equal(motivoSinClase(cfg, '2026-10-21', cfg.cursoPorId.GR7SA), null);
-  assert.equal(motivoSinClase(cfg, '2026-10-21', cfg.cursoPorId.GR7EB), 'Integración Politécnica');
-  assert.equal(motivoSinClase(cfg, '2026-10-19', cfg.cursoPorId.GR2QB), null); // el lunes 19 es normal
+  // Integración Politécnica (13–16 oct): solo 07:00–09:00 y 14:00–16:00 tienen clase.
+  assert.equal(motivoSinClase(cfg, '2026-10-14', cfg.cursoPorId.GR7SA), null);
+  assert.equal(motivoSinClase(cfg, '2026-10-14', cfg.cursoPorId.GR7EB), 'Integración Politécnica');
+  assert.equal(motivoSinClase(cfg, '2026-10-12', cfg.cursoPorId.GR2QB), null); // el lunes 12 es normal
   assert.equal(motivoSinClase(cfg, '2026-12-30', cfg.cursoPorId.GR7SA), 'Receso');
 });
 

@@ -4,8 +4,8 @@
   "semanas": [
     { "semana": 1,  "lugar": "lab",  "actividades": ["INTRO"] },
     { "semana": 2,  "lugar": "aula", "actividades": ["T1"] },
-    { "semana": 3,  "lugar": "lab",  "actividades": ["P1", "TC1"] },
-    { "semana": 4,  "lugar": "lab",  "actividades": ["REFUERZO"] },
+    { "semana": 3,  "lugar": "lab",  "actividades": ["REFUERZO"] },
+    { "semana": 4,  "lugar": "lab",  "actividades": ["P1", "TC1"] },
     { "semana": 5,  "lugar": "aula", "actividades": ["T2"] },
     { "semana": 6,  "lugar": "lab",  "actividades": ["P2", "TC2"] },
     { "semana": 7,  "lugar": "aula", "actividades": ["T3"] },
