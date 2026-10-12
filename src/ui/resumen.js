@@ -5,7 +5,7 @@ import { borrarAjuste, guardarAjuste } from '../datos/acciones.js';
 import { resumenEvento, unidadTrabajo } from '../nucleo/motor.js';
 import { sobreDiez, textoPuntos } from '../nucleo/motor-vista.js';
 import { esVisitante, eventoBase } from '../nucleo/grupos.js';
-import { RecuperacionDelEstudiante } from './recuperacion.js';
+import { RecuperacionDelEstudiante, RecuperacionesDelEvento } from './recuperacion.js';
 import { TarjetaVisitantes } from './visitantes.js';
 import { compararGrupos } from '../nucleo/util.js';
 import { controlCalifica, preparatorioCalifica } from '../nucleo/config.js';
@@ -57,6 +57,7 @@ export function Resumen({ ctx, evento }) {
     </div>
     <p class="tenue pequeno">As.: P presente · F falta · R se retiró antes. Nota sobre 10 · «…» pendiente · p = pendiente de nómina · v = de otro curso (recupera aquí). Toca una fila para ver el detalle, registrar una recuperación o un ajuste.</p>
     <${TarjetaVisitantes} ctx=${ctx} evento=${evento} />
+    ${evento.estado === 'normal' && evento.con_nota && !['trabajo_casa', 'plic'].includes(evento.tipo) && html`<${RecuperacionesDelEvento} ctx=${ctx} evento=${evento} directa=${true} />`}
     ${detalle && html`<${HojaDetalle} fila=${filas.find((f) => f.estudiante.id === detalle.estudiante.id) ?? detalle} evento=${evento} ctx=${ctx} cerrar=${() => setDetalle(null)} />`}`;
 }
 

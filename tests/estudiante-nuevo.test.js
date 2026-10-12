@@ -11,10 +11,11 @@ import { registrosDelCurso } from '../src/datos/consultas.js';
 import { aplicarExcelSemestre, planificarImportacion } from '../src/datos/importar.js';
 import {
   agregarEstudianteNuevo, agregarAlControl, cerrarPase, corregirEstudianteNuevo, guardarAjuste, guardarObservacion, guardarPuntaje,
-  puntuarPregunta, quitarEstudianteNuevo, pasarEstudianteAlCurso, sumarEstudianteAlCurso,
+  puntuarPregunta, quitarEstudianteNuevo, pasarEstudianteAlCurso, sumarEstudianteAlCurso, guardarRecuperacion, borrarRecuperacion,
 } from '../src/datos/acciones.js';
 import { generarEventos } from '../src/nucleo/calendario.js';
 import { activos, gruposDelEvento } from '../src/nucleo/grupos.js';
+import { crearContexto, notaEvento, resumenEvento } from '../src/nucleo/motor.js';
 import { configReal } from './ayudas.js';
 
 const cfg = configReal();
@@ -177,4 +178,26 @@ test('si el Excel trae al estudiante que pasó de curso, vuelve a ser de nómina
   await aplicarExcelSemestre(k.db, lectura, { ahora: AHORA });
   const e = await k.db.estudiantes.get('202620777');
   assert.deepEqual([e.curso, e.estado, e.agregado, e.viene_de, e.numero], ['GR2QB', 'nomina', null, null, 9]);
+});
+
+test('nota de otro profesor: el estudiante recupera fuera, la nota cuenta como la del evento sin grupo ni pase cerrado', async () => {
+  const k = await curso();
+  const evento = (await k.cargar()).eventos.find((e) => e.codigo === 'P1');
+  const nota = async (id) => {
+    const { reg, eventos } = await k.cargar();
+    return notaEvento(crearContexto(cfg, cfg.cursoPorId.GR2QB, eventos, reg), eventos.find((e) => e.id === evento.id), id);
+  };
+  assert.equal((await nota('a')).estado, 'pendiente', 'sin pase cerrado ni nada, está pendiente');
+  await guardarRecuperacion(k.db, evento.id, 'a', { estado: 'realizada', nota: 0.85, detalle: 'Prof. Pérez, jue 15 oct', motivo: 'justificada' }, AHORA);
+  const n = await nota('a');
+  assert.deepEqual([n.estado, n.valor], ['calculada', 0.85]);
+  assert.match(n.motivo, /recuperada en otra sesión \(Prof\. Pérez/);
+  assert.equal((await nota('b')).estado, 'pendiente', 'los demás no cambian');
+  assert.equal(await k.db.grupos_evento.count(), 0, 'no se creó ningún grupo');
+  const { reg, eventos } = await k.cargar();
+  const fila = resumenEvento(crearContexto(cfg, cfg.cursoPorId.GR2QB, eventos, reg), eventos.find((e) => e.id === evento.id)).filas.find((f) => f.estudiante.id === 'a');
+  assert.equal(fila.nota.valor, 0.85);
+  await assert.rejects(guardarRecuperacion(k.db, evento.id, 'a', { estado: 'realizada', nota: 8 }), /entre 0 y 10/);
+  await borrarRecuperacion(k.db, evento.id, 'a');
+  assert.equal((await nota('a')).estado, 'pendiente');
 });

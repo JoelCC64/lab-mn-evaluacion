@@ -17,10 +17,10 @@ export function textoRecuperacion(rec) {
 }
 
 /** Hoja para registrar o corregir la recuperación de un estudiante en un evento. */
-export function HojaRecuperacion({ evento, estudiante, actual, alCerrar }) {
+export function HojaRecuperacion({ evento, estudiante, actual, alCerrar, directa = false }) {
   const { db, avisar } = useApp();
   const feriado = evento.estado !== 'normal';
-  const [estado, setEstado] = useState(actual?.estado ?? (feriado ? 'realizada' : 'solicitada'));
+  const [estado, setEstado] = useState(actual?.estado ?? (feriado || directa ? 'realizada' : 'solicitada'));
   const [nota, setNota] = useState(actual?.nota !== null && actual?.nota !== undefined ? String(redondear(actual.nota * 10, 2)) : '');
   const [detalle, setDetalle] = useState(actual?.detalle ?? '');
   const opciones = [['solicitada', 'Solicitada'], ['realizada', 'Realizada'], ...(feriado ? [] : [['no_asistio', 'No asistió · 0']])];
@@ -38,7 +38,9 @@ export function HojaRecuperacion({ evento, estudiante, actual, alCerrar }) {
       <${Persona} estudiante=${estudiante} />
       <p class="tenue pequeno">${feriado
         ? `${evento.codigo} no se hizo en este curso (${evento.motivo}). Recuperarla es opcional: si la recupera, cuenta en su nota.`
-        : 'Falta justificada: recupera en otra sesión. Mientras tanto su nota queda pendiente; si no asiste a la recuperación programada, 0.'}</p>
+        : directa
+          ? 'Recuperó con otro profesor y te envió su nota final. No hace falta ponerlo en un grupo: esta nota es la de este evento.'
+          : 'Falta justificada: recupera en otra sesión. Mientras tanto su nota queda pendiente; si no asiste a la recuperación programada, 0.'}</p>
       <div class="segmentado" role="group" aria-label="Estado de la recuperación">
         ${opciones.map(([id, texto]) => html`
           <button class=${estado === id ? `elegido ${id === 'realizada' ? 'ok' : id === 'no_asistio' ? 'mal' : 'aviso'}` : ''} onClick=${() => setEstado(id)}>${texto}</button>`)}
@@ -46,8 +48,8 @@ export function HojaRecuperacion({ evento, estudiante, actual, alCerrar }) {
       ${estado === 'realizada' && html`
         <div class="campo"><label>Nota recibida (sobre 10)</label>
           <input class="entrada" inputmode="decimal" placeholder="0–10" value=${nota} onInput=${(e) => setNota(e.currentTarget.value)} /></div>`}
-      <div class="campo"><label>Dónde y cuándo (opcional)</label>
-        <input class="entrada" placeholder="Ej.: GR3QA, jue 15 oct" value=${detalle} onInput=${(e) => setDetalle(e.currentTarget.value)} /></div>
+      <div class="campo"><label>Con quién, dónde y cuándo (opcional)</label>
+        <input class="entrada" placeholder="Ej.: Prof. Pérez, GR3QA, jue 15 oct" value=${detalle} onInput=${(e) => setDetalle(e.currentTarget.value)} /></div>
       ${!feriado && estado !== 'realizada' && html`<p class="tenue pequeno">${estado === 'solicitada' ? 'Nota y preparatorio de esta sesión: pendientes.' : 'Nota y preparatorio de esta sesión: 0.'}</p>`}
       ${!feriado && estado === 'realizada' && html`<p class="tenue pequeno">El preparatorio de esta sesión no se cuenta en su promedio (lo revisa la sesión de recuperación).</p>`}
       <div class="botones">
@@ -62,13 +64,13 @@ export function HojaRecuperacion({ evento, estudiante, actual, alCerrar }) {
  * Recuperaciones de un evento que no se hizo en el curso (feriado o sin clase): las registradas y un buscador
  * para agregar otra.
  */
-export function RecuperacionesDelEvento({ ctx, evento }) {
+export function RecuperacionesDelEvento({ ctx, evento, directa = false }) {
   const [abierta, setAbierta] = useState(null);
   const registradas = ctx.reg.recuperaciones.filter((r) => r.evento === evento.id);
   const porId = ctx.estudiantePorId;
   if (!evento.con_nota) return null;
   return html`
-    <div class="seccion-titulo">Recuperaciones · ${registradas.length}</div>
+    <div class="seccion-titulo">${directa ? 'Notas de otros profesores' : 'Recuperaciones'} · ${registradas.length}</div>
     ${registradas.length > 0 && html`
       <div class="lista">
         ${registradas.map((r) => {
@@ -79,22 +81,23 @@ export function RecuperacionesDelEvento({ ctx, evento }) {
             </button>`;
         })}
       </div>`}
-    <p class="tenue pequeno">Si alguien recupera ${evento.codigo} en otra sesión, búscalo y registra la nota recibida:</p>
+    <p class="tenue pequeno">${directa
+      ? `Si alguien recuperó ${evento.codigo} con otro profesor y te envió su nota final, búscalo y regístrala. No necesita grupo:`
+      : `Si alguien recupera ${evento.codigo} en otra sesión, búscalo y registra la nota recibida:`}</p>
     <${BuscarEstudiante} estudiantes=${activos(ctx.reg.estudiantes)} alElegir=${(e) => setAbierta({ estudiante: e, actual: ctx.recuperaciones.get(`${evento.id}|${e.id}`) ?? null })} />
-    ${abierta && html`<${HojaRecuperacion} evento=${evento} estudiante=${abierta.estudiante} actual=${abierta.actual} alCerrar=${() => setAbierta(null)} />`}`;
+    ${abierta && html`<${HojaRecuperacion} evento=${evento} estudiante=${abierta.estudiante} actual=${abierta.actual} directa=${directa} alCerrar=${() => setAbierta(null)} />`}`;
 }
 
 /** Parte de la hoja de detalle de un estudiante (resumen del evento): su recuperación o el botón para registrarla. */
 export function RecuperacionDelEstudiante({ ctx, evento, estudiante, falta }) {
   const [abierta, setAbierta] = useState(false);
   const rec = ctx.recuperaciones.get(`${evento.id}|${estudiante.id}`) ?? null;
-  if (!rec && !falta) return null;
   return html`
     <div class="tarjeta">
       <div class="separado"><h3>Recuperación</h3>${rec && html`<${Chip} tono=${rec.estado === 'realizada' ? 'ok' : rec.estado === 'no_asistio' ? 'mal' : 'aviso'}>${textoRecuperacion(rec)}<//>`}</div>
-      ${!rec && html`<p class="tenue pequeno">Si la falta es justificada (Bienestar Estudiantil) y recupera en otra sesión, regístralo aquí.</p>`}
-      <button class="boton ancho" onClick=${() => setAbierta(true)}>${rec ? 'Corregir la recuperación' : 'Registrar recuperación…'}</button>
+      ${!rec && html`<p class="tenue pequeno">${falta ? 'Si la falta es justificada (Bienestar Estudiantil) y recupera en otra sesión, regístralo aquí.' : 'Si recuperó con otro profesor y te envió su nota final, regístrala aquí (sin grupo).'}</p>`}
+      <button class="boton ancho" onClick=${() => setAbierta(true)}>${rec ? 'Corregir la recuperación' : 'Registrar nota de otro profesor…'}</button>
     </div>
-    ${abierta && html`<${HojaRecuperacion} evento=${evento} estudiante=${estudiante} actual=${rec} alCerrar=${() => setAbierta(false)} />`}`;
+    ${abierta && html`<${HojaRecuperacion} evento=${evento} estudiante=${estudiante} actual=${rec} directa=${!falta} alCerrar=${() => setAbierta(false)} />`}`;
 }
 
