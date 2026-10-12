@@ -11,7 +11,7 @@ import { registrosDelCurso } from '../src/datos/consultas.js';
 import { aplicarExcelSemestre, planificarImportacion } from '../src/datos/importar.js';
 import {
   agregarEstudianteNuevo, agregarAlControl, cerrarPase, corregirEstudianteNuevo, guardarAjuste, guardarObservacion, guardarPuntaje,
-  puntuarPregunta, quitarEstudianteNuevo,
+  puntuarPregunta, quitarEstudianteNuevo, pasarEstudianteAlCurso, sumarEstudianteAlCurso,
 } from '../src/datos/acciones.js';
 import { generarEventos } from '../src/nucleo/calendario.js';
 import { activos, gruposDelEvento } from '../src/nucleo/grupos.js';
@@ -131,4 +131,50 @@ test('estudiante nuevo mal escrito: se corrige el nombre y el código, y lo regi
   await assert.rejects(corregirEstudianteNuevo(k.db, nuevo, { codigo: 'a', nombre: 'X' }), /solo números/);
   await assert.rejects(corregirEstudianteNuevo(k.db, nuevo, { codigo: '202620777', nombre: 'X' }), /ya es de OTRO CURSO/);
   await assert.rejects(corregirEstudianteNuevo(k.db, 'a', { codigo: 'a', nombre: 'X' }), /en el Excel/);
+});
+
+test('desde la pantalla del curso: un estudiante nuevo entra pendiente y sin grupo; no se repite ni se pisa el de otro curso', async () => {
+  const k = await curso();
+  const id = await sumarEstudianteAlCurso(k.db, 'GR2QB', { codigo: ' 2026 21888 ', nombre: ' lópez  vera  ana ' }, AHORA);
+  const e = await k.db.estudiantes.get(id);
+  assert.deepEqual([e.id, e.nombre, e.curso, e.estado, e.agregado, e.grupo_excel], ['202621888', 'LÓPEZ VERA ANA', 'GR2QB', 'pendiente', AHORA, null]);
+  assert.equal(await k.db.asistencia.count(), 0, 'no se marca asistencia: no hay evento');
+  assert.ok(activos((await k.cargar()).reg.estudiantes).some((x) => x.id === id));
+  await assert.rejects(sumarEstudianteAlCurso(k.db, 'GR2QB', { codigo: '202621888', nombre: 'X' }), /ya está en este curso/);
+  await assert.rejects(sumarEstudianteAlCurso(k.db, 'GR2QB', { codigo: '202620777', nombre: 'X' }), /De mis otros cursos/);
+  await assert.rejects(sumarEstudianteAlCurso(k.db, 'GR2QB', { codigo: 'a', nombre: 'X' }), /solo números/);
+});
+
+test('estudiante de otro de mis cursos: pasa de curso, conserva lo de allá y se devuelve como estaba', async () => {
+  const k = await curso();
+  await k.db.asistencia.put({ evento: 'GR1AA:P1', estudiante: '202620777', estado: 'no_vino', motivo: null, observacion: null, fecha: AHORA });
+  const e = await pasarEstudianteAlCurso(k.db, '202620777', 'GR2QB', AHORA);
+  assert.deepEqual([e.curso, e.estado, e.agregado, e.grupo_excel, e.viene_de.curso, e.viene_de.estado, e.viene_de.grupo_excel], ['GR2QB', 'pendiente', AHORA, null, 'GR1AA', 'nomina', '1']);
+  assert.ok(activos((await k.cargar()).reg.estudiantes).some((x) => x.id === '202620777'), 'cuenta aquí');
+  assert.equal((await k.db.asistencia.get(['GR1AA:P1', '202620777'])).estado, 'no_vino', 'lo de GR1AA se conserva');
+  await assert.rejects(pasarEstudianteAlCurso(k.db, '202620777', 'GR2QB'), /ya está en GR2QB/);
+  await assert.rejects(corregirEstudianteNuevo(k.db, '202620777', { codigo: '202629999', nombre: 'X' }), /Viene de GR1AA/);
+  await corregirEstudianteNuevo(k.db, '202620777', { codigo: '202620777', nombre: 'otro nombre' }, AHORA);
+  assert.equal((await k.db.estudiantes.get('202620777')).nombre, 'OTRO NOMBRE');
+
+  await quitarEstudianteNuevo(k.db, '202620777');
+  const v = await k.db.estudiantes.get('202620777');
+  assert.deepEqual([v.curso, v.estado, v.grupo_excel, v.numero, v.agregado ?? null, v.viene_de], ['GR1AA', 'nomina', '1', 1, null, null]);
+  assert.equal((await k.db.asistencia.get(['GR1AA:P1', '202620777'])).estado, 'no_vino');
+});
+
+test('estudiante de baja o inexistente no se pasa de curso', async () => {
+  const k = await curso();
+  await k.db.estudiantes.update('a', { estado: 'baja' });
+  await assert.rejects(pasarEstudianteAlCurso(k.db, 'a', 'GR1AA'), /de baja/);
+  await assert.rejects(pasarEstudianteAlCurso(k.db, 'zzz', 'GR1AA'), /no está en la lista/);
+});
+
+test('si el Excel trae al estudiante que pasó de curso, vuelve a ser de nómina en el curso del Excel (sin rastro de viene_de)', async () => {
+  const k = await curso();
+  await pasarEstudianteAlCurso(k.db, '202620777', 'GR2QB', AHORA);
+  const lectura = { cursos: { GR2QB: { estudiantes: [{ codigo: '202620777', nombre: 'OTRO CURSO', pendiente: false, grupo: '3', observacion: null, numero: 9 }] } } };
+  await aplicarExcelSemestre(k.db, lectura, { ahora: AHORA });
+  const e = await k.db.estudiantes.get('202620777');
+  assert.deepEqual([e.curso, e.estado, e.agregado, e.viene_de, e.numero], ['GR2QB', 'nomina', null, null, 9]);
 });

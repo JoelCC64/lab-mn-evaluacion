@@ -1,7 +1,7 @@
 // Curso: el evento de esta semana, todos los eventos por bimestre (con su estado) y los estudiantes.
 import { useState } from '../vendor/preact-htm.js';
 import { html, useApp, Pantalla, Chip, ChipMetodologia, Aviso, Cargando, enlace, Persona } from './base.js';
-import { HojaCorregirNuevo } from './estudiante-nuevo.js';
+import { HojaAgregarEstudiante, HojaCorregirNuevo } from './estudiante-nuevo.js';
 import { useCurso, textoBimestre, horario } from './curso-datos.js';
 import { nombreEvento } from './evento.js';
 import { eventoSugerido, semanaDeFecha } from '../nucleo/calendario.js';
@@ -49,7 +49,7 @@ export function Curso({ paralelo }) {
       ${porBimestre.map(({ b, eventos: lista }) => html`
         <div class="seccion-titulo">${textoBimestre(b)}</div>
         <div class="lista">${lista.map((e) => html`<${FilaEvento} evento=${e} ctx=${ctx} />`)}</div>`)}
-      <${Estudiantes} estudiantes=${reg.estudiantes} />
+      <${Estudiantes} paralelo=${paralelo} estudiantes=${reg.estudiantes} />
     <//>`;
 }
 
@@ -96,8 +96,9 @@ function TarjetaNotas({ ctx, paralelo, enCurso, hoy }) {
     </a>`;
 }
 
-function Estudiantes({ estudiantes }) {
+function Estudiantes({ paralelo, estudiantes }) {
   const [abierto, setAbierto] = useState(false);
+  const [agregando, setAgregando] = useState(false);
   const [corrigiendo, setCorrigiendo] = useState(null);
   const activos = delCurso(estudiantes);
   const bajas = estudiantes.filter((e) => e.estado === 'baja');
@@ -111,10 +112,12 @@ function Estudiantes({ estudiantes }) {
       <div class="lista">
         ${[...orden, ...bajas].map((e) => html`
           <div class="fila">
-            <${Persona} estudiante=${e} detalle=${e.agregado ? null : e.grupo_excel ? html`<span>· grupo del Excel ${e.grupo_excel}</span>` : html`<span>· sin grupo en el Excel</span>`} />
+            <${Persona} estudiante=${e} detalle=${e.viene_de ? html`<span>· viene de ${e.viene_de.curso}</span>` : e.agregado ? null : e.grupo_excel ? html`<span>· grupo del Excel ${e.grupo_excel}</span>` : html`<span>· sin grupo en el Excel</span>`} />
             ${e.agregado && html`<button class="boton chico" onClick=${() => setCorrigiendo(e)}>Corregir</button>`}
           </div>`)}
       </div>
+      <button class="boton ancho" onClick=${() => setAgregando(true)}>Agregar un estudiante</button>
+      ${agregando && html`<${HojaAgregarEstudiante} paralelo=${paralelo} alCerrar=${() => setAgregando(false)} />`}
       ${corrigiendo && html`<${HojaCorregirNuevo} estudiante=${corrigiendo} alCerrar=${() => setCorrigiendo(null)} />`}
       <p class="tenue pequeno">Los grupos del Excel solo sirven para el primer evento; después mandan los grupos de la app.</p>`}`;
 }

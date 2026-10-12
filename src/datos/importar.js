@@ -31,6 +31,7 @@ export async function planificarImportacion(db, lectura) {
         observacion_excel: f.observacion,
         numero: f.numero,
         agregado: null,   // si se había agregado en la app, desde ahora viene del Excel
+        viene_de: null,
       };
       contar(paralelo, 'total');
       if (f.pendiente) contar(paralelo, 'pendientes');

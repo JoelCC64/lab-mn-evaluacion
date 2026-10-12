@@ -410,6 +410,47 @@ export async function agregarEstudianteNuevo(db, evento, grupos, grupo, { codigo
 }
 
 /**
+ * Suma al curso, desde la pantalla del curso (sin evento), a un estudiante que no está en el Excel: por ejemplo, de
+ * matrícula extraordinaria o de un curso de otro docente. Queda «pendiente» y sin grupo; el primer evento al que venga
+ * lo pone en un grupo. Devuelve su id (el código).
+ */
+export async function sumarEstudianteAlCurso(db, curso, { codigo, nombre }, ahora = ahoraISO()) {
+  const datos = { codigo: String(codigo ?? '').replace(/\s+/g, ''), nombre: limpiar(nombre).toUpperCase() };
+  if (!datos.codigo || !datos.nombre) throw new Error('Hacen falta el código y los apellidos y nombres.');
+  if (datos.nombre.includes('@')) throw new Error('La app no guarda correos.');
+  if (!/^\d{6,12}$/.test(datos.codigo)) throw new Error('El código único lleva solo números (por ejemplo, 202620123).');
+  const antes = await db.estudiantes.get(datos.codigo);
+  if (antes && antes.estado !== 'baja') {
+    throw new Error(antes.curso === curso
+      ? `${antes.nombre} ya está en este curso.`
+      : `El código ${datos.codigo} ya está en ${antes.curso} (${antes.nombre}): para traerlo usa «De mis otros cursos».`);
+  }
+  await db.estudiantes.put({
+    id: datos.codigo, codigo: datos.codigo, nombre: datos.nombre, curso, estado: 'pendiente', grupo_excel: null, numero: null,
+    observacion_excel: null, agregado: ahora, actualizado: ahora, viene_de: null,
+  });
+  return datos.codigo;
+}
+
+/**
+ * Pasa a este curso a un estudiante de otro de mis cursos (por ejemplo, un cambio de paralelo). Cambia su curso y lo deja
+ * «pendiente» y sin grupo; lo que se le registró en los eventos del curso anterior se conserva ahí (los eventos tienen el
+ * curso en su id) y `viene_de` guarda cómo estaba para poder devolverlo. Devuelve el estudiante ya cambiado.
+ */
+export async function pasarEstudianteAlCurso(db, id, curso, ahora = ahoraISO()) {
+  const e = await db.estudiantes.get(id);
+  if (!e || e.estado === 'visitante') throw new Error('Ese estudiante no está en la lista de tus cursos.');
+  if (e.curso === curso && e.estado !== 'baja') throw new Error(`${e.nombre} ya está en ${curso}.`);
+  if (e.estado === 'baja') throw new Error(`${e.nombre} está de baja en ${e.curso}: agrégalo como estudiante nuevo.`);
+  const nuevo = {
+    ...e, curso, estado: 'pendiente', grupo_excel: null, numero: null, observacion_excel: null, agregado: ahora, actualizado: ahora,
+    viene_de: { curso: e.curso, estado: e.estado, grupo_excel: e.grupo_excel ?? null, numero: e.numero ?? null, observacion_excel: e.observacion_excel ?? null, agregado: e.agregado ?? null },
+  };
+  await db.estudiantes.put(nuevo);
+  return nuevo;
+}
+
+/**
  * Corrige el código o el nombre de un estudiante agregado en la app. Si cambia el código (que es su id), todo lo que
  * se le registró pasa al código nuevo. Devuelve el id (nuevo o el mismo).
  */
@@ -424,6 +465,7 @@ export async function corregirEstudianteNuevo(db, id, { codigo, nombre }, ahora 
     await db.estudiantes.update(id, { nombre: datos.nombre, actualizado: ahora });
     return id;
   }
+  if (e.viene_de) throw new Error(`Viene de ${e.viene_de.curso}: su código no se cambia aquí (lo registrado allá quedaría con el código viejo).`);
   const otro = await db.estudiantes.get(datos.codigo);
   if (otro) throw new Error(`El código ${datos.codigo} ya es de ${otro.nombre} (${otro.curso}).`);
   const tablas = TABLAS_DE_EVENTO.filter((t) => t !== 'cambios_evento');
@@ -453,7 +495,13 @@ export async function quitarEstudianteNuevo(db, id) {
   if (!e?.agregado) throw new Error('Solo se quitan así los estudiantes agregados en la app.');
   const tablas = TABLAS_DE_EVENTO.filter((t) => t !== 'cambios_evento');
   await db.transaction('rw', [db.estudiantes, ...tablas.map((t) => db.table(t))], async () => {
-    await db.estudiantes.delete(id);
+    // Si venía de otro de mis cursos, vuelve a él como estaba; si no, se borra.
+    if (e.viene_de) {
+      const { curso, ...resto } = e.viene_de;
+      await db.estudiantes.put({ ...e, curso, ...resto, viene_de: null, actualizado: ahoraISO() });
+    } else {
+      await db.estudiantes.delete(id);
+    }
     for (const t of tablas) {
       await db.table(t).filter((f) => f.evento?.startsWith(`${e.curso}:`) && (f.estudiante === id || (f.unidad === 'estudiante' && f.unidad_id === id))).delete();
     }
