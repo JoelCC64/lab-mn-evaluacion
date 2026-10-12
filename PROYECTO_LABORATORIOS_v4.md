@@ -1235,7 +1235,7 @@ Nombres de las actividades:
 | Fecha | Motivo | Cursos de Joel afectados | Actividad perdida |
 |---|---|---|---|
 | Vie 09/10 (sem. 2) | Independencia de Guayaquil | Ninguno | — |
-| Mar 13 a vie 16/10 (sem. 3) | Integración Politécnica: solo hay clases de 07:00–09:00 y 14:00–16:00 (el lunes 12 es normal) | GR7EB y GR3QA | Refuerzo (sin nota) |
+| (antes: 13–16/10, sem. 3) | La Integración Politécnica quedó suspendida hasta nuevo aviso (11-oct-2026): las clases se mantienen | Ninguno | — |
 | Lun 02/11 y mar 03/11 (sem. 6) | Día de los Difuntos; Independencia de Cuenca | GR2QB, GR9EB, GR3MB, GR1AA y GR4EB | T2 |
 | Lun 07/12 (sem. 11) | Fundación de Quito | GR2QB, GR9EB y GR3MB | P5 |
 | Jue 24/12 y vie 25/12 (sem. 13) | Navidad | GR1QA y GR3QA | P6 (GR1QA); T6 (GR3QA) |
@@ -1253,8 +1253,6 @@ Nombres de las actividades:
   "semestre": "2026B", "inicio": "2026-09-28", "semanas": 19,
   "feriados": [
     { "fecha": "2026-10-09", "motivo": "Independencia de Guayaquil" },
-    { "desde": "2026-10-13", "hasta": "2026-10-16", "motivo": "Integración Politécnica",
-      "franjas_con_clase": ["07:00-09:00", "14:00-16:00"] },
     { "fecha": "2026-11-02", "motivo": "Día de los Difuntos" },
     { "fecha": "2026-11-03", "motivo": "Independencia de Cuenca" },
     { "fecha": "2026-12-07", "motivo": "Fundación de Quito" },

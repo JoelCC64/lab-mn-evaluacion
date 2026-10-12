@@ -14,6 +14,7 @@ import { ACEPTA_EXCEL, abrirLibro, elegirArchivo } from './archivos.js';
 import { AjusteProfesor } from './dispositivo.js';
 import { simularClases } from '../datos/simulacion.js';
 import { VERSION_APP } from '../version.js';
+import { buscarVersionNueva } from './pwa.js';
 
 const ARCHIVO_DEMO = 'datos-ejemplo/Cursos_Lab_MN_2026B_EJEMPLO.xlsx';
 const ASISTENCIA_DEMO = 'datos-ejemplo/Asistencia_Semana1_EJEMPLO.xlsx';
@@ -25,6 +26,17 @@ export function Datos() {
   const [ocupado, setOcupado] = useState(null);
   const { ultimoRespaldo: ultimo, pendiente, dias, vencido } = useEstadoRespaldo(db.name, cfg.respaldo.recordatorio_dias);
   const { entregar, hoja } = useEntrega();
+
+  async function buscarActualizacion() {
+    try {
+      const r = await buscarVersionNueva();
+      if (r === 'nueva') avisar('Hay una versión nueva: toca «Actualizar» en la banda de arriba.', 'ok');
+      else if (r === 'al_dia') avisar(`La app está al día (versión ${VERSION_APP}).`, 'ok');
+      else avisar('Este navegador no guarda la app para usarla sin conexión: no hay nada que actualizar.', '');
+    } catch (e) {
+      avisar('No se pudo buscar (¿sin conexión?). Inténtalo de nuevo con internet.', 'mal');
+    }
+  }
 
   async function conOcupado(texto, f) {
     setOcupado(texto);
@@ -170,6 +182,7 @@ export function Datos() {
             <tr><td>Registros de clase</td><td class="num">${conteo ? Object.entries(conteo).filter(([k]) => !['estudiantes', 'importaciones', 'meta'].includes(k)).reduce((s, [, v]) => s + v, 0) : '…'}</td></tr>
           </tbody>
         </table>
+        <button class="boton ancho" onClick=${buscarActualizacion}>Buscar una versión nueva de la app</button>
         ${demo
           ? html`
             <button class="boton peligro ancho" onClick=${() => setVista({ tipo: 'borrar' })}>Borrar los datos de la demostración</button>

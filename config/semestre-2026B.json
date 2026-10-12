@@ -5,8 +5,6 @@
   "metodologias": { "TRAD": "Clásica", "SQI": "SQI" },
   "feriados": [
     { "fecha": "2026-10-09", "motivo": "Independencia de Guayaquil" },
-    { "desde": "2026-10-13", "hasta": "2026-10-16", "motivo": "Integración Politécnica",
-      "franjas_con_clase": ["07:00-09:00", "14:00-16:00"] },
     { "fecha": "2026-11-02", "motivo": "Día de los Difuntos" },
     { "fecha": "2026-11-03", "motivo": "Independencia de Cuenca" },
     { "fecha": "2026-12-07", "motivo": "Fundación de Quito" },
