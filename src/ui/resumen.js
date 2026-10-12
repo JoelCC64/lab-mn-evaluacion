@@ -10,7 +10,11 @@ import { TarjetaVisitantes } from './visitantes.js';
 import { compararGrupos } from '../nucleo/util.js';
 import { controlCalifica, preparatorioCalifica } from '../nucleo/config.js';
 
-const TEXTO_ASISTENCIA = { presente: 'P', no_vino: 'F', salio: 'F', se_retiro_antes: 'R' };
+// R = recuperó con otro profesor (aunque no vino, hizo la actividad); se retiró antes es «RA».
+const TEXTO_ASISTENCIA = { presente: 'P', no_vino: 'F', salio: 'F', se_retiro_antes: 'RA' };
+const recupero = (ctx, evento, id) => ctx.recuperaciones.get(`${evento.id}|${id}`)?.estado === 'realizada';
+const recuperoSinVenir = (ctx, evento, f) => recupero(ctx, evento, f.estudiante.id) && !['presente', 'se_retiro_antes'].includes(f.asistencia.estado);
+const marcaAsistencia = (ctx, evento, f) => (recuperoSinVenir(ctx, evento, f) ? 'R' : (TEXTO_ASISTENCIA[f.asistencia.estado] ?? '·'));
 
 export function Resumen({ ctx, evento }) {
   const { cfg } = useApp();
@@ -23,6 +27,7 @@ export function Resumen({ ctx, evento }) {
   const orden = [...filas].sort((a, b) => compararGrupos(a.grupo ?? '999', b.grupo ?? '999') || a.estudiante.nombre.localeCompare(b.estudiante.nombre, 'es'));
   const presentes = filas.filter((f) => ['presente', 'se_retiro_antes'].includes(f.asistencia.estado)).length;
   const faltas = filas.filter((f) => f.asistencia.falta).length;
+  const recuperaron = filas.filter((f) => recuperoSinVenir(ctx, evento, f)).length;
   const pendientes = filas.filter((f) => f.nota.estado === 'pendiente').length;
   // Un TC usa la asistencia de su práctica.
   const enPractica = evento.tipo === 'trabajo_casa' ? ` en ${eventoBase(evento, ctx.eventos).codigo}` : '';
@@ -32,6 +37,7 @@ export function Resumen({ ctx, evento }) {
     <div class="resumen-numeros">
       <div><b>${presentes}</b><span>presentes${enPractica}</span></div>
       <div><b>${faltas}</b><span>faltas${enPractica}</span></div>
+      ${recuperaron > 0 && html`<div><b>${recuperaron}</b><span>recuperaron (R)</span></div>`}
       ${conNota && html`<div><b>${pendientes}</b><span>notas pendientes</span></div>`}
     </div>
     <div class="lista desplazable">
@@ -47,7 +53,7 @@ export function Resumen({ ctx, evento }) {
                 <span class="nombres">${nombres(f.estudiante.nombre)}</span>
                 ${motivoFila(f) && html`<span class="motivo">${motivoFila(f)}</span>`}</td>
               <td class="num">${f.grupo ?? '–'}</td>
-              <td class="num">${TEXTO_ASISTENCIA[f.asistencia.estado] ?? '·'}</td>
+              <td class=${`num ${marcaAsistencia(ctx, evento, f) === 'R' ? 'recupero' : ''}`} title=${marcaAsistencia(ctx, evento, f) === 'R' ? 'Recuperó con otro profesor' : ''}>${marcaAsistencia(ctx, evento, f)}</td>
               ${conNota && html`<td class="num negrita">${f.nota.estado === 'calculada' ? sobreDiez(f.nota.valor) : f.nota.estado === 'excluido' ? '—' : '…'}</td>`}
               ${conPrep && html`<td class="num">${f.preparatorio.estado === 'calculada' ? f.preparatorio.nivel : '…'}</td>`}
               ${conControl && html`<td class="num">${f.control.estado === 'calculada' ? (ctrlNota ? sobreDiez(f.control.valor) : (f.control.aprobado ? '✓' : '✗')) : f.control.estado === 'no_esta' ? 'n/e' : ''}</td>`}
@@ -55,7 +61,7 @@ export function Resumen({ ctx, evento }) {
         </tbody>
       </table>
     </div>
-    <p class="tenue pequeno">As.: P presente · F falta · R se retiró antes. Nota sobre 10 · «…» pendiente · p = pendiente de nómina · v = de otro curso (recupera aquí). Toca una fila para ver el detalle, registrar una recuperación o un ajuste.</p>
+    <p class="tenue pequeno">As.: P presente · F falta · R recuperó con otro profesor · RA se retiró antes. Nota sobre 10 · «…» pendiente · p = pendiente de nómina · v = de otro curso (recupera aquí). Toca una fila para ver el detalle, registrar una recuperación o un ajuste.</p>
     <${TarjetaVisitantes} ctx=${ctx} evento=${evento} />
     ${evento.estado === 'normal' && evento.con_nota && !['trabajo_casa', 'plic'].includes(evento.tipo) && html`<${RecuperacionesDelEvento} ctx=${ctx} evento=${evento} directa=${true} />`}
     ${detalle && html`<${HojaDetalle} fila=${filas.find((f) => f.estudiante.id === detalle.estudiante.id) ?? detalle} evento=${evento} ctx=${ctx} cerrar=${() => setDetalle(null)} />`}`;
