@@ -7,7 +7,7 @@ import { nombreEvento } from './evento.js';
 import { eventoSugerido, semanaDeFecha } from '../nucleo/calendario.js';
 import { estadoEvento } from '../nucleo/estado-evento.js';
 import { avanceEvaluacion } from '../nucleo/motor-vista.js';
-import { fechaCorta, hoyLocal, compararGrupos } from '../nucleo/util.js';
+import { fechaCorta, hoyLocal, compararGrupos, lugarDeClase } from '../nucleo/util.js';
 import { nombreMetodologia } from '../nucleo/config.js';
 import { activos as delCurso } from '../nucleo/grupos.js';
 import { avisoControlCierre, bimestreEnCurso, pendientesDelBimestre } from '../nucleo/bimestre.js';
@@ -38,7 +38,7 @@ export function Curso({ paralelo }) {
             <${EstadoChip} evento=${sugerido} ctx=${ctx} />
           </div>
           <h2>${sugerido.codigo} · ${sugerido.titulo}</h2>
-          <div class="tenue pequeno">Semana ${sugerido.semana} · ${sugerido.lugar === 'lab' ? 'laboratorio' : 'aula'} · ${textoBimestre(sugerido.bimestre)}</div>
+          <div class="tenue pequeno">Semana ${sugerido.semana} · <b>${lugarDeClase(curso, sugerido.lugar)?.texto ?? 'sin lugar'}</b> · ${textoBimestre(sugerido.bimestre)}</div>
         </a>`}
       ${activos.length > 0 && html`<${TarjetaNotas} ctx=${ctx} paralelo=${paralelo} enCurso=${enCurso} hoy=${hoy} />`}
       ${activos.length > 0 && html`
@@ -48,7 +48,7 @@ export function Curso({ paralelo }) {
         </a>`}
       ${porBimestre.map(({ b, eventos: lista }) => html`
         <div class="seccion-titulo">${textoBimestre(b)}</div>
-        <div class="lista">${lista.map((e) => html`<${FilaEvento} evento=${e} ctx=${ctx} />`)}</div>`)}
+        <div class="lista">${lista.map((e) => html`<${FilaEvento} evento=${e} ctx=${ctx} curso=${curso} />`)}</div>`)}
       <${Estudiantes} paralelo=${paralelo} estudiantes=${reg.estudiantes} />
     <//>`;
 }
@@ -64,11 +64,12 @@ function EstadoChip({ evento, ctx }) {
   return html`<${Chip} tono=${e.tono} titulo=${e.detalle}>${e.texto}<//>`;
 }
 
-function FilaEvento({ evento, ctx }) {
+function FilaEvento({ evento, ctx, curso }) {
   const est = estadoEvento(evento, ctx.reg, avanceEvaluacion(ctx, evento));
   const esTC = evento.tipo === 'trabajo_casa';
   const secundaria = evento.tipo === 'sin_nota' || evento.tipo === 'plic' || (esTC && !evento.con_nota);
-  const lugar = evento.lugar ? (evento.lugar === 'lab' ? 'lab.' : 'aula') : '';
+  const l = lugarDeClase(curso, evento.lugar);
+  const lugar = l ? (l.tipo === 'lab' ? l.corto : `aula ${l.corto === 'aula' ? '' : l.corto}`.trim()) : '';
   // Un TC va bajo su práctica (misma fecha): se muestra como trabajo en casa, con su avance.
   const detalle = esTC ? 'en casa'
     : [fechaCorta(evento.fecha), lugar, evento.con_nota ? null : 'sin nota'].filter(Boolean).join(' · ');

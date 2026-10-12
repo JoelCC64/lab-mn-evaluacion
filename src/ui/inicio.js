@@ -4,7 +4,7 @@ import { html, useApp, useVivo, Pantalla, Chip, ChipMetodologia, Aviso, Cargando
 import { exportarRespaldoDelDia, useEstadoRespaldo } from './respaldo-dia.js';
 import { conteoPorCurso } from '../datos/consultas.js';
 import { generarEventos, eventoSugerido } from '../nucleo/calendario.js';
-import { diaDeFecha, fechaCorta, fechaLarga, hoyLocal } from '../nucleo/util.js';
+import { diaDeFecha, fechaCorta, fechaLarga, hoyLocal, lugarDeClase } from '../nucleo/util.js';
 import { horario, textoBimestre } from './curso-datos.js';
 import { cargarCursos } from '../datos/excel-datos.js';
 import { crearContexto } from '../nucleo/motor.js';
@@ -128,7 +128,8 @@ function FilaCurso({ curso, conteo, hoy, destacada }) {
         <div class="linea2">
           ${horario(curso)} · ${n ? `${n} est.` : 'sin estudiantes'}${conteo?.pendiente ? ` (${conteo.pendiente} pend.)` : ''}
         </div>
-        ${sugerido && html`<div class="linea2">Esta semana: <b>${sugerido.codigo}</b> · ${sugerido.titulo}${sugerido.estado !== 'normal' ? ` (${sugerido.estado === 'feriado' ? 'feriado' : 'sin clase'})` : ''}</div>`}
+        ${sugerido && html`<div class="linea2">Esta semana: <b>${sugerido.codigo}</b> · ${sugerido.titulo}${sugerido.estado !== 'normal' ? ` (${sugerido.estado === 'feriado' ? 'feriado' : 'sin clase'})` : ''}</div>
+        ${lugarDeClase(curso, sugerido.lugar) && sugerido.estado === 'normal' && html`<div class="linea2">Clase en: <b>${lugarDeClase(curso, sugerido.lugar).texto}</b></div>`}`}
       </div>
       <span class="flecha">›</span>
     </a>`;

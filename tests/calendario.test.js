@@ -2,7 +2,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 
 import { generarEventos, eventoSugerido, motivoSinClase, semanaDeFecha } from '../src/nucleo/calendario.js';
-import { diaDeFecha } from '../src/nucleo/util.js';
+import { diaDeFecha, lugarDeClase } from '../src/nucleo/util.js';
 import { configReal } from './ayudas.js';
 
 const cfg = configReal();
@@ -102,4 +102,26 @@ test('evento sugerido: la sesión de la semana o la próxima', () => {
   assert.equal(eventoSugerido(cfg, eventos, '2026-10-08').codigo, 'P1');   // jueves de la semana 2
   assert.equal(eventoSugerido(cfg, eventos, '2026-12-30').codigo, 'T6');   // receso → la próxima
   assert.equal(eventoSugerido(cfg, eventos, '2027-03-01').codigo, 'REVISION');
+});
+
+test('dónde es la clase: laboratorio y aula según el cronograma y el horario asignado del curso', () => {
+  const lugar = (paralelo, semana) => {
+    const e = eventosDe(paralelo).find((x) => x.semana === semana && x.sesion);
+    return lugarDeClase(cfg.cursoPorId[paralelo], e.lugar).texto;
+  };
+  // Grupo A: lab. en la semana 2 y aula en la 3; grupo B, al revés. Salas del horario asignado (11-oct-2026).
+  assert.equal(lugar('GR2QB', 2), 'Laboratorio · LAB 1');
+  assert.equal(lugar('GR2QB', 3), 'Aula · E14/P5/E015');
+  assert.equal(lugar('GR9EB', 2), 'Laboratorio · LAB 2');
+  assert.equal(lugar('GR1AA', 3), 'Aula · E14/P5/E014');
+  assert.equal(lugar('GR7EB', 2), 'Laboratorio · LAB 1');
+  assert.equal(lugar('GR6CD', 2), 'Aula · E14/P5/E014');
+  assert.equal(lugar('GR6CD', 3), 'Laboratorio · LAB 2');
+  assert.equal(lugar('GR3QA', 3), 'Laboratorio · LAB 2');
+  assert.equal(lugarDeClase(cfg.cursoPorId.GR2QB, null), null);
+  assert.deepEqual(lugarDeClase({}, 'aula'), { tipo: 'aula', sala: null, texto: 'Aula', corto: 'aula' });
+  const horario = { GR1AA: ['LAB 2', 'E14/P5/E014'], GR1QA: ['LAB 2', 'E14/P5/E014'], GR2QB: ['LAB 1', 'E14/P5/E015'], GR3MB: ['LAB 2', 'E14/P5/E014'],
+    GR3QA: ['LAB 2', 'E14/P5/E014'], GR4EB: ['LAB 1', 'E14/P5/E015'], GR6CD: ['LAB 2', 'E14/P5/E014'], GR7EB: ['LAB 1', 'E14/P5/E014'],
+    GR7SA: ['LAB 1', 'E14/P5/E014'], GR9EB: ['LAB 2', 'E14/P5/E015'] };
+  for (const [p, [lab, aula]] of Object.entries(horario)) assert.deepEqual([cfg.cursoPorId[p].laboratorio, cfg.cursoPorId[p].aula], [lab, aula], p);
 });

@@ -19,7 +19,7 @@ import { tieneFeedback } from '../nucleo/feedback.js';
 import { estadoEvento } from '../nucleo/estado-evento.js';
 import { unidadTrabajo } from '../nucleo/motor.js';
 import { avanceEvaluacion, seCalificaTrabajo } from '../nucleo/motor-vista.js';
-import { fechaCorta } from '../nucleo/util.js';
+import { fechaCorta, lugarDeClase } from '../nucleo/util.js';
 
 /** ¿Todas las unidades por calificar del TC tienen nota? */
 function trabajoCalificado(ctx, evento) {
@@ -32,8 +32,9 @@ export function nombreEvento(evento) {
   return soloTitulo ? evento.titulo : `${evento.codigo} · ${evento.titulo}`;
 }
 
-export function subtituloEvento(evento) {
-  return `${evento.curso} · ${fechaCorta(evento.fecha)} · semana ${evento.semana}${evento.con_nota ? ` · ${textoBimestre(evento.bimestre)}` : ''}`;
+export function subtituloEvento(evento, curso = null) {
+  const lugar = lugarDeClase(curso, evento.lugar);
+  return `${evento.curso} · ${fechaCorta(evento.fecha)} · semana ${evento.semana}${lugar ? ` · ${lugar.texto}` : ''}${evento.con_nota ? ` · ${textoBimestre(evento.bimestre)}` : ''}`;
 }
 
 /** Carga el curso y el evento (con el contexto del motor de notas). */
@@ -108,7 +109,7 @@ export function Evento({ id, pestana }) {
     </nav>`;
 
   return html`
-    <${Pantalla} titulo=${nombreEvento(evento)} subtitulo=${subtituloEvento(evento)} atras=${enlace('curso', curso.paralelo)} pestanas=${barra}
+    <${Pantalla} titulo=${nombreEvento(evento)} subtitulo=${subtituloEvento(evento, curso)} atras=${enlace('curso', curso.paralelo)} pestanas=${barra}
       acciones=${html`<${MenuEvento} ctx=${ctx} evento=${evento} />`}>
       <${AvisoDeEstado} evento=${evento} estado=${est} eventos=${eventos} />
       ${evento.tipo === 'plic' && evento.estado === 'normal' && html`<${Plic} ctx=${ctx} evento=${evento} />`}

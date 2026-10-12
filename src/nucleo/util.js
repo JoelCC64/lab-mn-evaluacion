@@ -123,3 +123,14 @@ export function compararGrupos(a, b) {
   if (Number.isFinite(na) && Number.isFinite(nb)) return na - nb;
   return String(a).localeCompare(String(b), 'es', { numeric: true });
 }
+
+/**
+ * Dónde es la clase: el laboratorio del curso («Laboratorio · LAB 2») o su aula («Aula · E14/P5/E014»). `lugar` es el del
+ * cronograma ('lab' o 'aula'). Sin sala configurada, solo «Laboratorio» o «Aula»; sin lugar (p. ej., el PLIC), null.
+ */
+export function lugarDeClase(curso, lugar) {
+  if (lugar !== 'lab' && lugar !== 'aula') return null;
+  const base = lugar === 'lab' ? 'Laboratorio' : 'Aula';
+  const sala = lugar === 'lab' ? curso?.laboratorio : curso?.aula;
+  return { tipo: lugar, sala: sala ?? null, texto: sala ? `${base} · ${sala}` : base, corto: sala ?? base.toLowerCase() };
+}
