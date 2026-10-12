@@ -463,3 +463,4 @@ textarea.entrada.texto-feedback { min-height: 120px; font-size: 14px; line-heigh
 .revision-nav { display: flex; gap: 8px; }
 .revision-nav .boton { font-size: 20px; min-width: 56px; }
 .revision-nav .boton.crece { font-size: 15px; }
+.fila.elegida { background: var(--azul-suave); outline: 2px solid var(--azul); }

@@ -20,6 +20,38 @@ export async function moverEstudiante(db, evento, grupos, estudiante, grupo, aho
   await db.grupos_evento.put({ evento, estudiante, grupo: grupo ?? null, fecha: ahora });
 }
 
+/**
+ * Elimina un grupo del evento (por ejemplo, llegaron menos estudiantes y se rehacen los grupos). Quien faltó («no vino» o
+ * «salió») queda sin grupo; los demás integrantes pasan a `destino` (un número de grupo o null = sin grupo). Se borra
+ * lo registrado del grupo: puntajes, etiquetas, pase y firma, notas y feedback; en los TC de esta práctica, las
+ * entregas del grupo, y en el taller siguiente, la retroalimentación dada. Los cambios de grupo pasan a los eventos
+ * siguientes como cualquier otro. No se puede con el pase cerrado (hay que reabrirlo). `tcs` y `talleres` salen de
+ * resumenEliminarGrupo.
+ */
+export async function eliminarGrupo(db, evento, grupos, grupo, { destino = null, tcs = [], talleres = [] } = {}, ahora = ahoraISO()) {
+  if ((await db.pases.get(evento))?.cerrado) throw new Error('El pase está cerrado: reábrelo antes de eliminar un grupo.');
+  if (destino !== null && String(destino) === String(grupo)) throw new Error('El destino no puede ser el mismo grupo.');
+  await asegurarInstantanea(db, evento, grupos, ahora);
+  const tablas = [db.grupos_evento, db.asistencia, db.puntajes, db.etiquetas, db.revisiones_grupo, db.notas, db.feedback, db.trabajos_casa, db.retroalimentaciones];
+  await db.transaction('rw', tablas, async () => {
+    for (const [estudiante, g] of grupos) {
+      if (g !== grupo) continue;
+      const asis = await db.asistencia.get([evento, estudiante]);
+      const falto = ['no_vino', 'salio'].includes(asis?.estado);
+      await db.grupos_evento.put({ evento, estudiante, grupo: falto ? null : (destino ?? null), fecha: ahora });
+    }
+    await db.puntajes.where('evento').equals(evento).filter((f) => f.grupo === grupo).delete();
+    await db.etiquetas.where('evento').equals(evento).filter((f) => f.grupo === grupo).delete();
+    await db.revisiones_grupo.delete([evento, grupo]);
+    for (const ev of [evento, ...tcs]) {
+      await db.notas.where('evento').equals(ev).filter((f) => f.unidad === 'grupo' && String(f.unidad_id) === String(grupo)).delete();
+      await db.feedback.where('evento').equals(ev).filter((f) => f.unidad === 'grupo' && String(f.unidad_id) === String(grupo)).delete();
+    }
+    for (const ev of tcs) await db.trabajos_casa.where('evento').equals(ev).filter((f) => f.unidad === 'grupo' && String(f.unidad_id) === String(grupo)).delete();
+    for (const ev of talleres) await db.retroalimentaciones.delete([ev, grupo]);
+  });
+}
+
 // ---------- Evaluación del grupo ----------
 
 export async function guardarPuntaje(db, evento, grupos, grupo, aspecto, valor, ahora = ahoraISO()) {

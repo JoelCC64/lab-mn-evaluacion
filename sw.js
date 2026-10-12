@@ -2,7 +2,7 @@
 // Guarda todos los archivos de la app para que funcione sin conexión.
 // En localhost usa primero la red (desarrollo); publicada, usa primero lo guardado (rápido y sin conexión).
 
-const VERSION = '0.12.8-545e895a06';
+const VERSION = '0.12.9-92912aa8ba';
 const CACHE = `lab-mn-${VERSION}`;
 const ARCHIVOS = [
   "./",
@@ -27,6 +27,7 @@ const ARCHIVOS = [
   "src/nucleo/calendario.js",
   "src/nucleo/config.js",
   "src/nucleo/csv.js",
+  "src/nucleo/eliminar-grupo.js",
   "src/nucleo/estado-evento.js",
   "src/nucleo/excel-escritura.js",
   "src/nucleo/excel-lectura.js",
@@ -58,6 +59,7 @@ const ARCHIVOS = [
   "src/ui/curso.js",
   "src/ui/datos.js",
   "src/ui/dispositivo.js",
+  "src/ui/eliminar-grupo.js",
   "src/ui/estudiante-nuevo.js",
   "src/ui/evento.js",
   "src/ui/excel.js",

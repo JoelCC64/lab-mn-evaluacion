@@ -11,6 +11,7 @@ import { seEvaluaPorGrupo, sobreDiez, textoNotaGrupo } from '../nucleo/motor-vis
 import { preparatorioCalifica } from '../nucleo/config.js';
 import { HojaVisitante } from './visitantes.js';
 import { HojaCorregirNuevo } from './estudiante-nuevo.js';
+import { BotonEliminarGrupo } from './eliminar-grupo.js';
 
 export function Grupo({ id, grupo }) {
   const { curso, ctx, evento, cargando } = useEvento(id);
@@ -30,6 +31,7 @@ export function Grupo({ id, grupo }) {
       ${g && conRubrica && html`<${Evaluacion} key=${`ev-${grupo}`} ctx=${ctx} evento=${evento} grupo=${grupo} config=${config} grupos=${grupos} />`}
       ${g && html`<${Integrantes} key=${`in-${grupo}`} ctx=${ctx} evento=${evento} grupo=${grupo} integrantes=${g.integrantes} grupos=${grupos} />`}
       ${g && config && (config.cierre?.length || config.penalizacion_total) && html`<${Cierre} key=${`ci-${grupo}`} ctx=${ctx} evento=${evento} grupo=${grupo} grupos=${grupos} config=${config} />`}
+      ${g && html`<${BotonEliminarGrupo} ctx=${ctx} evento=${evento} grupo=${grupo} />`}
       ${g && html`<${PieListo} ctx=${ctx} evento=${evento} grupo=${grupo} grupos=${grupos} siguiente=${siguiente} />`}
     <//>`;
 }

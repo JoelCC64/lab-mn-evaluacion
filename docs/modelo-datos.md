@@ -78,6 +78,8 @@ Claves entre corchetes: compuestas. Todas las tablas de registro llevan `fecha` 
 - Si no, se toma la del evento anterior más cercano del curso que la tenga.
 - Si no hay ninguna, se usan los grupos del Excel (`grupo_excel`).
 
+**Eliminar un grupo** (0.12.9; pantalla del grupo › «Eliminar este grupo…», con el pase abierto): los integrantes que faltaron («no vino» o «salió») quedan sin grupo y los demás pasan a otro grupo o a «sin grupo»; se borra lo registrado del grupo (puntajes, etiquetas, pase y firma, notas y feedback; las entregas de sus TC y la retroalimentación del taller siguiente). Los grupos no se renumeran: si se elimina el 2, quedan 1, 3, 4…; el cambio pasa a los eventos siguientes sin instantánea propia.
+
 La instantánea se crea la primera vez que se registra algo de grupo en el evento: un puntaje, el pase de un grupo o un cambio de grupo. Desde ahí las notas de ese evento ya no cambian si después se mueven estudiantes en otro evento. Un cambio de grupo pasa a los eventos siguientes que aún no tienen instantánea.
 
 **Trabajos en casa:**
