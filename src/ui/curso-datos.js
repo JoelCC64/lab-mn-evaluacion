@@ -9,7 +9,7 @@ import { DIAS_TEXTO } from '../nucleo/util.js';
 export function useCurso(paralelo) {
   const { cfg, db } = useApp();
   const curso = cfg.cursoPorId[paralelo] ?? null;
-  const reg = useVivo(() => (curso ? registrosDelCurso(db, paralelo) : Promise.resolve(null)), [paralelo]);
+  const reg = useVivo(() => (curso ? registrosDelCurso(db, paralelo, cfg) : Promise.resolve(null)), [paralelo]);
   const eventos = useMemo(
     () => (curso && reg ? generarEventos(cfg, curso, reg.cambios_evento) : null),
     [curso, reg],

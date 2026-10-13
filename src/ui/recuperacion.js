@@ -36,6 +36,7 @@ export function HojaRecuperacion({ evento, estudiante, actual, alCerrar, directa
   return html`
     <${Hoja} titulo=${`Recuperación de ${evento.codigo}`} alCerrar=${alCerrar}>
       <${Persona} estudiante=${estudiante} />
+      ${actual?.vinculada && html`<p class="pequeno"><b>Vinculada:</b> recuperó en ${actual.detalle?.split(' (')[0]} y su nota se toma de allá (se actualiza sola). Si guardas aquí otra, la tuya manda.</p>`}
       <p class="tenue pequeno">${feriado
         ? `${evento.codigo} no se hizo en este curso (${evento.motivo}). Recuperarla es opcional: si la recupera, cuenta en su nota.`
         : directa
@@ -53,7 +54,7 @@ export function HojaRecuperacion({ evento, estudiante, actual, alCerrar, directa
       ${!feriado && estado !== 'realizada' && html`<p class="tenue pequeno">${estado === 'solicitada' ? 'Nota y preparatorio de esta sesión: pendientes.' : 'Nota y preparatorio de esta sesión: 0.'}</p>`}
       ${!feriado && estado === 'realizada' && html`<p class="tenue pequeno">El preparatorio de esta sesión no se cuenta en su promedio (lo revisa la sesión de recuperación).</p>`}
       <div class="botones">
-        ${actual && html`<button class="boton" onClick=${quitar}>Quitar</button>`}
+        ${actual && !actual.vinculada && html`<button class="boton" onClick=${quitar}>Quitar</button>`}
         <button class="boton" onClick=${alCerrar}>Cancelar</button>
         <button class="boton primario" disabled=${estado === 'realizada' && nota === ''} onClick=${guardar}>Guardar</button>
       </div>

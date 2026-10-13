@@ -5,7 +5,7 @@ import { generarEventos } from '../nucleo/calendario.js';
 /** [{ curso, reg, eventos }] de todos los cursos configurados. */
 export async function cargarCursos(db, cfg) {
   return Promise.all(cfg.cursos.map(async (curso) => {
-    const reg = await registrosDelCurso(db, curso.paralelo);
+    const reg = await registrosDelCurso(db, curso.paralelo, cfg);
     return { curso, reg, eventos: generarEventos(cfg, curso, reg.cambios_evento) };
   }));
 }

@@ -92,6 +92,7 @@ Si llega un documento oficial nuevo que contradiga algo de aquí, se pregunta a 
 | El profesor que recibe la recuperación envía la nota al profesor del estudiante y al estudiante en 24 h | LP §10 |
 
 En la app:
+- **Estudiantes de mis otros cursos que recuperan en una sesión (misma metodología):** se agregan como «recupera aquí» desde «De mis otros cursos»; su nota de esa sesión aparece sola, como recuperación realizada, en la misma actividad de su curso (0.12.11). SQI solo recupera con SQI y Clásica con Clásica: no se vincula entre metodologías.
 - **Estudiantes del curso que recuperan en otra sesión:** se registra la recuperación (solicitada, realizada con su nota o «no asistió» = 0). Mientras está solicitada, la nota queda pendiente. Si la realizó, el preparatorio de la sesión que faltó no entra en su promedio.
 - **En un feriado,** recuperar es opcional: solo cuenta si la realizó.
 - **Estudiantes de otros docentes que recuperan aquí:** se agregan al grupo con código y nombre, se califican con su grupo y la app arma el texto con la nota para su profesor. No van al Excel ni a coordinación.
