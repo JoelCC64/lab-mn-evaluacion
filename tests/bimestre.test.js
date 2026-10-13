@@ -278,8 +278,9 @@ test('estudiante de otro curso que recupera aquí: se califica con su grupo, la 
 });
 
 test('antes del envío: bimestre en curso, eventos pendientes por evaluar y quién sigue sin control oral', async () => {
-  assert.deepEqual(bimestreEnCurso(cfg, '2026-11-20'), { bimestre: 1, envio: '2026-12-01', dias: 11 });
-  assert.equal(bimestreEnCurso(cfg, '2026-12-02').bimestre, 2);
+  assert.deepEqual(bimestreEnCurso(cfg, '2026-11-20'), { bimestre: 1, envio: '2026-11-25', dias: 5 });
+  assert.equal(bimestreEnCurso(cfg, '2026-11-26').bimestre, 2);
+  assert.equal(bimestreEnCurso(cfg, '2026-11-25').bimestre, 1, 'el día del envío todavía es el 1.er bimestre');
   assert.equal(bimestreEnCurso(cfg, '2027-02-01'), null);
 
   const k = await curso('GR2QB', { a: '1', b: '1', c: '2' });

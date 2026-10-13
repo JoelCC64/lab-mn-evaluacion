@@ -103,7 +103,7 @@ En la app:
 |---|---|---|
 | 19 semanas: 28-sep-2026 al 5-feb-2027; cronogramas A y B por metodología | Intro-T, Intro-SQI | `config/cronogramas/` |
 | Feriados: 9-oct; 2 y 3 nov; 7 dic; 24 y 25 dic; receso 28-dic a 1-ene | Plan | `config/semestre-2026B.json` |
-| Envío de notas a coordinación: 1-dic-2026 (B1) y 29-ene-2027 (B2) | Plan; LP §17 | `envio_notas` |
+| Envío de notas a coordinación: 25-nov-2026 (B1; el reglamento dice 1-dic, Joel lo adelantó) y 29-ene-2027 (B2) | Plan; LP §17 | `envio_notas` |
 | Archivo para coordinación: APELLIDOS Y NOMBRES (una columna, decisión de Joel), NÚMERO ÚNICO, NOTA(/6), PROFESOR | LP §17; Joel | `formato_coordinacion` |
 
 ## Datos de los estudiantes

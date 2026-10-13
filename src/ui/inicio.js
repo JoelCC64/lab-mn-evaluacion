@@ -77,7 +77,7 @@ function AvisoRespaldo() {
 }
 
 /**
- * Recordatorio del envío de notas a coordinación (1 de diciembre y 29 de enero): cuántos días faltan y qué eventos
+ * Recordatorio del envío de notas a coordinación (25 de noviembre y 29 de enero): cuántos días faltan y qué eventos
  * que ya pasaron siguen sin evaluar en todos los cursos. Se destaca cuando faltan pocos días.
  */
 function RecordatorioEnvio() {

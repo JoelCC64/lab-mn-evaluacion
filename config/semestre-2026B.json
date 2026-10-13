@@ -14,7 +14,7 @@
   "receso": { "desde": "2026-12-28", "hasta": "2027-01-01" },
   "fin_bimestre_1": "2026-11-26",
   "ultimo_dia_clases": "2027-01-28",
-  "envio_notas": { "1": "2026-12-01", "2": "2027-01-29" },
+  "envio_notas": { "1": "2026-11-25", "2": "2027-01-29" },
   "registro_saew": { "1": "2026-12-04", "2": "2027-02-04" },
   "plic": { "fecha": "2027-01-21", "inicio": "11:00", "fin": "13:00", "semana": 17 },
   "formato_coordinacion": ["APELLIDOS Y NOMBRES", "NÚMERO ÚNICO", "NOTA(/6)", "PROFESOR"],

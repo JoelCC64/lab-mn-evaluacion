@@ -29,7 +29,7 @@ Fuera del aula registra los trabajos preparatorios y los trabajos en casa. Todo 
    - Las notas se redondean a 2 decimales.
 10. **PLIC:** examen presencial controlado por un profesor; vale 0.5 si el estudiante lo completa de forma válida y 0 si no.
 11. **Datos:** se guardan códigos y nombres (sin separar apellidos y nombres), **no correos**.
-12. **Orden de trabajo:** las Fases 0 a 6 cubren lo necesario para entregar la nota del 1.er bimestre el 1 de diciembre de 2026.
+12. **Orden de trabajo:** las Fases 0 a 6 cubren lo necesario para entregar la nota del 1.er bimestre el 25 de noviembre de 2026.
 
 ---
 
@@ -79,7 +79,7 @@ Las reglas de esta sección salen de estas fuentes. Si llega un documento oficia
 - Además hay 3 estudiantes **pendientes** (GR4EB, GR7EB y GR3QA): asisten, pero aún no constan en la nómina (probable matrícula extraordinaria).
 - El semestre tiene 19 semanas, del 28 de septiembre de 2026 al 5 de febrero de 2027. Cada semana el curso va al laboratorio (prácticas) o al aula (talleres) según su cronograma A o B (Anexo H).
 - **Bimestres:** el 1.er bimestre incluye P1–P3 y T1–T3 (y TC1–TC3 en SQI); el 2.º, P4–P7 y T4–T7 (y TC4, TC5 y TC7). **El bimestre se asigna por actividad, no por fecha:** P4 (cronograma A) y T4 (cronograma B) son de la semana 9, que en el calendario aún es del 1.er bimestre, pero cuentan en el 2.º.
-- **Envío de notas a coordinación:** 1.er bimestre hasta el martes 1 de diciembre de 2026; 2.º bimestre hasta el viernes 29 de enero de 2027.
+- **Envío de notas a coordinación:** 1.er bimestre hasta el miércoles 25 de noviembre de 2026 (el reglamento dice el 1 de diciembre; se adelantó el 13-oct-2026); 2.º bimestre hasta el viernes 29 de enero de 2027.
 
 ### 1.3 Flujo de datos
 
@@ -433,7 +433,7 @@ Casos de prueba mínimos (en `tests/`):
 
 ## 6. Fases
 
-**Calendario.** La semana 2 empieza el 5 de octubre de 2026 y la nota del 1.er bimestre se envía el 1 de diciembre. Las primeras sesiones se evaluarán en papel, así que la app debe permitir **carga retroactiva** (eventos con fecha pasada). Las Fases 0 a 6 cubren todo lo necesario para calcular, guardar en el Excel y entregar la nota del 1.er bimestre. El feedback completo, las métricas y el trabajo en varios dispositivos pueden esperar al 2.º bimestre.
+**Calendario.** La semana 2 empieza el 5 de octubre de 2026 y la nota del 1.er bimestre se envía el 25 de noviembre. Las primeras sesiones se evaluarán en papel, así que la app debe permitir **carga retroactiva** (eventos con fecha pasada). Las Fases 0 a 6 cubren todo lo necesario para calcular, guardar en el Excel y entregar la nota del 1.er bimestre. El feedback completo, las métricas y el trabajo en varios dispositivos pueden esperar al 2.º bimestre.
 
 ### Fase 0: Preparación y configuración del semestre
 - Repositorio, estructura de carpetas (Anexo E), `PROGRESS.md`, `docs/modelo-datos.md` y `docs/reglas-oficiales.md` (resumen de §1 con la fuente de cada regla).
@@ -556,7 +556,7 @@ Casos de prueba mínimos (en `tests/`):
   - SQI = prácticas (grupal) + TC (grupal) + talleres + PLIC.
 - **En el Excel:** columnas de componentes y nota del bimestre en cada hoja de curso.
 - **Hojas «Coordinación B1» y «Coordinación B2»:** apellidos y nombres en una sola columna, número único, nota sobre 6 y profesor. Los pendientes van marcados.
-- **Recordatorio** de las fechas de envío (1 de diciembre de 2026 y 29 de enero de 2027), con la lista de eventos que faltan por evaluar.
+- **Recordatorio** de las fechas de envío (25 de noviembre de 2026 y 29 de enero de 2027), con la lista de eventos que faltan por evaluar.
 
 **Listo cuando:** la nota de cada bimestre coincide con cálculos manuales en ambos esquemas (incluidos feriados, faltas, recuperaciones y estudiantes sin control) y una prueba comprueba que las hojas de coordinación tienen sus cuatro columnas y las notas redondeadas a 2 decimales.
 
@@ -1243,7 +1243,7 @@ Nombres de las actividades:
 ### H.4 Fechas clave
 
 - Fin del 1.er bimestre en el calendario: jueves 26 de noviembre de 2026.
-- Envío de notas del 1.er bimestre: martes 1 de diciembre de 2026 (registro en el SAEW: viernes 4 de diciembre).
+- Envío de notas del 1.er bimestre: miércoles 25 de noviembre de 2026 (registro en el SAEW: viernes 4 de diciembre).
 - PLIC: jueves 21 de enero de 2027, de 11:00 a 13:00.
 - Último día de clases: jueves 28 de enero de 2027.
 - Envío de notas del 2.º bimestre: viernes 29 de enero de 2027 (registro en el SAEW: jueves 4 de febrero).
@@ -1261,7 +1261,7 @@ Nombres de las actividades:
   ],
   "receso": { "desde": "2026-12-28", "hasta": "2027-01-01" },
   "fin_bimestre_1": "2026-11-26",
-  "envio_notas": { "1": "2026-12-01", "2": "2027-01-29" },
+  "envio_notas": { "1": "2026-11-25", "2": "2027-01-29" },
   "plic": { "fecha": "2027-01-21", "inicio": "11:00", "fin": "13:00" },
   "formato_coordinacion": ["APELLIDOS Y NOMBRES", "NÚMERO ÚNICO", "NOTA(/6)", "PROFESOR"],
   "redondeo_decimales": 2
@@ -1292,7 +1292,7 @@ Nombres de las actividades:
 | 16 | Feriados | No contemplado | Actividad excluida y renormalización; recuperación opcional; lista 2026B | Lineamientos §15 (SQI) y §14 (VF); Planificación |
 | 17 | Recuperaciones | No contemplado | Nota recibida o 0; texto para el profesor del estudiante externo | Lineamientos §14 (SQI) y §13 (VF); Lineamientos profesores §10 |
 | 18 | Penalización por equipo | No contemplado | Botón opcional: 0 al grupo en la práctica, a criterio del profesor | Lineamientos §1; Lineamientos profesores §15 |
-| 19 | Archivo de notas | Por confirmar | Hojas de coordinación en el mismo Excel, con apellidos y nombres en una columna; envíos el 1 de diciembre y el 29 de enero | Lineamientos profesores §17; Planificación; Joel |
+| 19 | Archivo de notas | Por confirmar | Hojas de coordinación en el mismo Excel, con apellidos y nombres en una columna; envíos el 25 de noviembre y el 29 de enero | Lineamientos profesores §17; Planificación; Joel |
 | 20 | Redondeo | Sin definir | 2 decimales, redondeo usual | Joel |
 | 21 | Calendario | No contemplado | Cronogramas A y B por metodología, sesiones sin nota y receso | Introducción T y SQI (cronogramas) |
 | 22 | Privacidad | Solo identificadores | Códigos y nombres; nunca correos | Joel |
