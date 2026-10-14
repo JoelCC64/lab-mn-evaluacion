@@ -43,6 +43,7 @@ Claves entre corchetes: compuestas. Todas las tablas de registro llevan `fecha` 
 | `trabajos_casa` | `[evento+unidad+unidad_id]` | `unidad` (`grupo` · `estudiante`, según `unidad_calificacion` del TC), `unidad_id` (número de grupo o código), `entregado`, `puntajes` (`{ pregunta: puntos }`), `etiquetas` (ids de la configuración) | TC de SQI pregunta por pregunta. `entregado: false` vale 0 y conserva los puntajes por si fue un toque equivocado. Desde la versión 3 de la base (Fase 5) | `homework` |
 | `feedback` | `[evento+unidad+unidad_id]` | `unidad` (`grupo` · `estudiante`), `texto` (el editado, o `null`), `base` (el texto generado cuando se editó), `copiado` (momento en que se copió o compartió) | Solo lo que el profesor hizo con el feedback: el texto generado no se guarda, se arma cada vez con lo registrado. Si lo registrado cambia después de editar, `base` ya no coincide y la app lo avisa. Desde la versión 5 (Fase 7) | (nuevo) |
 | `cambios_evento` | `evento` | `estado` (`sin_clase` · `normal`), `motivo` | Cambios manuales del calendario (clase suspendida, semana 1 sin clase) | `events.estado` |
+| `decimas` | `[evento+id]` | `estudiante`, `valor` (múltiplo de 0.1, en décimas de punto sobre 10), `motivo`, `lote` (las filas de un mismo premio), `unidad` (`grupo` · `estudiante`), `grupo` (solo informativo) | Premio en décimas por responder una pregunta compleja. `evento` = donde se ganó. Se suma a la nota de la **próxima práctica a la que asista** el estudiante (`destinoDecimas`: si faltó, pasa a la siguiente), sin pasar de 10; el ajuste individual manda y una penalización total no las recibe. Un premio de grupo guarda una fila por integrante presente. Desde la versión 6 de la base (0.12.14) | (nuevo) |
 | `importaciones` | autoincremental | `tipo` (`excel_semestre` · `asistencia_semana1` · `respaldo`), `archivo`, `resumen` (solo conteos) | Historial de lecturas del Excel y de restauraciones | (nuevo) |
 | `meta` | `clave` | `valor` | Datos sueltos: último respaldo, versión del modelo | (nuevo) |
 
@@ -52,6 +53,7 @@ Claves entre corchetes: compuestas. Todas las tablas de registro llevan `fecha` 
 - 2: Fase 4, con la tabla `retroalimentaciones`.
 - 3: Fase 5, con la tabla `trabajos_casa`.
 - 4: Fase 6, con las tablas `recuperaciones` y `plic`.
+- 6: 0.12.14, con la tabla `decimas`.
 - 5: Fase 7, con la tabla `feedback`.
 
 **Lo último que se escribió en el Excel** (`excel_writes` en el §4) no va en la base: va en la hoja oculta «_app» del propio Excel (ver `docs/excel.md`). Así viaja con el archivo y no se pierde cuando la Mac importa un respaldo del iPhone, que reemplaza toda la base.

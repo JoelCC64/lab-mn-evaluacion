@@ -7,6 +7,7 @@ import { sobreDiez, textoPuntos } from '../nucleo/motor-vista.js';
 import { esVisitante, eventoBase } from '../nucleo/grupos.js';
 import { RecuperacionDelEstudiante, RecuperacionesDelEvento } from './recuperacion.js';
 import { TarjetaVisitantes } from './visitantes.js';
+import { DecimasDeEstudiante, DecimasDelEvento } from './decimas.js';
 import { compararGrupos } from '../nucleo/util.js';
 import { controlCalifica, preparatorioCalifica } from '../nucleo/config.js';
 
@@ -63,6 +64,7 @@ export function Resumen({ ctx, evento }) {
     </div>
     <p class="tenue pequeno">As.: P presente · F falta · R recuperó con otro profesor · RA se retiró antes. Nota sobre 10 · «…» pendiente · p = pendiente de nómina · v = de otro curso (recupera aquí). Toca una fila para ver el detalle, registrar una recuperación o un ajuste.</p>
     <${TarjetaVisitantes} ctx=${ctx} evento=${evento} />
+    <${DecimasDelEvento} ctx=${ctx} evento=${evento} />
     ${evento.estado === 'normal' && evento.con_nota && !['trabajo_casa', 'plic'].includes(evento.tipo) && html`<${RecuperacionesDelEvento} ctx=${ctx} evento=${evento} directa=${true} />`}
     ${detalle && html`<${HojaDetalle} fila=${filas.find((f) => f.estudiante.id === detalle.estudiante.id) ?? detalle} evento=${evento} ctx=${ctx} cerrar=${() => setDetalle(null)} />`}`;
 }
@@ -113,6 +115,7 @@ function HojaDetalle({ fila, evento, ctx, cerrar }) {
         ${preparatorio.estado !== 'sin_nota' && html`<tr><td>Preparatorio</td><td>${preparatorio.estado === 'calculada' ? `${preparatorio.nivel}/2` : preparatorio.estado}${preparatorio.motivo ? ` · ${preparatorio.motivo}` : ''}</td></tr>`}
         ${control.estado !== 'sin_control' && html`<tr><td>Control oral</td><td>${control.estado === 'calculada' ? (control.valor !== null ? `${sobreDiez(control.valor)}/10 (${(control.puntajes ?? []).join(', ') || control.motivo})` : (control.aprobado ? 'aprobado' : 'no aprobado')) : control.estado}</td></tr>`}
       </tbody></table>
+      ${!esVisitante(fila.estudiante) && html`<${DecimasDeEstudiante} ctx=${ctx} evento=${evento} estudiante=${fila.estudiante} nota=${nota} />`}
       ${evento.con_nota && !esVisitante(fila.estudiante) && html`<${RecuperacionDelEstudiante} ctx=${ctx} evento=${evento} estudiante=${fila.estudiante} falta=${asistencia.falta} />`}
       ${evento.con_nota && html`
         <div class="tarjeta">

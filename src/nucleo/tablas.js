@@ -4,7 +4,7 @@
 export const TABLAS_REGISTRO = [
   'grupos_evento', 'asistencia', 'pases', 'revisiones_grupo', 'puntajes', 'etiquetas', 'notas',
   'controles', 'revision_preparatorio', 'novedades_preparatorio', 'ajustes', 'retroalimentaciones', 'trabajos_casa',
-  'recuperaciones', 'plic', 'feedback',
+  'recuperaciones', 'plic', 'feedback', 'decimas',
 ];
 
 /** Tablas cuyas filas pertenecen a un evento (clave o índice «evento» = «PARALELO:CÓDIGO»). */
@@ -32,6 +32,7 @@ export const CLAVES = {
   recuperaciones: ['evento', 'estudiante'],
   plic: ['evento', 'estudiante'],
   feedback: ['evento', 'unidad', 'unidad_id'],
+  decimas: ['evento', 'id'],
   cambios_evento: ['evento'],
   importaciones: ['id'],
   meta: ['clave'],

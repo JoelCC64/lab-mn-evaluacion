@@ -2,7 +2,7 @@
 // registrado (`registrosDelCurso`). Las notas de actividad van de 0 a 1; nunca se guardan, se calculan.
 // Cada resultado explica qué entró, con qué peso, qué se excluyó y qué se ajustó (transparencia).
 
-import { agruparPor } from './util.js';
+import { agruparPor, redondear } from './util.js';
 import { esquemaDe } from './config.js';
 import { eventoBase, gruposDelEvento } from './grupos.js';
 
@@ -29,6 +29,7 @@ export function crearContexto(cfg, curso, eventos, reg) {
     trabajosCasa: indice('trabajos_casa', (f) => `${f.evento}|${f.unidad}|${f.unidad_id}`),
     recuperaciones: indice('recuperaciones', (f) => `${f.evento}|${f.estudiante}`),
     plic: indice('plic', (f) => f.estudiante),
+    decimas: agruparPor(reg.decimas ?? [], (f) => f.estudiante),
     cacheGrupos: new Map(),
   };
 }
@@ -128,6 +129,26 @@ export function notaTrabajo(ctx, evento, unidadId) {
   return { ...r, completo: true, valor: puntos / config.escala_total };
 }
 
+/**
+ * Práctica donde cuentan las décimas de un premio ganado en el evento `origen`: la primera práctica con nota después de
+ * ese evento a la que el estudiante sí asiste (si faltó, pasan a la siguiente). null si aún no hay ninguna.
+ */
+export function destinoDecimas(ctx, origen, estudiante) {
+  const i = ctx.eventos.findIndex((e) => e.id === origen);
+  for (const e of ctx.eventos.slice(i + 1)) {
+    if (e.tipo !== 'practica' || !e.con_nota || e.estado !== 'normal') continue;
+    if (asistenciaDe(ctx, e, estudiante).falta) continue;
+    return e;
+  }
+  return null;
+}
+
+/** Premios en décimas de un estudiante que cuentan en este evento: { filas, total } (total en décimas de punto sobre 10). */
+export function decimasDelEvento(ctx, evento, estudiante) {
+  const filas = (ctx.decimas?.get(estudiante) ?? []).filter((f) => destinoDecimas(ctx, f.evento, estudiante)?.id === evento.id);
+  return { filas, total: redondear(filas.reduce((s, f) => s + f.valor, 0), 1) };
+}
+
 function conAjuste(ctx, r) {
   const ajuste = ctx.ajustes.get(`${r.evento}|${r.estudiante}`);
   if (!ajuste) return r;
@@ -181,7 +202,18 @@ export function notaEvento(ctx, evento, estudiante) {
     const g = notaGrupo(ctx, evento, r.grupo);
     r.partes = { grupo: g };
     if (g.valor === null) return conAjuste(ctx, { ...r, motivo: g.sinConfig ? 'falta la rúbrica de la actividad' : `falta evaluar el grupo ${r.grupo}` });
-    return conAjuste(ctx, { ...r, estado: 'calculada', valor: g.valor, motivo: g.penalizacion ? `penalización total (${g.motivo})` : null });
+    if (g.penalizacion) return conAjuste(ctx, { ...r, estado: 'calculada', valor: g.valor, motivo: `penalización total (${g.motivo})` });
+    // Décimas de premio (preguntas complejas): se suman a la nota de la práctica, sin pasar de 10. El ajuste individual, si hay, manda.
+    const d = decimasDelEvento(ctx, evento, estudiante);
+    if (d.total > 0) {
+      const valor = Math.min(1, g.valor + d.total / 10);
+      const aplicadas = redondear((valor - g.valor) * 10, 2);
+      return conAjuste(ctx, {
+        ...r, estado: 'calculada', valor, valor_sin_decimas: g.valor, decimas: { total: d.total, aplicadas, filas: d.filas },
+        motivo: aplicadas > 0 ? `incluye +${aplicadas} de décimas de premio` : 'décimas de premio: ya tiene 10',
+      });
+    }
+    return conAjuste(ctx, { ...r, estado: 'calculada', valor: g.valor, motivo: null });
   }
 
   if (evento.tipo === 'taller') {

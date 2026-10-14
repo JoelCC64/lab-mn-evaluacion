@@ -18,7 +18,7 @@ import {
 } from '../src/datos/paquete.js';
 import { guardarLocal } from '../src/datos/local.js';
 import {
-  agregarVisitante, alternarEtiqueta, alternarEtiquetaTrabajo, guardarAjuste, guardarFeedback, guardarRecuperacion, marcarEntrega,
+  agregarVisitante, alternarEtiqueta, alternarEtiquetaTrabajo, otorgarDecimas, guardarAjuste, guardarFeedback, guardarRecuperacion, marcarEntrega,
   marcarPlic, marcarRetro, marcarSinClase, puntuarTrabajo,
 } from '../src/datos/acciones.js';
 import { registrosDelCurso } from '../src/datos/consultas.js';
@@ -119,6 +119,7 @@ test('Listo cuando (1): respaldo completo en .zip (JSON y un CSV por tabla): exp
   await marcarRetro(db, 'GR2QB:T1', '1', true, CLASES);
   await marcarSinClase(db, 'GR2QB:P6', 'Clase suspendida', CLASES);
   await db.notas.put({ evento: P1, unidad: 'grupo', unidad_id: '3', texto: ' Dijo "hola", luego:\r\nñandú 🙂; 1,5 ', fecha: CLASES });
+  await otorgarDecimas(db, P1, [e1], { valor: 0.3, motivo: 'Pregunta compleja, "con comillas"' }, CLASES);
   await db.meta.put({ clave: 'prueba', valor: { lista: [1, null, 'a,b'] } });
 
   const antes = await exportarRespaldo(db, opciones(RESPALDO));

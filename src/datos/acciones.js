@@ -52,6 +52,31 @@ export async function eliminarGrupo(db, evento, grupos, grupo, { destino = null,
   });
 }
 
+// ---------- Décimas de premio ----------
+
+/**
+ * Premia con `valor` décimas (múltiplo de 0.1) a cada uno de los `estudiantes` por responder una pregunta compleja en el
+ * evento. Es una fila por estudiante; las de un mismo premio comparten `lote` (un premio de grupo se quita de una vez).
+ * Las décimas se suman a la próxima práctica a la que asista cada uno (ver `destinoDecimas`). `unidad`: 'grupo' o
+ * 'estudiante'; `grupo`: el grupo donde se ganaron (solo informativo). Devuelve el lote.
+ */
+export async function otorgarDecimas(db, evento, estudiantes, { valor, motivo = null, unidad = 'estudiante', grupo = null }, ahora = ahoraISO()) {
+  const v = Number(valor);
+  if (!(v > 0 && v <= 10) || Math.abs(v * 10 - Math.round(v * 10)) > 1e-9) throw new Error('Las décimas van de 0.1 en 0.1 (por ejemplo, 0.1, 0.2, 0.5).');
+  const ids = [...new Set(estudiantes)];
+  if (!ids.length) throw new Error('No hay a quién darle las décimas (nadie presente en el grupo).');
+  const lote = `${ahora}-${Math.random().toString(36).slice(2, 7)}`;
+  await db.decimas.bulkPut(ids.map((estudiante) => ({
+    evento, id: `${lote}|${estudiante}`, estudiante, valor: Math.round(v * 10) / 10, motivo: limpiar(motivo) || null, lote, unidad, grupo: grupo ?? null, fecha: ahora,
+  })));
+  return lote;
+}
+
+/** Quita un premio completo (todas sus filas) o, con `estudiante`, solo la fila de ese estudiante. */
+export async function quitarDecimas(db, evento, lote, estudiante = null) {
+  await db.decimas.where('evento').equals(evento).filter((f) => f.lote === lote && (estudiante === null || f.estudiante === estudiante)).delete();
+}
+
 // ---------- Evaluación del grupo ----------
 
 export async function guardarPuntaje(db, evento, grupos, grupo, aspecto, valor, ahora = ahoraISO()) {

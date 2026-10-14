@@ -145,6 +145,7 @@ test('respaldo: exportar, borrar todo, restaurar y obtener datos idénticos', as
   await db.recuperaciones.put({ evento: ev, estudiante: e.id, estado: 'realizada', nota: 0.8, motivo: 'justificada', detalle: 'GR3QA, jue 15 oct', fecha: AHORA });
   await db.plic.put({ evento: 'GR2QB:PLIC', estudiante: e.id, completo_valido: true, fecha: AHORA });
   await db.feedback.put({ evento: ev, unidad: 'grupo', unidad_id: '1', texto: 'Texto editado', base: 'Texto generado', copiado: AHORA, fecha: AHORA });
+  await db.decimas.put({ evento: ev, id: 'lote1|' + e.id, estudiante: e.id, valor: 0.3, motivo: 'pregunta compleja', lote: 'lote1', unidad: 'estudiante', grupo: '1', fecha: AHORA });
   await db.meta.put({ clave: 'prueba', valor: 1 });
 
   const opciones = { semestre: '2026B', app: 'prueba', config: cfg.version, ahora: AHORA };
@@ -230,16 +231,17 @@ test('una base de la versión 2 (Fase 4) se actualiza a la actual (trabajos en c
   assert.equal((await db.trabajos_casa.where('evento').equals('GR1AA:TC1').first()).unidad_id, '2');
 });
 
-test('una base de la versión 4 (Fase 6) se actualiza a la 5 (feedback), sin perder las recuperaciones', async () => {
-  const nombre = await baseAnterior(4, ['feedback']);
+test('una base de la versión 4 (Fase 6) se actualiza a la actual (feedback y décimas), sin perder las recuperaciones', async () => {
+  const nombre = await baseAnterior(4, ['feedback', 'decimas']);
   const v4 = new Dexie(nombre);
-  v4.version(4).stores(Object.fromEntries(Object.entries(TABLAS).filter(([t]) => t !== 'feedback')));
+  v4.version(4).stores(Object.fromEntries(Object.entries(TABLAS).filter(([t]) => !['feedback', 'decimas'].includes(t))));
   await v4.recuperaciones.put({ evento: 'GR2QB:P2', estudiante: '199900001', estado: 'realizada', nota: 0.8, motivo: 'justificada', detalle: null, fecha: AHORA });
   v4.close();
   const db = abrirBase(nombre);
   await db.open();
-  assert.equal(db.verno, 5);
+  assert.equal(db.verno, VERSION_BASE);
   assert.equal((await db.recuperaciones.get(['GR2QB:P2', '199900001'])).nota, 0.8);
+  assert.equal(await db.decimas.count(), 0, 'la tabla de décimas existe y está vacía');
   await db.feedback.put({ evento: 'GR2QB:P1', unidad: 'grupo', unidad_id: '1', texto: 'Editado', base: 'Generado', copiado: null, fecha: AHORA });
   assert.equal(await db.feedback.where('evento').equals('GR2QB:P1').count(), 1);
 });
@@ -247,7 +249,7 @@ test('una base de la versión 4 (Fase 6) se actualiza a la 5 (feedback), sin per
 test('un respaldo hecho con una versión anterior (sin retroalimentaciones, trabajos en casa ni feedback) se puede restaurar', async () => {
   const db = await baseConEjemplo();
   const viejo = await exportarRespaldo(db, { semestre: '2026B', app: '0.3.0', config: cfg.version, ahora: AHORA });
-  for (const t of ['retroalimentaciones', 'trabajos_casa', 'recuperaciones', 'plic', 'feedback']) delete viejo.tablas[t];
+  for (const t of ['retroalimentaciones', 'trabajos_casa', 'recuperaciones', 'plic', 'feedback', 'decimas']) delete viejo.tablas[t];
   assert.deepEqual(validarRespaldo(viejo, db, { semestre: '2026B' }), []);
   await restaurarRespaldo(db, viejo);
   assert.equal(await db.estudiantes.count(), 196);

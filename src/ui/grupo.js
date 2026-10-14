@@ -6,12 +6,13 @@ import {
   agregarEstudianteNuevo, alternarEtiqueta, guardarNotaProfesor, guardarObservacion, guardarPuntaje, marcarAsistencia, moverEstudiante, revisarGrupo,
 } from '../datos/acciones.js';
 import { gruposDe, notaControl, notaGrupo, rubrica } from '../nucleo/motor.js';
-import { grupoNuevo, listaDeGrupos } from '../nucleo/grupos.js';
+import { esVisitante, grupoNuevo, listaDeGrupos } from '../nucleo/grupos.js';
 import { seEvaluaPorGrupo, sobreDiez, textoNotaGrupo } from '../nucleo/motor-vista.js';
 import { preparatorioCalifica } from '../nucleo/config.js';
 import { HojaVisitante } from './visitantes.js';
 import { HojaCorregirNuevo } from './estudiante-nuevo.js';
 import { BotonEliminarGrupo } from './eliminar-grupo.js';
+import { BotonDecimas } from './decimas.js';
 
 export function Grupo({ id, grupo }) {
   const { curso, ctx, evento, cargando } = useEvento(id);
@@ -192,7 +193,11 @@ function Integrantes({ ctx, evento, grupo, integrantes, grupos }) {
   const [agregando, setAgregando] = useState(false);
   const ap = evento.tipo === 'taller' ? ctx.cfg.actividades[evento.config]?.asistencia_permanencia : null;
   return html`
-    <div class="seccion-titulo">Integrantes · pase final</div>
+    <div class="separado">
+      <div class="seccion-titulo">Integrantes · pase final</div>
+      <${BotonDecimas} ctx=${ctx} evento=${evento} unidad="grupo" grupo=${grupo} etiqueta="+ Décimas al grupo" titulo=${`Décimas al grupo ${grupo}`}
+        estudiantes=${integrantes.filter((e) => !esVisitante(e) && !['no_vino', 'salio'].includes(ctx.asistencia.get(`${evento.id}|${e.id}`)?.estado))} />
+    </div>
     ${ap && html`<p class="tenue pequeno">Asistencia y permanencia: presente 1 · se retiró antes ${ap.se_retiro_antes} · no vino 0. Si alguien está pero no trabaja, anótalo en su observación.</p>`}
     <div class="lista">
       ${integrantes.map((e) => html`<${Integrante} key=${e.id} ctx=${ctx} evento=${evento} estudiante=${e} grupos=${grupos} alMover=${() => setMoviendo(e)} />`)}
@@ -223,6 +228,7 @@ function Integrante({ ctx, evento, estudiante, grupos, alMover }) {
           ${novedad && preparatorioCalifica(cfg, ctx.curso.metodologia) && novedad.nivel !== null ? html`<${Chip} tono="aviso">prep. ${novedad.nivel}<//>` : null}
           ${control.estado === 'calculada' ? html`<${Chip} tono="info">control ${control.valor !== null ? sobreDiez(control.valor) : (control.aprobado ? '✓' : '✗')}<//>` : null}`} />
         ${estudiante.agregado && html`<button class="boton chico" onClick=${() => setCorrigiendo(true)}>Corregir</button>`}
+        <${BotonDecimas} ctx=${ctx} evento=${evento} unidad="estudiante" estudiantes=${[estudiante]} etiqueta="+ Décimas" titulo="Décimas" />
         <button class="boton chico" onClick=${alMover}>Mover</button>
       </div>
       ${corrigiendo && html`<${HojaCorregirNuevo} estudiante=${estudiante} alCerrar=${() => setCorrigiendo(false)} />`}
