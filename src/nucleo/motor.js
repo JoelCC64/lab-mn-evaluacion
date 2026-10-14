@@ -143,9 +143,19 @@ export function destinoDecimas(ctx, origen, estudiante) {
   return null;
 }
 
+/**
+ * ¿Cuenta este premio? Un premio de grupo no cuenta para quien faltó (no vino o salió) a la clase donde se ganó, aunque
+ * se haya marcado su falta después de darlo; uno individual sí (se dio a propósito a esa persona).
+ */
+export function premioCuenta(ctx, fila) {
+  if (fila.unidad !== 'grupo') return true;
+  const origen = ctx.eventoPorId.get(fila.evento);
+  return !(origen && asistenciaDe(ctx, origen, fila.estudiante).falta);
+}
+
 /** Premios en décimas de un estudiante que cuentan en este evento: { filas, total } (total en décimas de punto sobre 10). */
 export function decimasDelEvento(ctx, evento, estudiante) {
-  const filas = (ctx.decimas?.get(estudiante) ?? []).filter((f) => destinoDecimas(ctx, f.evento, estudiante)?.id === evento.id);
+  const filas = (ctx.decimas?.get(estudiante) ?? []).filter((f) => premioCuenta(ctx, f) && destinoDecimas(ctx, f.evento, estudiante)?.id === evento.id);
   return { filas, total: redondear(filas.reduce((s, f) => s + f.valor, 0), 1) };
 }
 

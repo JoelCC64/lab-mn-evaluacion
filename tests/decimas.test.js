@@ -152,3 +152,23 @@ test('el ajuste individual manda sobre las décimas; las décimas no aplican si 
   const b = await k.nota('P2', 'b');
   assert.ok(b.decimas.total === 0.5 && b.valor <= 1);
 });
+
+test('premio de grupo: quien faltó a la clase donde se ganó no recibe las décimas (aunque su falta se marque después); el individual sí cuenta', async () => {
+  const k = await curso();
+  const { eventos, ctx: c0 } = await k.cargar();
+  const t1 = eventos.find((e) => e.codigo === 'T1');
+  // Se da al grupo 1 (a, b, c) antes de marcar quién faltó.
+  await otorgarDecimas(k.db, t1.id, ['a', 'b', 'c'], { valor: 0.3, unidad: 'grupo', grupo: '1' }, AHORA);
+  // Después se marca que c no vino al T1; y a d (que no vino) se le dieron décimas individuales a propósito.
+  await marcarAsistencia(k.db, t1.id, gruposDe(c0, t1), 'c', 'no_vino', null, AHORA);
+  await marcarAsistencia(k.db, t1.id, gruposDe(c0, t1), 'd', 'no_vino', null, AHORA);
+  await otorgarDecimas(k.db, t1.id, ['d'], { valor: 0.2 }, AHORA);
+  await k.practica('P2', { baja: 0 });
+  const [a, c, d] = [await k.nota('P2', 'a'), await k.nota('P2', 'c'), await k.nota('P2', 'd')];
+  assert.equal(a.decimas.total, 0.3);
+  assert.equal(c.decimas, undefined, 'c faltó al T1: el premio del grupo no le cuenta');
+  assert.equal(d.decimas.total, 0.2, 'el premio individual sí cuenta');
+  // Si se corrige y c sí vino, el premio vuelve a contar (se calcula cada vez).
+  await marcarAsistencia(k.db, t1.id, null, 'c', 'presente', null, AHORA);
+  assert.equal((await k.nota('P2', 'c')).decimas.total, 0.3);
+});

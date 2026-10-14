@@ -3,7 +3,7 @@
 import { useState } from '../vendor/preact-htm.js';
 import { html, useApp, Chip, Hoja, Persona } from './base.js';
 import { otorgarDecimas, quitarDecimas } from '../datos/acciones.js';
-import { decimasDelEvento, destinoDecimas } from '../nucleo/motor.js';
+import { decimasDelEvento, destinoDecimas, premioCuenta } from '../nucleo/motor.js';
 
 const VALORES = [0.1, 0.2, 0.3, 0.5, 1];
 const texto = (v) => String(Math.round(v * 10) / 10);
@@ -67,12 +67,14 @@ export function DecimasDelEvento({ ctx, evento }) {
     <div class="seccion-titulo">Décimas de premio · ${filas.length === 1 ? '1 estudiante' : `${filas.length} estudiantes`}</div>
     <div class="lista">
       ${lotes.map(({ lote, del, primera }) => {
-        const destinos = [...new Set(del.map((f) => destinoDecimas(ctx, evento.id, f.estudiante)?.codigo ?? '—'))];
+        const validas = del.filter((f) => premioCuenta(ctx, f));
+        const sinContar = del.length - validas.length;
+        const destinos = [...new Set(validas.map((f) => destinoDecimas(ctx, evento.id, f.estudiante)?.codigo ?? '—'))];
         return html`
           <div class="fila">
             <div class="principal">
-              <div class="linea1">+${texto(primera.valor)} · ${primera.unidad === 'grupo' ? `grupo ${primera.grupo ?? ''} (${del.length})` : nombre(primera.estudiante)}</div>
-              <div class="linea2">${primera.motivo ?? 'sin motivo'} · cuentan en ${destinos.join(' / ')}</div>
+              <div class="linea1">+${texto(primera.valor)} · ${primera.unidad === 'grupo' ? `grupo ${primera.grupo ?? ''} (${validas.length})` : nombre(primera.estudiante)}</div>
+              <div class="linea2">${`${primera.motivo ?? 'sin motivo'} · ${validas.length ? `cuentan en ${destinos.join(' / ')}` : 'no cuentan'}${sinContar ? ` · ${sinContar} sin contar por faltar` : ''}`}</div>
             </div>
             <button class="boton chico" onClick=${() => setQuitando({ lote, del })}>Quitar</button>
           </div>`;
@@ -101,8 +103,9 @@ export function DecimasDeEstudiante({ ctx, evento, estudiante, nota }) {
       ${entran.total > 0 && html`
         <p class="pequeno"><b>${aplica ? `En ${evento.codigo}: +${texto(aplica.aplicadas)}` : `Se suman en ${evento.codigo}: +${texto(entran.total)} (cuando su nota esté calculada)`}</b>${aplica && aplica.aplicadas < aplica.total ? ` de ${texto(aplica.total)} (la nota no pasa de 10)` : ''}${' · '}${
           entran.filas.map((f) => `${texto(f.valor)} de ${codigo(f.evento)}${f.motivo ? ` (${f.motivo})` : ''}`).join(' + ')}</p>`}
-      ${ganadas.map((f) => html`
-        <p class="pequeno">${`Ganó +${texto(f.valor)}${f.motivo ? ` (${f.motivo})` : ''} aquí; cuenta en `}<b>${destinoDecimas(ctx, evento.id, estudiante.id)?.codigo ?? 'la próxima práctica (aún sin práctica)'}</b>.</p>`)}
+      ${ganadas.map((f) => (premioCuenta(ctx, f)
+        ? html`<p class="pequeno">${`Ganó +${texto(f.valor)}${f.motivo ? ` (${f.motivo})` : ''} aquí; cuenta en `}<b>${destinoDecimas(ctx, evento.id, estudiante.id)?.codigo ?? 'la próxima práctica (aún sin práctica)'}</b>.</p>`
+        : html`<p class="pequeno">${`+${texto(f.valor)} del grupo${f.motivo ? ` (${f.motivo})` : ''}: no cuenta, porque faltó a esta clase.`}</p>`))}
     </div>`;
 }
 
