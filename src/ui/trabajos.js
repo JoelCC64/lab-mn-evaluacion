@@ -244,6 +244,20 @@ function Entrega({ n, alElegir }) {
     </div>`;
 }
 
+/** «Ver criterio»: qué se evalúa y qué vale cada nivel (rúbrica del reglamento SQI para profesores, Tablas 7 a 12). */
+function Criterio({ p }) {
+  const [abierto, setAbierto] = useState(false);
+  const [completo, parcial] = [Math.max(...p.puntajes), p.criterios.parcial === null ? null : [...p.puntajes].sort((a, b) => b - a)[1]];
+  const niveles = [[completo, p.criterios.completo], ...(parcial === null ? [] : [[parcial, p.criterios.parcial]]), [0, p.criterios.sin]];
+  return html`
+    <button class="boton chico" style="align-self:flex-start" onClick=${() => setAbierto(!abierto)}>${abierto ? "ocultar criterio" : "ver criterio"}</button>
+    ${abierto && html`
+      <div class="ayuda">
+        ${p.aspecto && html`<p style="margin:0 0 4px"><b>Se evalúa:</b> ${p.aspecto}</p>`}
+        <dl>${niveles.map(([v, t]) => html`<dt>${v} ${v === 1 ? 'punto' : 'puntos'}</dt><dd>${t}</dd>`)}</dl>
+      </div>`}`;
+}
+
 function Preguntas({ n, config, alPuntuar, alEtiquetar }) {
   const marcadas = new Set(n.etiquetas);
   return html`
@@ -253,6 +267,7 @@ function Preguntas({ n, config, alPuntuar, alEtiquetar }) {
         return html`
           <div class=${`tc-pregunta ${p.valor === null ? 'pendiente' : ''}`} key=${p.id}>
             <div class="tc-enunciado"><b>${p.id}</b><span>${p.texto}</span></div>
+            ${p.criterios && html`<${Criterio} p=${p} />`}
             <div class="niveles chicos">
               ${p.puntajes.map((v) => html`<button class=${p.valor === v ? 'elegido' : ''} onClick=${() => alPuntuar(p, v)}>${v}</button>`)}
             </div>

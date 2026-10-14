@@ -114,7 +114,7 @@ export function notaTrabajo(ctx, evento, unidadId) {
   const fila = ctx.trabajosCasa.get(`${evento.id}|${unidadTrabajo(config)}|${unidadId}`) ?? null;
   const partes = (config?.preguntas ?? []).map((p) => {
     const v = fila?.puntajes?.[p.id];
-    return { id: p.id, texto: p.texto, puntajes: p.puntajes, max: Math.max(...p.puntajes), valor: v === undefined ? null : v };
+    return { id: p.id, texto: p.texto, aspecto: p.aspecto ?? null, criterios: p.criterios ?? null, puntajes: p.puntajes, max: Math.max(...p.puntajes), valor: v === undefined ? null : v };
   });
   const faltan = partes.filter((p) => p.valor === null).map((p) => p.id);
   const puntos = partes.reduce((s, p) => s + (p.valor ?? 0), 0);

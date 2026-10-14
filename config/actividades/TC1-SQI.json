@@ -16,6 +16,12 @@
     {
       "id": "1a",
       "texto": "Objetivos del curso frente a sus expectativas de un laboratorio tradicional",
+      "aspecto": "Comparación entre los objetivos del curso y las expectativas sobre un laboratorio tradicional.",
+      "criterios": {
+        "completo": "Responde de manera pertinente.",
+        "parcial": null,
+        "sin": "No responde o la respuesta no se relaciona con la pregunta."
+      },
       "puntajes": [
         1,
         0
@@ -24,6 +30,12 @@
     {
       "id": "1b",
       "texto": "Los cinco objetivos de aprendizaje aplicados a sus intereses profesionales",
+      "aspecto": "Aplicación de los cinco objetivos de aprendizaje a sus intereses profesionales.",
+      "criterios": {
+        "completo": "Relaciona los cinco objetivos con sus intereses profesionales.",
+        "parcial": null,
+        "sin": "No responde o no establece relaciones pertinentes."
+      },
       "puntajes": [
         2,
         0
@@ -32,6 +44,12 @@
     {
       "id": "2a-i",
       "texto": "Incertidumbre de las mediciones individuales, posición más alta",
+      "aspecto": "Incertidumbre de las mediciones individuales tomadas desde la posición más alta.",
+      "criterios": {
+        "completo": "Procedimiento y resultado correctos.",
+        "parcial": "Procedimiento adecuado con errores de cálculo.",
+        "sin": "Procedimiento incorrecto o no realizado."
+      },
       "puntajes": [
         1,
         0.5,
@@ -41,6 +59,12 @@
     {
       "id": "2a-ii",
       "texto": "Incertidumbre de las mediciones individuales, posición más baja",
+      "aspecto": "Incertidumbre de las mediciones individuales tomadas desde la posición más baja.",
+      "criterios": {
+        "completo": "Procedimiento y resultado correctos.",
+        "parcial": "Procedimiento adecuado con errores de cálculo.",
+        "sin": "Procedimiento incorrecto o no realizado."
+      },
       "puntajes": [
         1,
         0.5,
@@ -50,6 +74,12 @@
     {
       "id": "2b-i",
       "texto": "Incertidumbre de la media, posición más alta",
+      "aspecto": "Incertidumbre de la media para las mediciones tomadas desde la posición más alta.",
+      "criterios": {
+        "completo": "Procedimiento y resultado correctos.",
+        "parcial": "Procedimiento adecuado con errores de cálculo.",
+        "sin": "Procedimiento incorrecto o no realizado."
+      },
       "puntajes": [
         1,
         0.5,
@@ -59,6 +89,12 @@
     {
       "id": "2b-ii",
       "texto": "Incertidumbre de la media, posición más baja",
+      "aspecto": "Incertidumbre de la media para las mediciones tomadas desde la posición más baja.",
+      "criterios": {
+        "completo": "Procedimiento y resultado correctos.",
+        "parcial": "Procedimiento adecuado con errores de cálculo.",
+        "sin": "Procedimiento incorrecto o no realizado."
+      },
       "puntajes": [
         1,
         0.5,
@@ -68,6 +104,12 @@
     {
       "id": "2c",
       "texto": "Diferencia entre la incertidumbre individual y la de la media",
+      "aspecto": "Diferencia entre la incertidumbre individual y la incertidumbre de la media.",
+      "criterios": {
+        "completo": "Presenta una explicación pertinente.",
+        "parcial": null,
+        "sin": "No responde o la explicación no se relaciona con la pregunta."
+      },
       "puntajes": [
         1,
         0
@@ -76,6 +118,12 @@
     {
       "id": "2d",
       "texto": "Método de medición más confiable, justificado con los resultados",
+      "aspecto": "Determinación del método de medición más confiable.",
+      "criterios": {
+        "completo": "Conclusión correcta y justificada con los resultados.",
+        "parcial": "Conclusión correcta con justificación incompleta.",
+        "sin": "Conclusión incorrecta, sin justificación o no realizada."
+      },
       "puntajes": [
         2,
         1,

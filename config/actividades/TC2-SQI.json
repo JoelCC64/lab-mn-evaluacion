@@ -16,6 +16,12 @@
     {
       "id": "1",
       "texto": "Comparación cuantitativa del período del péndulo a 10° y 20°",
+      "aspecto": "Comparación cuantitativa del periodo del péndulo para 10° y 20°.",
+      "criterios": {
+        "completo": "Cálculos, comparación y conclusión correctos.",
+        "parcial": "Procedimiento adecuado con errores de cálculo o interpretación.",
+        "sin": "Procedimiento incorrecto, sin comparación o no realizado."
+      },
       "puntajes": [
         4,
         2,
@@ -25,6 +31,12 @@
     {
       "id": "2a-i",
       "texto": "Cómo una expectativa previa puede ser productiva en un experimento",
+      "aspecto": "Discusión sobre cómo una expectativa previa puede ser productiva durante un experimento.",
+      "criterios": {
+        "completo": "Presenta una respuesta pertinente.",
+        "parcial": null,
+        "sin": "No responde o la respuesta no se relaciona con la pregunta."
+      },
       "puntajes": [
         1.5,
         0
@@ -33,6 +45,12 @@
     {
       "id": "2a-ii",
       "texto": "Cómo puede ser contraproducente",
+      "aspecto": "Discusión sobre cómo una expectativa previa puede ser contraproducente durante un experimento.",
+      "criterios": {
+        "completo": "Presenta una respuesta pertinente.",
+        "parcial": null,
+        "sin": "No responde o la respuesta no se relaciona con la pregunta."
+      },
       "puntajes": [
         1.5,
         0
@@ -41,6 +59,12 @@
     {
       "id": "2b",
       "texto": "Prácticas concretas para reducir el efecto de expectativas y sesgos",
+      "aspecto": "Prácticas para reducir los efectos de las expectativas y los posibles sesgos.",
+      "criterios": {
+        "completo": "Propone estrategias concretas y pertinentes.",
+        "parcial": null,
+        "sin": "No responde o no propone acciones relacionadas con el experimento."
+      },
       "puntajes": [
         3,
         0

@@ -16,6 +16,12 @@
     {
       "id": "1a",
       "texto": "Similitudes y diferencias entre el curso y las mediciones de la constante de estructura fina (lectura)",
+      "aspecto": "Reflexión sobre las similitudes y diferencias entre el curso de laboratorio y el proceso descrito para las mediciones de la constante de estructura fina.",
+      "criterios": {
+        "completo": "Presenta una entrada estructurada que aborda las similitudes y las diferencias, y las relaciona con la lectura.",
+        "parcial": "Aborda solamente las similitudes o solamente las diferencias, o la relación con la lectura es superficial.",
+        "sin": "No responde o la reflexión no se relaciona con la lectura."
+      },
       "puntajes": [
         4,
         2,
@@ -25,6 +31,12 @@
     {
       "id": "1b-i",
       "texto": "Referencia completa del artículo elegido (título, autor, fuente)",
+      "aspecto": "Referencia completa del artículo de divulgación científica o de ingeniería seleccionado.",
+      "criterios": {
+        "completo": "Registra el título, el autor y la fuente o enlace del artículo.",
+        "parcial": "Registra la referencia de manera incompleta.",
+        "sin": "No presenta la referencia o el artículo no corresponde a lo solicitado."
+      },
       "puntajes": [
         2,
         1,
@@ -34,6 +46,12 @@
     {
       "id": "1b-ii",
       "texto": "Descripción del diseño experimental o del proceso de medición del artículo, con la extensión pedida",
+      "aspecto": "Descripción del diseño experimental o del proceso de medición detallado en el artículo.",
+      "criterios": {
+        "completo": "Describe el diseño o el proceso de medición de forma clara y pertinente, respetando la extensión solicitada.",
+        "parcial": "La descripción es parcial, poco clara o no respeta la extensión solicitada.",
+        "sin": "No realiza la descripción o esta no corresponde al artículo citado."
+      },
       "puntajes": [
         4,
         2,

@@ -16,6 +16,12 @@
     {
       "id": "1a",
       "texto": "Sistema elástico concreto y pregunta comprobable para la siguiente práctica",
+      "aspecto": "Selección del sistema y/o de la pregunta que se probará en la siguiente práctica.",
+      "criterios": {
+        "completo": "Describe un sistema elástico concreto y una pregunta comprobable.",
+        "parcial": "Menciona el sistema o la pregunta, pero de manera imprecisa.",
+        "sin": "No responde o la propuesta no permite comprobar la ley de Hooke."
+      },
       "puntajes": [
         2,
         1,
@@ -25,6 +31,12 @@
     {
       "id": "1b",
       "texto": "Justificación del interés de la propuesta",
+      "aspecto": "Justificación del interés del sistema o de la pregunta propuesta.",
+      "criterios": {
+        "completo": "Presenta una justificación pertinente.",
+        "parcial": null,
+        "sin": "No responde o la justificación no se relaciona con la propuesta."
+      },
       "puntajes": [
         1,
         0
@@ -33,6 +45,12 @@
     {
       "id": "1c",
       "texto": "Predicción: cuándo la ley de Hooke es un modelo adecuado",
+      "aspecto": "Predicción de las condiciones en las que la ley de Hooke sería un modelo adecuado.",
+      "criterios": {
+        "completo": "Predicción pertinente y argumentada.",
+        "parcial": "Predicción pertinente con argumentación incompleta.",
+        "sin": "No responde o la predicción no corresponde al sistema propuesto."
+      },
       "puntajes": [
         2,
         1,
@@ -42,6 +60,12 @@
     {
       "id": "1d",
       "texto": "Predicción: cuándo no lo es",
+      "aspecto": "Predicción de las condiciones en las que la ley de Hooke sería un modelo inapropiado.",
+      "criterios": {
+        "completo": "Predicción pertinente y argumentada.",
+        "parcial": "Predicción pertinente con argumentación incompleta.",
+        "sin": "No responde o la predicción no corresponde al sistema propuesto."
+      },
       "puntajes": [
         2,
         1,
@@ -51,6 +75,12 @@
     {
       "id": "1e",
       "texto": "Plan de comprobación realizable (mediciones, variables y criterios)",
+      "aspecto": "Planificación de la comprobación experimental (mediciones, variables y criterios).",
+      "criterios": {
+        "completo": "Describe un procedimiento realizable que permite responder la pregunta planteada.",
+        "parcial": "Describe un procedimiento incompleto o sin especificar las mediciones.",
+        "sin": "No responde o no presenta una planificación utilizable."
+      },
       "puntajes": [
         3,
         1.5,

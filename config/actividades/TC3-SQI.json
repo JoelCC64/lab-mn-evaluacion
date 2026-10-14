@@ -16,6 +16,12 @@
     {
       "id": "1a",
       "texto": "Al menos una pregunta nueva y comprobable",
+      "aspecto": "Formulación de nuevas preguntas comprobables relacionadas con las investigaciones.",
+      "criterios": {
+        "completo": "Presenta al menos una pregunta comprobable y pertinente.",
+        "parcial": null,
+        "sin": "No responde o la pregunta propuesta no es comprobable."
+      },
       "puntajes": [
         1,
         0
@@ -24,6 +30,12 @@
     {
       "id": "1b",
       "texto": "Reflexión sobre cómo gestionó expectativas y sesgos (los tres aspectos pedidos)",
+      "aspecto": "Reflexión sobre las prácticas empleadas para gestionar expectativas y sesgos.",
+      "criterios": {
+        "completo": "Responde los tres aspectos solicitados.",
+        "parcial": null,
+        "sin": "No responde o la respuesta no se relaciona con la experiencia."
+      },
       "puntajes": [
         2,
         0
@@ -32,6 +44,12 @@
     {
       "id": "2a",
       "texto": "Si el objeto alcanza una velocidad terminal, justificado con los datos",
+      "aspecto": "Determinación de si el objeto alcanza una velocidad terminal.",
+      "criterios": {
+        "completo": "Conclusión correcta y justificada mediante los datos.",
+        "parcial": "Conclusión correcta con análisis incompleto.",
+        "sin": "Conclusión incorrecta, sin justificación o no realizada."
+      },
       "puntajes": [
         2,
         1,
@@ -41,6 +59,12 @@
     {
       "id": "2b",
       "texto": "Aceleración en el intervalo en que acelera (procedimiento, resultado y unidades)",
+      "aspecto": "Determinación de la aceleración durante el intervalo en el que el objeto está acelerando.",
+      "criterios": {
+        "completo": "Procedimiento, resultado y unidades correctos.",
+        "parcial": "Procedimiento adecuado con errores de cálculo, intervalo o unidades.",
+        "sin": "Procedimiento incorrecto o no realizado."
+      },
       "puntajes": [
         3,
         1.5,
@@ -50,6 +74,12 @@
     {
       "id": "2c",
       "texto": "Comparación cuantitativa con la gravedad en Quito",
+      "aspecto": "Comparación con la aceleración de la gravedad en Quito.",
+      "criterios": {
+        "completo": "Comparación cuantitativa correcta y justificada.",
+        "parcial": "Comparación adecuada, pero incompleta o con errores menores.",
+        "sin": "Comparación incorrecta o no realizada."
+      },
       "puntajes": [
         2,
         1,

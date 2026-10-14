@@ -155,6 +155,15 @@
               "properties": {
                 "id": { "type": "string", "minLength": 1 },
                 "texto": { "$ref": "comun.schema.json#/$defs/texto" },
+                "aspecto": { "$ref": "comun.schema.json#/$defs/texto" },
+                "criterios": {
+                  "type": "object", "required": ["completo", "parcial", "sin"], "additionalProperties": false,
+                  "properties": {
+                    "completo": { "$ref": "comun.schema.json#/$defs/texto" },
+                    "parcial": { "oneOf": [{ "$ref": "comun.schema.json#/$defs/texto" }, { "type": "null" }] },
+                    "sin": { "$ref": "comun.schema.json#/$defs/texto" }
+                  }
+                },
                 "puntajes": { "type": "array", "minItems": 2, "uniqueItems": true, "items": { "type": "number", "minimum": 0 } }
               }
             }
