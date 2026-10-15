@@ -322,7 +322,7 @@ function HojaAgregar({ ctx, evento, grupo, grupos, cerrar }) {
       <div class="seccion-titulo">De otros grupos</div>
       <div class="lista">${deOtros.map(({ e, g }) => html`<button class="fila" onClick=${() => agregar(e)}><${Persona} estudiante=${e} detalle=${html`<span>· grupo ${g}</span>`} /></button>`)}</div>
       <button class="boton ancho" onClick=${() => setNuevo(true)}>+ Estudiante nuevo en este curso (no está en el Excel)…</button>
-      ${evento.con_nota && html`<button class="boton ancho" onClick=${() => setVisitante(true)}>+ Estudiante de otro curso (recupera aquí)…</button>`}
+      <button class="boton ancho" onClick=${() => setVisitante(true)}>${evento.con_nota ? '+ Estudiante de otro curso (recupera aquí)…' : '+ Estudiante de otro curso (asiste aquí)…'}</button>
       <button class="boton ancho" onClick=${cerrar}>Cancelar</button>
     <//>`;
 }

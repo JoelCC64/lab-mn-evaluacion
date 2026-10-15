@@ -12,7 +12,7 @@ import { AjusteProfesor, useProfesor } from './dispositivo.js';
 export function HojaVisitante({ evento, grupo, grupos, alCerrar }) {
   const [modo, setModo] = useState('otro');
   return html`
-    <${Hoja} titulo=${`Recupera aquí · grupo ${grupo}`} alCerrar=${alCerrar}>
+    <${Hoja} titulo=${`${evento.con_nota ? 'Recupera aquí' : 'Asiste aquí'} · grupo ${grupo}`} alCerrar=${alCerrar}>
       <div class="botones">
         <button class=${`boton chico ${modo === 'otro' ? 'primario' : ''}`} onClick=${() => setModo('otro')}>De otro docente</button>
         <button class=${`boton chico ${modo === 'mio' ? 'primario' : ''}`} onClick=${() => setModo('mio')}>De mis otros cursos</button>
@@ -45,7 +45,7 @@ function DeMisCursos({ evento, grupo, grupos, alCerrar }) {
   };
   return html`
     <p class="tenue pequeno">Estudiante de otro de tus cursos de ${metodologia === 'SQI' ? 'SQI' : 'la metodología clásica'} (solo se recupera con la misma metodología).
-      Se califica con su grupo y su nota aparece sola en ${evento.codigo} de su curso.</p>
+      ${evento.con_nota ? `Se califica con su grupo y su nota aparece sola en ${evento.codigo} de su curso.` : 'Sesión sin nota: queda su asistencia y las décimas que gane con su grupo, que se suman en su curso.'}</p>
     <div class="campo"><label>Buscar por nombre, código o curso</label>
       <input class="entrada" value=${buscar} onInput=${(e) => setBuscar(e.currentTarget.value)} autocomplete="off" /></div>
     <div class="lista">
@@ -72,7 +72,9 @@ function FormularioOtroDocente({ evento, grupo, grupos, alCerrar }) {
     } catch (e) { avisar(e.message, 'mal'); }
   };
   return html`
-    <p class="tenue pequeno">Estudiante de otro docente que recupera ${evento.codigo} en esta sesión. Se califica con su grupo, no va al Excel y la app arma el texto con su nota para su profesor.</p>
+    <p class="tenue pequeno">${evento.con_nota
+      ? `Estudiante de otro docente que recupera ${evento.codigo} en esta sesión. Se califica con su grupo, no va al Excel y la app arma el texto con su nota para su profesor.`
+      : 'Estudiante de otro docente que asiste a esta sesión sin nota. No va al Excel; la app arma el texto con su asistencia y las décimas que gane, para su profesor.'}</p>
       ${campo('codigo', 'Código único', { inputmode: 'numeric', autocomplete: 'off' })}
       ${campo('nombre', 'Apellidos y nombres', { autocapitalize: 'characters', autocomplete: 'off' })}
       ${campo('paralelo', 'Su paralelo (opcional)', { autocapitalize: 'characters', placeholder: 'Ej.: GR5XX' })}
@@ -92,19 +94,19 @@ export function TarjetaVisitantes({ ctx, evento }) {
   const [abierto, setAbierto] = useState(null);
   if (!visitantes.length) return null;
   return html`
-    <div class="seccion-titulo">Recuperan aquí (otros cursos) · ${visitantes.length}</div>
+    <div class="seccion-titulo">${evento.con_nota ? 'Recuperan aquí' : 'Asisten aquí'} (otros cursos) · ${visitantes.length}</div>
     <div class="lista">
       ${visitantes.map((v) => {
         const n = notaEvento(ctx, evento, v.id);
         return html`
           <button class="fila" onClick=${() => setAbierto(v)}>
-            <${Persona} estudiante=${v} detalle=${html`${esMio(ctx, v) && html`<${Chip} tono="info">mi estudiante · ${v.visita.paralelo}<//>`}<${Chip} tono=${n.estado === 'calculada' ? 'ok' : ''}>${n.estado === 'calculada' ? `${sobreDiez(n.valor)}/10` : 'nota pendiente'}<//>`} />
+            <${Persona} estudiante=${v} detalle=${html`${esMio(ctx, v) && html`<${Chip} tono="info">mi estudiante · ${v.visita.paralelo}<//>`}${evento.con_nota && html`<${Chip} tono=${n.estado === 'calculada' ? 'ok' : ''}>${n.estado === 'calculada' ? `${sobreDiez(n.valor)}/10` : 'nota pendiente'}<//>`}`} />
             <span class="flecha">›</span>
           </button>`;
       })}
     </div>
-    <p class="tenue pequeno">Envía la nota a su profesor en las 24 h siguientes: toca a cada uno para copiar o compartir el texto.
-      ${visitantes.some((v) => esMio(ctx, v)) ? ' Los de tus cursos no necesitan texto: su nota ya aparece en su propio curso.' : ''}</p>
+    <p class="tenue pequeno">Envía ${evento.con_nota ? 'la nota' : 'la asistencia y las décimas'} a su profesor en las 24 h siguientes: toca a cada uno para copiar o compartir el texto.
+      ${visitantes.some((v) => esMio(ctx, v)) ? ` Los de tus cursos no necesitan texto: ${evento.con_nota ? 'su nota ya aparece' : 'sus décimas ya cuentan'} en su propio curso.` : ''}</p>
     ${abierto && html`<${HojaTextoProfesor} ctx=${ctx} evento=${evento} visitante=${abierto} alCerrar=${() => setAbierto(null)} />`}`;
 }
 

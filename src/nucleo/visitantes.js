@@ -40,14 +40,16 @@ export function textoParaSuProfesor(ctx, evento, visitante, firma = null) {
   const ctrl = notaControl(ctx, evento, visitante.id);
   const metodologia = cfg.semestre.metodologias[curso.metodologia] ?? curso.metodologia;
   const lineas = [
-    `Recuperación en el Laboratorio de Mecánica Newtoniana (EPN, ${cfg.semestre.semestre})`,
+    `${evento.con_nota ? 'Recuperación' : 'Asistencia a una sesión'} en el Laboratorio de Mecánica Newtoniana (EPN, ${cfg.semestre.semestre})`,
     '',
     `Estudiante: ${visitante.nombre} · código ${visitante.codigo}${visitante.visita?.paralelo ? ` · paralelo ${visitante.visita.paralelo}` : ''}`,
-    `Actividad: ${evento.codigo} · ${evento.titulo} (${metodologia})`,
+    `${evento.con_nota ? 'Actividad' : 'Sesión sin nota'}: ${evento.codigo} · ${evento.titulo} (${metodologia})`,
     `Sesión: ${curso.paralelo}, ${fechaLarga(evento.fecha)}, ${curso.inicio}–${curso.fin}`,
     `Asistencia: ${asis.estado ? (cfg.asistencia.estados[asis.estado]?.texto ?? asis.estado) : 'sin registrar'}${asis.motivo ? ` (${asis.motivo})` : ''}`,
   ];
-  if (n.estado === 'calculada') {
+  if (!evento.con_nota) {
+    // Sesión sin nota (por ejemplo, el refuerzo): solo asistencia y décimas.
+  } else if (n.estado === 'calculada') {
     const detalle = partesEnTexto(n);
     lineas.push(`Nota de la actividad: ${sobreDiez(n.valor)}/10${n.valor === 0 && n.motivo ? ` (${n.motivo})` : detalle ? ` (${detalle})` : ''}`);
     if (n.ajuste) lineas.push(`Ajuste: ${n.ajuste.motivo}`);
@@ -65,5 +67,5 @@ export function textoParaSuProfesor(ctx, evento, visitante, firma = null) {
   }
   if (asis.observacion) lineas.push(`Observación: ${asis.observacion}`);
   if (firma) lineas.push('', firma);
-  return { texto: lineas.join('\n'), final: n.estado === 'calculada' };
+  return { texto: lineas.join('\n'), final: !evento.con_nota || n.estado === 'calculada' };
 }

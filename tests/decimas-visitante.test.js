@@ -102,3 +102,23 @@ test('el texto para el profesor de una visita ajena menciona las décimas ganada
   const { texto } = textoParaSuProfesor(ctx, e, ctx.estudiantePorId.get(v));
   assert.match(texto, /Décimas ganadas con su grupo: \+0\.3.*incertidumbre/);
 });
+
+test('al refuerzo (sesión sin nota) puede asistir una visita: gana décimas con su grupo y llegan a su curso; su texto no habla de nota', async () => {
+  const k = await escenario();
+  const { e, v } = await conVisita(k, 'GR1QA', 'REFUERZO');
+  assert.equal(e.con_nota, false);
+  await otorgarDecimas(k.db, e.id, ['h1', v], { valor: 0.2, motivo: 'pregunta', unidad: 'grupo', grupo: '1' }, AHORA);
+  const { ctx, ev } = await k.cargar('GR7SA');
+  const f = ctx.decimas.get('x1');
+  assert.equal(f.length, 1);
+  const destino = destinoDecimas(ctx, f[0].evento, 'x1', f[0].evento_fecha);
+  assert.equal(destino.tipo, 'practica');
+  assert.equal(decimasDelEvento(ctx, destino, 'x1').total, 0.2);
+  assert.equal((await registrosDelCurso(k.db, 'GR7SA', cfg)).recuperaciones.length, 0, 'sin nota no hay recuperación vinculada');
+  const anfitrion = (await k.cargar('GR1QA')).ctx;
+  const { texto, final } = textoParaSuProfesor(anfitrion, e, anfitrion.estudiantePorId.get(v));
+  assert.equal(final, true);
+  assert.doesNotMatch(texto, /Nota de la actividad/);
+  assert.match(texto, /Sesión sin nota: REFUERZO/);
+  assert.match(texto, /Décimas ganadas con su grupo: \+0\.2/);
+});
