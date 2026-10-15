@@ -1,7 +1,7 @@
 // Estudiantes de otros docentes que recuperan en una sesión de este curso (Fase 6). Se agregan al evento con su
 // código y nombre, se califican con su grupo y la app arma el texto con la nota para su profesor (que se envía en
 // las 24 h siguientes). No van al Excel ni cuentan en el curso. Funciones puras.
-import { asistenciaDe, notaControl, notaEvento, notaPreparatorio } from './motor.js';
+import { asistenciaDe, notaControl, notaEvento, notaPreparatorio, premioCuenta } from './motor.js';
 import { esVisitante } from './grupos.js';
 import { fechaLarga, redondear } from './util.js';
 
@@ -57,6 +57,11 @@ export function textoParaSuProfesor(ctx, evento, visitante, firma = null) {
   if (prep.estado === 'calculada') lineas.push(`Trabajo preparatorio: ${prep.nivel}/2`);
   if (ctrl.estado === 'calculada') {
     lineas.push(`Control oral: ${ctrl.valor !== null && ctrl.valor !== undefined ? `${sobreDiez(ctrl.valor)}/10` : ctrl.aprobado ? 'aprobado' : 'no aprobado'}`);
+  }
+  const premios = (ctx.decimas?.get(visitante.id) ?? []).filter((f) => f.evento === evento.id && premioCuenta(ctx, f));
+  if (premios.length) {
+    const total = redondear(premios.reduce((s, f) => s + f.valor, 0), 1);
+    lineas.push(`Décimas ganadas${premios.some((f) => f.unidad === 'grupo') ? ' con su grupo' : ''}: +${total} (para sumar a su próxima práctica)${premios.some((f) => f.motivo) ? ` · ${premios.filter((f) => f.motivo).map((f) => f.motivo).join('; ')}` : ''}`);
   }
   if (asis.observacion) lineas.push(`Observación: ${asis.observacion}`);
   if (firma) lineas.push('', firma);

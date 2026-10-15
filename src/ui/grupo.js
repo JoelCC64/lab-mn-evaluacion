@@ -196,7 +196,7 @@ function Integrantes({ ctx, evento, grupo, integrantes, grupos }) {
     <div class="separado">
       <div class="seccion-titulo">Integrantes · pase final</div>
       <${BotonDecimas} ctx=${ctx} evento=${evento} unidad="grupo" grupo=${grupo} etiqueta="+ Décimas al grupo" titulo=${`Décimas al grupo ${grupo}`}
-        estudiantes=${integrantes.filter((e) => !esVisitante(e) && !['no_vino', 'salio'].includes(ctx.asistencia.get(`${evento.id}|${e.id}`)?.estado))} />
+        estudiantes=${integrantes.filter((e) => !['no_vino', 'salio'].includes(ctx.asistencia.get(`${evento.id}|${e.id}`)?.estado))} />
     </div>
     ${ap && html`<p class="tenue pequeno">Asistencia y permanencia: presente 1 · se retiró antes ${ap.se_retiro_antes} · no vino 0. Si alguien está pero no trabaja, anótalo en su observación.</p>`}
     <div class="lista">

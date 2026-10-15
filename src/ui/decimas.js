@@ -3,20 +3,25 @@
 import { useState } from '../vendor/preact-htm.js';
 import { html, useApp, Chip, Hoja, Persona } from './base.js';
 import { otorgarDecimas, quitarDecimas } from '../datos/acciones.js';
+import { esVisitante } from '../nucleo/grupos.js';
 import { decimasDelEvento, destinoDecimas, premioCuenta } from '../nucleo/motor.js';
 
 const VALORES = [0.1, 0.2, 0.3, 0.5, 1];
 const texto = (v) => String(Math.round(v * 10) / 10);
 
 /** Hoja para dar décimas a `estudiantes` (lista de estudiantes). `unidad`: 'grupo' o 'estudiante'. */
-export function HojaDecimas({ ctx, evento, estudiantes, unidad, grupo = null, titulo, alCerrar }) {
+export function HojaDecimas({ ctx, evento, estudiantes: candidatos, unidad, grupo = null, titulo, alCerrar }) {
   const { db, avisar } = useApp();
+  const [fuera, setFuera] = useState([]);   // quitados a mano antes de confirmar
+  const estudiantes = candidatos.filter((e) => !fuera.includes(e.id));
+  const visitantes = estudiantes.filter(esVisitante);
+  const propios = estudiantes.filter((e) => !esVisitante(e));
   const [valor, setValor] = useState(0.1);
   const [otro, setOtro] = useState('');
   const [motivo, setMotivo] = useState('');
   const v = otro.trim() !== '' ? Number(otro.replace(',', '.')) : valor;
   const valido = v > 0 && Math.abs(v * 10 - Math.round(v * 10)) < 1e-9;
-  const destinos = [...new Set(estudiantes.map((e) => destinoDecimas(ctx, evento.id, e.id)?.codigo ?? null))];
+  const destinos = [...new Set(propios.map((e) => destinoDecimas(ctx, evento.id, e.id)?.codigo ?? null))];
   const donde = destinos.length === 1 && destinos[0] ? destinos[0] : destinos.every((d) => d === null) ? null : 'varias';
   const dar = async () => {
     try {
@@ -30,7 +35,10 @@ export function HojaDecimas({ ctx, evento, estudiantes, unidad, grupo = null, ti
       <p class="tenue pequeno">${`Por responder una pregunta compleja. Se suman a la nota de ${
         donde === 'varias' ? 'la próxima práctica a la que asista cada uno' : donde ? `la práctica ${donde}` : 'la próxima práctica (aún no hay una)'
       } (si falta, pasan a la siguiente a la que asista). La nota no pasa de 10.`}</p>
-      ${estudiantes.length > 1 && html`<p class="pequeno"><b>${estudiantes.length} presentes:</b> ${estudiantes.map((e) => e.nombre.split(' ')[0]).join(' · ')}</p>`}
+      ${candidatos.length > 1 && html`
+        <p class="pequeno"><b>${estudiantes.length} presentes</b> (toca un nombre para quitarlo o ponerlo):</p>
+        <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px">${candidatos.map((e) => html`<button class=${`chip ${fuera.includes(e.id) ? '' : 'ok'}`} onClick=${() => setFuera(fuera.includes(e.id) ? fuera.filter((x) => x !== e.id) : [...fuera, e.id])}>${`${e.nombre.split(' ')[0]}${esVisitante(e) ? ' (visita)' : ''}`}</button>`)}</div>`}
+      ${visitantes.length > 0 && html`<p class="tenue pequeno">${`${visitantes.length === 1 ? 'La visita se lleva' : 'Las visitas se llevan'} sus décimas a su propio curso (a la primera práctica de allá después de hoy). Si es estudiante de otro profesor, van en el texto que le envías.`}</p>`}
       ${estudiantes.length === 1 && html`<${Persona} estudiante=${estudiantes[0]} />`}
       <div class="segmentado" role="group" aria-label="Décimas">
         ${VALORES.map((x) => html`<button class=${otro.trim() === '' && valor === x ? 'elegido ok' : ''} onClick=${() => { setOtro(''); setValor(x); }}>+${texto(x)}</button>`)}
@@ -69,7 +77,7 @@ export function DecimasDelEvento({ ctx, evento }) {
       ${lotes.map(({ lote, del, primera }) => {
         const validas = del.filter((f) => premioCuenta(ctx, f));
         const sinContar = del.length - validas.length;
-        const destinos = [...new Set(validas.map((f) => destinoDecimas(ctx, evento.id, f.estudiante)?.codigo ?? '—'))];
+        const destinos = [...new Set(validas.map((f) => (esVisitante(ctx.estudiantePorId.get(f.estudiante) ?? {}) ? 'su curso' : destinoDecimas(ctx, evento.id, f.estudiante)?.codigo ?? '—')))];
         return html`
           <div class="fila">
             <div class="principal">
@@ -96,7 +104,7 @@ export function DecimasDeEstudiante({ ctx, evento, estudiante, nota }) {
   const entran = decimasDelEvento(ctx, evento, estudiante.id);
   const aplica = nota?.decimas;
   if (!ganadas.length && !entran.total) return null;
-  const codigo = (id) => ctx.eventoPorId.get(id)?.codigo ?? id;
+  const codigo = (id) => ctx.eventoPorId.get(id)?.codigo ?? id.replace(':', ' · ');
   return html`
     <div class="tarjeta">
       <h3>Décimas de premio</h3>
@@ -104,7 +112,7 @@ export function DecimasDeEstudiante({ ctx, evento, estudiante, nota }) {
         <p class="pequeno"><b>${aplica ? `En ${evento.codigo}: +${texto(aplica.aplicadas)}` : `Se suman en ${evento.codigo}: +${texto(entran.total)} (cuando su nota esté calculada)`}</b>${aplica && aplica.aplicadas < aplica.total ? ` de ${texto(aplica.total)} (la nota no pasa de 10)` : ''}${' · '}${
           entran.filas.map((f) => `${texto(f.valor)} de ${codigo(f.evento)}${f.motivo ? ` (${f.motivo})` : ''}`).join(' + ')}</p>`}
       ${ganadas.map((f) => (premioCuenta(ctx, f)
-        ? html`<p class="pequeno">${`Ganó +${texto(f.valor)}${f.motivo ? ` (${f.motivo})` : ''} aquí; cuenta en `}<b>${destinoDecimas(ctx, evento.id, estudiante.id)?.codigo ?? 'la próxima práctica (aún sin práctica)'}</b>.</p>`
+        ? html`<p class="pequeno">${`Ganó +${texto(f.valor)}${f.motivo ? ` (${f.motivo})` : ''} aquí; cuenta en `}<b>${esVisitante(estudiante) ? 'su propio curso' : destinoDecimas(ctx, evento.id, estudiante.id)?.codigo ?? 'la próxima práctica (aún sin práctica)'}</b>.</p>`
         : html`<p class="pequeno">${`+${texto(f.valor)} del grupo${f.motivo ? ` (${f.motivo})` : ''}: no cuenta, porque faltó a esta clase.`}</p>`))}
     </div>`;
 }

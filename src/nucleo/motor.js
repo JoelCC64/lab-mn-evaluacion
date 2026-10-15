@@ -132,10 +132,14 @@ export function notaTrabajo(ctx, evento, unidadId) {
 /**
  * Práctica donde cuentan las décimas de un premio ganado en el evento `origen`: la primera práctica con nota después de
  * ese evento a la que el estudiante sí asiste (si faltó, pasan a la siguiente). null si aún no hay ninguna.
+ * Un visitante no tiene destino aquí (sus décimas cuentan en su propio curso). Si el premio se ganó en otro curso (`origen`
+ * no está en este), `fecha` es la de esa sesión: cuenta la primera práctica propia posterior a ella.
  */
-export function destinoDecimas(ctx, origen, estudiante) {
+export function destinoDecimas(ctx, origen, estudiante, fecha = null) {
+  if (ctx.estudiantePorId.get(estudiante)?.estado === 'visitante') return null;
   const i = ctx.eventos.findIndex((e) => e.id === origen);
-  for (const e of ctx.eventos.slice(i + 1)) {
+  if (i < 0 && !fecha) return null;
+  for (const e of i < 0 ? ctx.eventos.filter((x) => x.fecha > fecha) : ctx.eventos.slice(i + 1)) {
     if (e.tipo !== 'practica' || !e.con_nota || e.estado !== 'normal') continue;
     if (asistenciaDe(ctx, e, estudiante).falta) continue;
     return e;
@@ -155,7 +159,7 @@ export function premioCuenta(ctx, fila) {
 
 /** Premios en décimas de un estudiante que cuentan en este evento: { filas, total } (total en décimas de punto sobre 10). */
 export function decimasDelEvento(ctx, evento, estudiante) {
-  const filas = (ctx.decimas?.get(estudiante) ?? []).filter((f) => premioCuenta(ctx, f) && destinoDecimas(ctx, f.evento, estudiante)?.id === evento.id);
+  const filas = (ctx.decimas?.get(estudiante) ?? []).filter((f) => premioCuenta(ctx, f) && destinoDecimas(ctx, f.evento, estudiante, f.evento_fecha)?.id === evento.id);
   return { filas, total: redondear(filas.reduce((s, f) => s + f.valor, 0), 1) };
 }
 
