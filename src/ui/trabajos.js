@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from '../vendor/preact-htm.js';
 import { html, useApp, Pantalla, Chip, Hoja, Aviso, Cargando, enlace, ir } from './base.js';
 import { useEvento } from './evento.js';
 import { NotaTexto } from './grupo.js';
-import { alternarEtiquetaTrabajo, borrarTrabajo, marcarEntrega, puntuarTrabajo } from '../datos/acciones.js';
+import { alternarEtiquetaTrabajo, borrarTrabajo, descontarTrabajo, marcarEntrega, puntuarTrabajo } from '../datos/acciones.js';
 import { leerLocal } from '../datos/local.js';
 import { eventoBase } from '../nucleo/grupos.js';
 import { unidadTrabajo } from '../nucleo/motor.js';
@@ -194,6 +194,8 @@ function Calificacion({ ctx, evento, unidadId }) {
             <${NotaTexto} key=${`nota-${evento.id}-${unidadId}`} evento=${evento} unidad=${unidad} unidadId=${unidadId}
               actual=${ctx.reg.notas.find((x) => x.evento === evento.id && x.unidad === unidad && x.unidad_id === String(unidadId))?.texto ?? ''} />
           </div>
+          <${Descuento} key=${`desc-${evento.id}-${unidadId}`} n=${n} config=${config}
+            alGuardar=${(v, motivo) => tocar(async () => { try { await descontarTrabajo(db, evento.id, unidad, unidadId, v, motivo); } catch (e) { avisar(e.message, 'mal'); } })} />
           ${n.registrado && html`<${Borrar} alBorrar=${() => tocar(async () => { await borrarTrabajo(db, evento.id, unidad, unidadId); avisar('Calificación borrada.'); })} />`}`
         : html`<${Aviso} tono="mal">${unidad === 'grupo' ? `Todos faltaron a ${practica.codigo}` : `Faltó a ${practica.codigo}`}: tiene 0 en el ${evento.codigo} y no hace falta calificarlo.<//>`}
       <div class="pie-fijo">
@@ -280,6 +282,40 @@ function Preguntas({ n, config, alPuntuar, alEtiquetar }) {
               </div>`}
           </div>`;
       })}
+    </div>`;
+}
+
+const DESCUENTOS = [0.5, 1, 1.5, 2];
+const MOTIVO_BASE = 'Redacción u ortografía deficientes';
+
+/**
+ * Apartado final: descuento por lo que la rúbrica no cubre (redacción, ortografía). Se resta de la suma de las preguntas,
+ * sin bajar de 0, y queda con su motivo en el Resumen y en el feedback.
+ */
+function Descuento({ n, config, alGuardar }) {
+  const [otro, setOtro] = useState('');
+  const [motivo, setMotivo] = useState(n.descuento_motivo ?? '');
+  const aplicado = n.descuento ?? 0;
+  const elegir = (v) => { setOtro(''); alGuardar(v, v > 0 ? (motivo.trim() || MOTIVO_BASE) : null); if (v > 0 && !motivo.trim()) setMotivo(MOTIVO_BASE); if (v === 0) setMotivo(''); };
+  const valorOtro = otro.trim() === '' ? null : Number(otro.replace(',', '.'));
+  const otroValido = valorOtro !== null && valorOtro > 0 && valorOtro <= config.escala_total && Math.abs(valorOtro * 10 - Math.round(valorOtro * 10)) < 1e-9;
+  return html`
+    <div class="tarjeta">
+      <h3>Ajuste por redacción y ortografía</h3>
+      <p class="tenue pequeno">Para sancionar un texto muy mal redactado, impropio de un universitario: lo que la rúbrica no cubre. Se resta de la suma de las preguntas (sin bajar de 0).</p>
+      <div class="segmentado" role="group" aria-label="Descuento">
+        <button class=${aplicado === 0 ? 'elegido ok' : ''} onClick=${() => (aplicado === 0 ? null : elegir(0))}>Sin descuento</button>
+        ${DESCUENTOS.map((v) => html`<button class=${aplicado === v ? 'elegido mal' : ''} onClick=${() => (aplicado === v ? null : elegir(v))}>−${v}</button>`)}
+      </div>
+      <div class="campo"><label>Otro descuento (puntos, múltiplo de 0.1)</label>
+        <div class="fila-flex">
+          <input class="entrada" inputmode="decimal" placeholder="0.3" value=${otro} onInput=${(e) => setOtro(e.currentTarget.value)} />
+          <button class="boton chico" disabled=${!otroValido} onClick=${() => { alGuardar(valorOtro, motivo.trim() || MOTIVO_BASE); if (!motivo.trim()) setMotivo(MOTIVO_BASE); setOtro(''); }}>Aplicar</button>
+        </div></div>
+      ${aplicado > 0 && html`
+        <div class="campo"><label>Motivo</label>
+          <input class="entrada" value=${motivo} onInput=${(e) => setMotivo(e.currentTarget.value)} onBlur=${() => { if (motivo.trim() && motivo.trim() !== (n.descuento_motivo ?? '')) alGuardar(aplicado, motivo); }} /></div>
+        <p class="pequeno"><b>${`${textoPuntos(n.suma)} − ${textoPuntos(aplicado)} = ${textoPuntos(n.puntos)}`}</b>${` sobre ${config.escala_total}.`}</p>`}
     </div>`;
 }
 

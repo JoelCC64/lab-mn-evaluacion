@@ -344,6 +344,20 @@ export async function alternarEtiquetaTrabajo(db, evento, unidad, unidadId, etiq
   }), ahora);
 }
 
+/**
+ * Descuento (en puntos sobre la escala del TC, múltiplo de 0.1) por lo que la rúbrica no cubre: redacción, ortografía.
+ * Lleva su motivo, que es obligatorio. `valor` 0 (o vacío) lo quita.
+ */
+export async function descontarTrabajo(db, evento, unidad, unidadId, valor, motivo, ahora = ahoraISO()) {
+  const v = Number(valor) || 0;
+  if (v < 0 || Math.abs(v * 10 - Math.round(v * 10)) > 1e-9) throw new Error('El descuento va de 0.1 en 0.1 puntos (por ejemplo, 0.5 o 1).');
+  const m = limpiar(motivo);
+  if (v > 0 && !m) throw new Error('Escribe el motivo del descuento (por ejemplo, «redacción deficiente»).');
+  await cambiarTrabajo(db, evento, unidad, unidadId, () => (v > 0
+    ? { descuento: Math.round(v * 10) / 10, descuento_motivo: m }
+    : { descuento: 0, descuento_motivo: null }), ahora);
+}
+
 /** Borra lo registrado del TC de la unidad (la nota del profesor se conserva). */
 export async function borrarTrabajo(db, evento, unidad, unidadId) {
   await db.trabajos_casa.delete([evento, unidad, String(unidadId)]);

@@ -8,7 +8,7 @@ import { randomUUID } from 'node:crypto';
 import { abrirBase } from '../src/db.js';
 import { registrosDelCurso } from '../src/datos/consultas.js';
 import {
-  alternarEtiquetaTrabajo, borrarTrabajo, cerrarPase, guardarNotaProfesor, guardarPuntaje, marcarAsistencia, marcarEntrega,
+  alternarEtiquetaTrabajo, borrarTrabajo, cerrarPase, descontarTrabajo, guardarNotaProfesor, guardarPuntaje, marcarAsistencia, marcarEntrega,
   puntuarTrabajo,
 } from '../src/datos/acciones.js';
 import { generarEventos } from '../src/nucleo/calendario.js';
@@ -148,4 +148,39 @@ test('TC individual: una unidad por estudiante (en el orden de los grupos) y qui
   assert.equal(notaEvento(ctx, tc1, 'b').valor, 1);
   assert.equal(notaEvento(ctx, tc1, 'a').motivo, 'falta calificar su trabajo');
   assert.equal(siguientePorCalificar(unidadesDelTrabajo(ctx, tc1), 'b'), 'd', 'salta a «c», que faltó');
+});
+
+test('descuento por redacción u ortografía: se resta de la suma, lleva motivo, no baja de 0 y se quita', async () => {
+  const { db, evento, cargar } = await cursoConP1();
+  const tc1 = evento('TC1');
+  const max = TC1.preguntas.map((p) => Math.max(...p.puntajes));
+  await calificar(db, tc1, '1', max);
+  const nota = async () => notaEvento(await cargar(), tc1, 'a');
+  const total = TC1.escala_total;
+  cerca((await nota()).valor, 1);
+
+  await assert.rejects(descontarTrabajo(db, tc1.id, 'grupo', '1', 1, ''), /motivo/);
+  await assert.rejects(descontarTrabajo(db, tc1.id, 'grupo', '1', 0.25, 'x'), /0\.1/);
+
+  await descontarTrabajo(db, tc1.id, 'grupo', '1', 1.5, 'Redacción deficiente');
+  const t = (await nota()).partes.trabajo;
+  assert.equal(t.descuento, 1.5);
+  assert.equal(t.descuento_motivo, 'Redacción deficiente');
+  cerca(t.suma, total);
+  cerca(t.puntos, total - 1.5);
+  cerca((await nota()).valor, (total - 1.5) / total);
+
+  // Un descuento mayor que la suma deja 0, no negativo.
+  await descontarTrabajo(db, tc1.id, 'grupo', '1', total + 5, 'Ilegible');
+  cerca((await nota()).valor, 0);
+
+  // Se conserva al cambiar un puntaje y se quita con 0.
+  await descontarTrabajo(db, tc1.id, 'grupo', '1', 0.5, 'Ortografía');
+  await puntuarTrabajo(db, tc1.id, 'grupo', '1', TC1.preguntas[0].id, 0);
+  assert.equal((await nota()).partes.trabajo.descuento, 0.5);
+  await descontarTrabajo(db, tc1.id, 'grupo', '1', 0, '');
+  const q = (await nota()).partes.trabajo;
+  assert.equal(q.descuento, 0);
+  assert.equal(q.descuento_motivo, null);
+  cerca(q.puntos, q.suma);
 });

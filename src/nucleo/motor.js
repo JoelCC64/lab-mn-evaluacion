@@ -108,7 +108,9 @@ export function unidadTrabajo(config) {
 /**
  * Trabajo en casa de una unidad (número de grupo o id de estudiante), pregunta por pregunta:
  * { registrado, entregado, completo, valor (0–1, o null si falta algo), puntos, total, partes, faltan, etiquetas }.
- * Nota = Σ puntos / escala total (10), sin penalización por atraso. «No entregó» vale 0.
+ * Nota = (Σ puntos − descuento) / escala total (10), sin penalización por atraso. «No entregó» vale 0.
+ * `descuento` (puntos, ≥ 0) lo pone el profesor por lo que la rúbrica no cubre (redacción, ortografía) y lleva su motivo;
+ * `puntos` ya lo trae restado (sin bajar de 0) y `suma` es la de las preguntas.
  */
 export function notaTrabajo(ctx, evento, unidadId) {
   const config = evento.config ? ctx.cfg.actividades[evento.config] : null;
@@ -118,10 +120,13 @@ export function notaTrabajo(ctx, evento, unidadId) {
     return { id: p.id, texto: p.texto, aspecto: p.aspecto ?? null, criterios: p.criterios ?? null, puntajes: p.puntajes, max: Math.max(...p.puntajes), valor: v === undefined ? null : v };
   });
   const faltan = partes.filter((p) => p.valor === null).map((p) => p.id);
-  const puntos = partes.reduce((s, p) => s + (p.valor ?? 0), 0);
+  const suma = partes.reduce((s, p) => s + (p.valor ?? 0), 0);
+  const descuento = fila?.descuento > 0 ? Math.min(fila.descuento, suma) : 0;
+  const puntos = redondear(suma - descuento, 2);
   const r = {
     registrado: Boolean(fila), entregado: fila ? fila.entregado !== false : null, completo: false, valor: null,
-    puntos, total: config?.escala_total ?? null, partes, faltan, etiquetas: fila?.etiquetas ?? [],
+    puntos, suma, descuento, descuento_motivo: descuento > 0 ? (fila.descuento_motivo ?? null) : null,
+    total: config?.escala_total ?? null, partes, faltan, etiquetas: fila?.etiquetas ?? [],
   };
   if (!fila || !config?.preguntas) return r;
   if (fila.entregado === false) return { ...r, completo: true, valor: 0, puntos: 0 };

@@ -231,7 +231,7 @@ function unidadDeTrabajo(ctx, evento, config, u) {
     ({ mejor, mejorar } = itemsDeTrabajo(ctx, config, n));
     const conValor = n.partes.filter((p) => p.valor !== null);
     notaTexto = n.completo
-      ? `Nota del ${evento.codigo}: ${textoPuntos(n.puntos)}/${total} (${conValor.map((p) => `${p.id} ${textoPuntos(p.valor)}/${textoPuntos(p.max)}`).join(' · ')})`
+      ? `Nota del ${evento.codigo}: ${textoPuntos(n.puntos)}/${total} (${conValor.map((p) => `${p.id} ${textoPuntos(p.valor)}/${textoPuntos(p.max)}`).join(' · ')}${n.descuento > 0 ? ` · descuento −${textoPuntos(n.descuento)}${n.descuento_motivo ? `: ${n.descuento_motivo}` : ''}` : ''})`
       : `Nota del ${evento.codigo}: pendiente (${n.faltan.length === 1 ? 'falta 1 pregunta' : `faltan ${n.faltan.length} preguntas`})`;
     notaCorta = n.completo ? `${textoPuntos(n.puntos)}/${total}` : 'nota pendiente';
   }
