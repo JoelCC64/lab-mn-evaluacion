@@ -121,6 +121,19 @@ export async function marcarAsistencia(db, evento, grupos, estudiante, estado, m
   });
 }
 
+/**
+ * Taller: el estudiante está en clase pero no hizo el coloquio (requisito de ingreso). Su asistencia no cambia, pero el
+ * taller queda sin nota (0). `sin` falso lo quita. Es un dato aparte del estado de asistencia (asistencia y cumplimiento).
+ */
+export async function marcarSinColoquio(db, evento, grupos, estudiante, sin = true, ahora = ahoraISO()) {
+  if (grupos) await asegurarInstantanea(db, evento, grupos, ahora);
+  await db.transaction('rw', db.asistencia, async () => {
+    const actual = (await db.asistencia.get([evento, estudiante])) ?? { evento, estudiante, estado: null, motivo: null, observacion: null };
+    const { sin_coloquio: _anterior, ...resto } = actual;
+    await db.asistencia.put({ ...resto, ...(sin ? { sin_coloquio: true } : {}), fecha: ahora });
+  });
+}
+
 /** Observación del estudiante en el evento (no cambia la nota por sí sola). */
 export async function guardarObservacion(db, evento, estudiante, texto, ahora = ahoraISO()) {
   await db.transaction('rw', db.asistencia, async () => {

@@ -29,6 +29,7 @@ export function Resumen({ ctx, evento }) {
   const presentes = filas.filter((f) => ['presente', 'se_retiro_antes'].includes(f.asistencia.estado)).length;
   const faltas = filas.filter((f) => f.asistencia.falta).length;
   const recuperaron = filas.filter((f) => recuperoSinVenir(ctx, evento, f)).length;
+  const sinColoquio = filas.filter((f) => f.asistencia.sinColoquio && !f.asistencia.falta).length;
   const pendientes = filas.filter((f) => f.nota.estado === 'pendiente').length;
   // Un TC usa la asistencia de su práctica.
   const enPractica = evento.tipo === 'trabajo_casa' ? ` en ${eventoBase(evento, ctx.eventos).codigo}` : '';
@@ -38,6 +39,7 @@ export function Resumen({ ctx, evento }) {
     <div class="resumen-numeros">
       <div><b>${presentes}</b><span>presentes${enPractica}</span></div>
       <div><b>${faltas}</b><span>faltas${enPractica}</span></div>
+      ${sinColoquio > 0 && html`<div><b>${sinColoquio}</b><span>sin coloquio (sin nota)</span></div>`}
       ${recuperaron > 0 && html`<div><b>${recuperaron}</b><span>recuperaron (R)</span></div>`}
       ${conNota && html`<div><b>${pendientes}</b><span>notas pendientes</span></div>`}
     </div>

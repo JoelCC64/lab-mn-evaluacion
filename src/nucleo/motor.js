@@ -52,6 +52,7 @@ export function asistenciaDe(ctx, evento, estudiante) {
     observacion: fila?.observacion ?? null,
     paseCerrado: Boolean(ctx.pases.get(base.id)?.cerrado),
     falta: FALTAS.includes(fila?.estado),
+    sinColoquio: Boolean(fila?.sin_coloquio),   // taller: estuvo en clase pero no hizo el coloquio (sin nota)
   };
 }
 
@@ -237,6 +238,8 @@ export function notaEvento(ctx, evento, estudiante) {
 
   if (evento.tipo === 'taller') {
     if (!config) return conAjuste(ctx, { ...r, motivo: 'falta la configuración del taller' });
+    // Asistió pero no hizo el coloquio: la asistencia queda como está y el taller no tiene nota (0).
+    if (asis.sinColoquio) return conAjuste(ctx, { ...r, estado: 'calculada', valor: 0, motivo: 'no hizo el coloquio (asistió, sin nota)' });
     const ap = asis.estado === 'se_retiro_antes' ? config.asistencia_permanencia.se_retiro_antes : 1;
     const g = r.grupo === null ? null : notaGrupo(ctx, evento, r.grupo);
     r.partes = { asistencia_permanencia: ap, grupo: g };
