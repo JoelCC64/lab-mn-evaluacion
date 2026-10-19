@@ -3,10 +3,10 @@ import { useState } from '../vendor/preact-htm.js';
 import { html, useApp, Chip, Hoja, Persona, Aviso } from './base.js';
 import { BuscarEstudiante } from './buscar.js';
 import {
-  agregarAlControl, aprobarControl, elegirConcepto, marcarNoEsta, marcarSalio, marcarSinColoquio, puntuarPregunta, quitarDelControl, volverASorteado,
+  agregarAlControl, aprobarControl, elegirConcepto, marcarNoEsta, marcarSalio, puntuarPregunta, quitarDelControl, volverASorteado,
 } from '../datos/acciones.js';
 import { candidatosSorteo, coberturaControl, sortear } from '../nucleo/sorteo.js';
-import { gruposDe, notaControl } from '../nucleo/motor.js';
+import { notaControl } from '../nucleo/motor.js';
 import { controlCalifica } from '../nucleo/config.js';
 import { activos } from '../nucleo/grupos.js';
 import { sobreDiez } from '../nucleo/motor-vista.js';
@@ -63,8 +63,6 @@ export function Control({ ctx, evento }) {
         califica=${califica} sinControlAntes=${sinControl.includes(est.id)} alNoEsta=${() => noEsta(est)} alSalio=${() => setSalida(est)} />`;
     })}
 
-    ${evento.tipo === 'taller' && html`<${SinColoquio} ctx=${ctx} evento=${evento} />`}
-
     ${manual && html`
       <${Hoja} titulo="Elegir a mano" alCerrar=${() => setManual(false)}>
         <${BuscarEstudiante} estudiantes=${activos(ctx.reg.estudiantes).filter((e) => !filas.some((f) => f.estudiante === e.id))}
@@ -79,32 +77,6 @@ export function Control({ ctx, evento }) {
           <button class="boton" onClick=${() => setSalida(null)}>Cancelar</button>
           <button class="boton peligro-fuerte" onClick=${async () => { await marcarSalio(db, evento.id, salida.id, co.salio.motivo_falta); setSalida(null); }}>Salió</button>
         </div>
-      <//>`}`;
-}
-
-/** Taller: quienes están en clase pero no hicieron el coloquio (asisten, pero el taller queda sin nota). */
-function SinColoquio({ ctx, evento }) {
-  const { db, avisar } = useApp();
-  const [eligiendo, setEligiendo] = useState(false);
-  const grupos = gruposDe(ctx, evento);
-  const marcados = ctx.reg.asistencia.filter((a) => a.evento === evento.id && a.sin_coloquio)
-    .map((a) => ctx.estudiantePorId.get(a.estudiante)).filter(Boolean)
-    .sort((a, b) => a.nombre.localeCompare(b.nombre, 'es'));
-  return html`
-    <div class="seccion-titulo">Sin coloquio · ${marcados.length}</div>
-    <div class="tarjeta">
-      <p class="tenue pequeno">Estuvo en clase pero no hizo el coloquio: la asistencia no cambia, pero no puede tener nota en este taller (0).</p>
-      ${marcados.map((e) => html`
-        <div class="separado">
-          <${Persona} estudiante=${e} detalle=${html`<${Chip} tono="aviso">sin nota<//>`} />
-          <button class="boton chico" onClick=${() => marcarSinColoquio(db, evento.id, grupos, e.id, false)}>Quitar</button>
-        </div>`)}
-      <button class="boton chico ancho" onClick=${() => setEligiendo(true)}>+ Registrar a alguien sin coloquio…</button>
-    </div>
-    ${eligiendo && html`
-      <${Hoja} titulo="¿Quién no hizo el coloquio?" alCerrar=${() => setEligiendo(false)}>
-        <${BuscarEstudiante} estudiantes=${activos(ctx.reg.estudiantes).filter((e) => !marcados.some((m) => m.id === e.id) && !ctx.asistencia.get(`${evento.id}|${e.id}`)?.estado?.match(/no_vino|salio/))}
-          alElegir=${async (e) => { await marcarSinColoquio(db, evento.id, grupos, e.id, true); avisar(`${e.nombre.split(' ')[0]}: sin coloquio, sin nota en ${evento.codigo}.`); setEligiendo(false); }} />
       <//>`}`;
 }
 

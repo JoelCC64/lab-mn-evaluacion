@@ -3,7 +3,7 @@ import { useEffect, useRef, useState } from '../vendor/preact-htm.js';
 import { html, useApp, Pantalla, Chip, Hoja, Aviso, Cargando, Persona, enlace, ir } from './base.js';
 import { useEvento, nombreEvento } from './evento.js';
 import {
-  agregarEstudianteNuevo, alternarEtiqueta, guardarNotaProfesor, guardarObservacion, guardarPuntaje, marcarAsistencia, marcarSinColoquio, moverEstudiante, revisarGrupo,
+  agregarEstudianteNuevo, alternarEtiqueta, guardarNotaProfesor, guardarObservacion, guardarPuntaje, marcarAsistencia, moverEstudiante, revisarGrupo,
 } from '../datos/acciones.js';
 import { gruposDe, notaControl, notaGrupo, rubrica } from '../nucleo/motor.js';
 import { esVisitante, grupoNuevo, listaDeGrupos } from '../nucleo/grupos.js';
@@ -231,11 +231,7 @@ function Integrante({ ctx, evento, estudiante, grupos, alMover }) {
         <${BotonDecimas} ctx=${ctx} evento=${evento} unidad="estudiante" estudiantes=${[estudiante]} etiqueta="+ Décimas" titulo="Décimas" />
         <button class="boton chico" onClick=${alMover}>Mover</button>
       </div>
-      ${evento.tipo === 'taller' && !falta && html`
-        <div class="separado">
-          ${a?.sin_coloquio ? html`<${Chip} tono="aviso">Sin coloquio · sin nota<//>` : html`<span class="tenue pequeno">Coloquio</span>`}
-          <button class="boton chico" onClick=${() => marcarSinColoquio(db, evento.id, grupos, estudiante.id, !a?.sin_coloquio)}>${a?.sin_coloquio ? 'Sí hizo el coloquio' : 'No hizo el coloquio'}</button>
-        </div>`}
+      ${evento.tipo === 'taller' && !falta && a?.sin_coloquio && html`<div><${Chip} tono="aviso">Sin coloquio · sin nota (se quita en «Puerta»)<//></div>`}
       ${corrigiendo && html`<${HojaCorregirNuevo} estudiante=${estudiante} alCerrar=${() => setCorrigiendo(false)} />`}
       ${estado === 'salio'
         ? html`<div class="separado"><${Chip} tono="mal">Salió (${a.motivo ?? 'control'})<//><span class="tenue pequeno">Se corrige en «Control»</span></div>`

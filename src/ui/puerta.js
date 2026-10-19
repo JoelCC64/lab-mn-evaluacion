@@ -1,11 +1,12 @@
-// Pestaña «Puerta»: revisión del trabajo preparatorio uno por uno, antes de entrar.
+// Pestaña «Puerta»: revisión del trabajo preparatorio uno por uno, antes de entrar (y, en talleres, quién no hizo el coloquio).
 // «Revisión hecha: todos cumplieron» + solo las novedades. La nota (2) se calcula al cerrar el pase.
 import { useState } from '../vendor/preact-htm.js';
 import { html, useApp, Chip, Hoja, Persona, Aviso } from './base.js';
 import { BuscarEstudiante } from './buscar.js';
-import { borrarNovedad, guardarNovedad, marcarRevisionPreparatorio } from '../datos/acciones.js';
+import { borrarNovedad, guardarNovedad, marcarRevisionPreparatorio, marcarSinColoquio } from '../datos/acciones.js';
 import { preparatorioCalifica } from '../nucleo/config.js';
 import { activos } from '../nucleo/grupos.js';
+import { gruposDe } from '../nucleo/motor.js';
 
 const hora = (iso) => new Date(iso).toLocaleTimeString('es-EC', { hour: '2-digit', minute: '2-digit' });
 
@@ -51,9 +52,36 @@ export function Puerta({ ctx, evento }) {
             </button>`;
         })}
       </div>`}
+    ${evento.tipo === 'taller' && html`<${SinColoquio} ctx=${ctx} evento=${evento} />`}
     ${!revision?.revisada && califica && html`<${Aviso} tono="aviso">Si no marcas la revisión, el preparatorio de quienes no tienen novedad queda pendiente.<//>`}
     ${elegido && html`<${HojaNovedad} evento=${evento} estudiante=${elegido} califica=${califica}
       actual=${novedades.find((n) => n.estudiante === elegido.id)} cerrar=${() => setElegido(null)} />`}`;
+}
+
+/** Taller: quienes están en clase pero no hicieron el coloquio (asisten, pero el taller queda sin nota). */
+function SinColoquio({ ctx, evento }) {
+  const { db, avisar } = useApp();
+  const [eligiendo, setEligiendo] = useState(false);
+  const grupos = gruposDe(ctx, evento);
+  const marcados = ctx.reg.asistencia.filter((a) => a.evento === evento.id && a.sin_coloquio)
+    .map((a) => ctx.estudiantePorId.get(a.estudiante)).filter(Boolean)
+    .sort((a, b) => a.nombre.localeCompare(b.nombre, 'es'));
+  return html`
+    <div class="seccion-titulo">Sin coloquio · ${marcados.length}</div>
+    <div class="tarjeta">
+      <p class="tenue pequeno">Revisión del coloquio en la puerta: si entra pero no lo hizo, la asistencia no cambia, pero no puede tener nota en este taller (0).</p>
+      ${marcados.map((e) => html`
+        <div class="separado">
+          <${Persona} estudiante=${e} detalle=${html`<${Chip} tono="aviso">sin nota<//>`} />
+          <button class="boton chico" onClick=${() => marcarSinColoquio(db, evento.id, grupos, e.id, false)}>Quitar</button>
+        </div>`)}
+      <button class="boton chico ancho" onClick=${() => setEligiendo(true)}>+ Registrar a alguien sin coloquio…</button>
+    </div>
+    ${eligiendo && html`
+      <${Hoja} titulo="¿Quién no hizo el coloquio?" alCerrar=${() => setEligiendo(false)}>
+        <${BuscarEstudiante} estudiantes=${activos(ctx.reg.estudiantes).filter((e) => !marcados.some((m) => m.id === e.id) && !ctx.asistencia.get(`${evento.id}|${e.id}`)?.estado?.match(/no_vino|salio/))}
+          alElegir=${async (e) => { await marcarSinColoquio(db, evento.id, grupos, e.id, true); avisar(`${e.nombre.split(' ')[0]}: sin coloquio, sin nota en ${evento.codigo}.`); setEligiendo(false); }} />
+      <//>`}`;
 }
 
 function HojaNovedad({ evento, estudiante, califica, actual, cerrar }) {
