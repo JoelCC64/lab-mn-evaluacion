@@ -21,6 +21,16 @@ export async function moverEstudiante(db, evento, grupos, estudiante, grupo, aho
 }
 
 /**
+ * Mueve a un estudiante de grupo conservando las notas ya calculadas (`conservar`, de `notasAConservar`): cada una queda
+ * como ajuste individual con su motivo, para que el cambio de grupo no la deje pendiente.
+ */
+export async function moverConservandoNota(db, evento, grupos, estudiante, grupo, conservar = [], ahora = ahoraISO()) {
+  await moverEstudiante(db, evento, grupos, estudiante, grupo, ahora);
+  if (grupo === null) return;
+  for (const c of conservar) await guardarAjuste(db, c.evento, estudiante, c.valor, `conserva su nota del grupo ${c.grupo} (pasó al grupo ${grupo})`, ahora);
+}
+
+/**
  * Elimina un grupo del evento (por ejemplo, llegaron menos estudiantes y se rehacen los grupos). Quien faltó («no vino» o
  * «salió») queda sin grupo; los demás integrantes pasan a `destino` (un número de grupo o null = sin grupo). Se borra
  * lo registrado del grupo: puntajes, etiquetas, pase y firma, notas y feedback; en los TC de esta práctica, las
