@@ -1,5 +1,5 @@
 // Resúmenes del motor de notas para las pantallas.
-import { asistenciaDe, gruposDe, notaEvento, notaGrupo, notaTrabajo, unidadTrabajo } from './motor.js';
+import { asistenciaDe, gruposDe, notaGrupo, notaTrabajo, unidadTrabajo } from './motor.js';
 import { activos, listaDeGrupos } from './grupos.js';
 import { redondear } from './util.js';
 
@@ -91,16 +91,4 @@ export function textoNotaGrupo(nota) {
     return `${p.valor}/${p.max}`;
   }
   return `${sobreDiez(nota.valor)}/10`;
-}
-
-/**
- * Notas calculadas que perdería un estudiante al cambiarlo de grupo en un evento ya evaluado: la de este evento y las de
- * los trabajos en casa de esta práctica (usan su grupo). Cada una: { evento, codigo, valor, grupo } (grupo = el de antes).
- * No incluye faltas (0 en cualquier grupo), notas con ajuste ni recuperaciones, que no dependen del grupo.
- */
-export function notasAConservar(ctx, evento, estudiante) {
-  const eventos = [evento, ...ctx.eventos.filter((e) => e.tipo === 'trabajo_casa' && e.practica === evento.id)];
-  return eventos.map((e) => ({ e, n: notaEvento(ctx, e, estudiante) }))
-    .filter(({ n }) => n.estado === 'calculada' && n.grupo !== null && !n.ajuste && !n.recuperacion && !asistenciaDe(ctx, evento, estudiante).falta)
-    .map(({ e, n }) => ({ evento: e.id, codigo: e.codigo, valor: n.valor, grupo: n.grupo }));
 }

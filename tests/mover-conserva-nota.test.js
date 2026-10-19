@@ -6,10 +6,9 @@ import { randomUUID } from 'node:crypto';
 
 import { abrirBase } from '../src/db.js';
 import { registrosDelCurso } from '../src/datos/consultas.js';
-import { borrarAjuste, cerrarPase, guardarPuntaje, moverConservandoNota, moverEstudiante } from '../src/datos/acciones.js';
+import { cerrarPase, guardarPuntaje, moverEstudiante } from '../src/datos/acciones.js';
 import { generarEventos } from '../src/nucleo/calendario.js';
 import { crearContexto, gruposDe, notaEvento, rubrica } from '../src/nucleo/motor.js';
-import { notasAConservar } from '../src/nucleo/motor-vista.js';
 import { configReal } from './ayudas.js';
 
 const cfg = configReal();
@@ -56,53 +55,4 @@ test('mover a alguien en un evento posterior no cambia su nota de la práctica 1
   const { ctx: c3 } = await k.cargar();
   assert.equal(gruposDe(c3, t1).get('a'), '6');
   assert.equal(gruposDe(c3, eventos.find((e) => e.codigo === 'P1')).get('a'), '1');
-});
-
-test('moverEstudiante a secas dentro de una práctica ya evaluada deja su nota pendiente (por eso existe «conservar»)', async () => {
-  const k = await escenario();
-  const p1 = await k.evaluar('P1', '1');
-  const { ctx } = await k.cargar();
-  await cerrarPase(k.db, p1.id, gruposDe(ctx, p1), 'sin grupo', AHORA);
-  await moverEstudiante(k.db, p1.id, gruposDe(ctx, p1), 'a', '6', AHORA);
-  assert.equal((await k.nota('P1', 'a')).estado, 'pendiente');
-});
-
-test('mover dentro de la misma práctica conservando la nota: queda como ajuste y no depende del nuevo grupo', async () => {
-  const k = await escenario();
-  const p1 = await k.evaluar('P1', '1');
-  const { ctx } = await k.cargar();
-  await cerrarPase(k.db, p1.id, gruposDe(ctx, p1), 'sin grupo', AHORA);
-  const antes = await k.nota('P1', 'a');
-  const { ctx: cerrado } = await k.cargar();
-  const conservar = notasAConservar(cerrado, p1, 'a');
-  assert.deepEqual(conservar.map((c) => [c.codigo, c.grupo]), [['P1', '1']]);
-
-  await moverConservandoNota(k.db, p1.id, gruposDe(cerrado, p1), 'a', '6', conservar, AHORA);
-  const despues = await k.nota('P1', 'a');
-  assert.equal(despues.estado, 'calculada');
-  assert.equal(despues.valor, antes.valor);
-  assert.match(despues.motivo, /conserva su nota del grupo 1/);
-  // Sus excompañeros no cambian y el nuevo grupo se evalúa aparte, sin afectar a «a».
-  assert.equal((await k.nota('P1', 'b')).valor, antes.valor);
-  await k.evaluar('P1', '6', 0);
-  assert.equal((await k.nota('P1', 'a')).valor, antes.valor);
-  // Quitar el ajuste devuelve la nota de su grupo actual.
-  await borrarAjuste(k.db, p1.id, 'a');
-  assert.equal((await k.nota('P1', 'a')).valor, 0);
-});
-
-test('no hay nada que conservar si su grupo aún no se evaluó o si faltó', async () => {
-  const k = await escenario();
-  const { ctx, eventos } = await k.cargar();
-  const p1 = eventos.find((e) => e.codigo === 'P1');
-  assert.deepEqual(notasAConservar(ctx, p1, 'a'), []);
-});
-
-test('también en un taller evaluado', async () => {
-  const k = await escenario();
-  const t1 = await k.evaluar('T1', '1');
-  const { ctx } = await k.cargar();
-  await cerrarPase(k.db, t1.id, gruposDe(ctx, t1), 'sin grupo', AHORA);
-  const { ctx: cerrado } = await k.cargar();
-  assert.deepEqual(notasAConservar(cerrado, t1, 'a').map((c) => c.codigo), ['T1']);
 });
