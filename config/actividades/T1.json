@@ -22,7 +22,10 @@
     "escala": [
       0,
       1,
-      2
+      2,
+      3,
+      4,
+      5
     ],
     "descripcion": "Preguntas u observaciones del docente, ejecución de las actividades y tareas. No exige que el grupo termine el taller.",
     "incluye": [

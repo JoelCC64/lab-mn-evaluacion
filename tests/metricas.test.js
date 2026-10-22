@@ -180,7 +180,7 @@ test('asistencia y permanencia por curso, sesión, día, franja, grupo y estudia
   const db = abrirBase(`met-${randomUUID()}`);
   const k = await curso(db, 'GR2QB', { a: '1', b: '1', c: '2', d: '2', e: '2' });
   await k.sesion('P1', { niveles: { 1: [4, 4, 4], 2: [2, 2, 2] }, faltan: ['a'], retirados: ['c'] });
-  await k.sesion('T1', { niveles: { 1: [2], 2: [1] }, faltan: ['a', 'd'] });
+  await k.sesion('T1', { niveles: { 1: [5], 2: [2.5] }, faltan: ['a', 'd'] });
   const m = await metricas(db, { alcance: 'GR2QB' });
 
   assert.equal(m.unCurso, true);
@@ -212,10 +212,10 @@ test('rúbricas: distribución por criterio y aspecto, etiquetas, penalización 
   await trad.sesion('P1', { niveles: { 1: [4, 4, 4], 2: [2, 3, 1] }, etiquetas: { 1: ['montaje_ok'], 2: ['h_mal_medida', 'propagacion_mal'] } });
   const { e: p1, grupos } = await trad.evento('P1');
   await revisarGrupo(db, p1.id, grupos, '3', { penalizacion_total: true, motivo_penalizacion: 'Equipo no ordenado' }, AHORA);
-  await trad.sesion('T1', { niveles: { 1: [2], 2: [1], 3: [0] } });
+  await trad.sesion('T1', { niveles: { 1: [5], 2: [2.5], 3: [0] } });
   const sqi = await curso(db, 'GR1AA', { a: '1', b: '1', c: '2', d: '2' });
   await sqi.sesion('P1', { niveles: { 1: [3, 3, 2], 2: [1, 0, 0] } });
-  await sqi.sesion('T1', { niveles: { 1: [2], 2: [2] } });
+  await sqi.sesion('T1', { niveles: { 1: [5], 2: [5] } });
 
   const m = await metricas(db, {});
   const rP1 = m.rubricas.find((x) => x.clave === 'P1-TRAD|TRAD');

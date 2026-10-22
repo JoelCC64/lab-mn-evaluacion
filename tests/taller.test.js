@@ -70,17 +70,17 @@ test('T1 (Clásica, cronograma B): pase, evaluación integral por grupo y nota d
   await agregarAlControl(c.db, t1.id, ['c']);
   await puntuarPregunta(c.db, t1.id, 'c', 0, 2);
   await puntuarPregunta(c.db, t1.id, 'c', 1, 2);
-  await guardarPuntaje(c.db, t1.id, grupos, '1', 'integral', 2);
+  await guardarPuntaje(c.db, t1.id, grupos, '1', 'integral', 5);
   let { ctx } = await c.cargar();
   assert.deepEqual(avanceEvaluacion(ctx, t1), { grupos: 3, evaluados: 1 });
-  await taller(c, 'T1', { integral: { 2: 1, 3: 2 }, faltan: ['e'], retirados: ['h'] });
+  await taller(c, 'T1', { integral: { 2: 2.5, 3: 5 }, faltan: ['e'], retirados: ['h'] });
   ({ ctx } = await c.cargar());
   assert.deepEqual(avanceEvaluacion(ctx, t1), { grupos: 3, evaluados: 3 });
 
   const nota = (id) => notaEvento(ctx, t1, id);
-  cerca(nota('a').valor, 1.0, 'asistencia completa e integral 2/2');
-  cerca(nota('d').valor, 0.75, 'asistencia completa e integral 1/2 (caso del §4)');
-  cerca(nota('h').valor, 0.75, 'se retiró antes con integral 2/2 (caso del §4)');
+  cerca(nota('a').valor, 1.0, 'asistencia completa e integral 5/5');
+  cerca(nota('d').valor, 0.75, 'asistencia completa e integral 2.5/5 (caso del §4)');
+  cerca(nota('h').valor, 0.75, 'se retiró antes con integral 5/5 (caso del §4)');
   assert.equal(nota('h').motivo, 'se retiró antes');
   assert.deepEqual([nota('e').valor, nota('e').motivo], [0, 'no vino']);
   assert.deepEqual([nota('j').valor, nota('j').motivo], [0, `no vino (${SIN_GRUPO})`]);
@@ -101,8 +101,8 @@ test('curso que perdió el T2 por feriado (GR2QB): el componente de talleres pro
   const cfgT3 = conTaller('T3');
   const c = await curso('GR2QB', cfgT3);
   assert.equal(c.evento('T2').estado, 'feriado');
-  await taller(c, 'T1', { integral: { 1: 2, 2: 2, 3: 2 } });
-  await taller(c, 'T3', { integral: { 1: 1, 2: 2, 3: 2 }, retirados: ['g'] });
+  await taller(c, 'T1', { integral: { 1: 5, 2: 5, 3: 5 } });
+  await taller(c, 'T3', { integral: { 1: 2.5, 2: 5, 3: 5 }, retirados: ['g'] });
   const { ctx } = await c.cargar();
   assert.equal(c.evento('T3').config, 'T3');
   const talleres = (id) => notaBimestre(ctx, id, 1).componentes.find((x) => x.id === 'talleres');

@@ -391,8 +391,8 @@ Casos de prueba mínimos (en `tests/`):
 | TC1 del grupo con 1 + 2 + 1 + 0.5 + 1 + 1 + 1 + 1 = 8.5/10 | 0.85 × 0.80 = 0.68 puntos para cada integrante presente en P1 |
 | Integrante que «no vino» a P1 en SQI | 0 en P1 y 0 en TC1, aunque su grupo tenga nota |
 | Práctica Clásica con diseño 3/4, datos 4/4 y análisis 2/4 | 0.15 + 0.30 + 0.25 = 0.70 |
-| Taller con asistencia completa y evaluación integral 1/2 | 0.5 × 1 + 0.5 × 0.5 = 0.75 |
-| Taller: estudiante que «se retiró antes», evaluación integral 2/2 | 0.5 × 0.5 + 0.5 × 1 = 0.75 |
+| Taller con asistencia completa y evaluación integral a mitad de la escala (2.5/5; con la escala 0–2 anterior, 1/2) | 0.5 × 1 + 0.5 × 0.5 = 0.75 |
+| Taller: estudiante que «se retiró antes», evaluación integral máxima (5/5) | 0.5 × 0.5 + 0.5 × 1 = 0.75 |
 | Grupo con nota 0.9; un integrante «salió» tras el control | 0 para él; 0.9 para los demás |
 | Estudiante movido de grupo en la sesión | Recibe la nota del grupo nuevo, no la del grupo del Excel |
 | Curso Clásica que perdió T2 por feriado; T1 = 1.0 y T3 = 0.75 | Talleres del 1.er bimestre = 0.875 |
@@ -522,7 +522,7 @@ Casos de prueba mínimos (en `tests/`):
 ### Fase 4: Talleres (ambas metodologías)
 - **Asistencia y permanencia** (individual), desde el pase final: presente = 1; «se retiró antes» = valor parcial (0.5); «no vino» = 0.
 - Quien está pero no trabaja, u otra situación, se anota en el campo de observaciones del estudiante; no hay descuento automático.
-- **Evaluación integral por grupo** (escala configurable, por defecto 0/1/2): preguntas u observaciones del docente, ejecución y tareas.
+- **Evaluación integral por grupo** (escala configurable; desde el 22-oct-2026 es 0 a 5; antes 0/1/2): preguntas u observaciones del docente, ejecución y tareas.
   - Banco de preguntas visible en pantalla.
   - No exige que el grupo termine el taller.
 - **Retroalimentación de la práctica anterior:** al abrir el taller, la app muestra los grupos de la última práctica del curso con sus integrantes, sus puntajes por aspecto, sus etiquetas, la nota del profesor y los resultados del control. Una casilla marca la retroalimentación como dada.
