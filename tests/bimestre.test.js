@@ -93,10 +93,10 @@ async function curso(paralelo, grupos, estados = {}) {
 async function clasicaB1() {
   const k = await curso('GR2QB', { a: '1', b: '1', c: '2', d: '2', p: '2' }, { p: 'pendiente' });
   await k.sesion('P1', { niveles: { 1: [4, 4, 2], 2: [3, 4, 4] }, novedades: [['a', 1]], controles: [['a', [2, 1]]] });
-  await k.sesion('T1', { niveles: { 1: [5], 2: [2.5] }, controles: [['b', [2, 2]]] });
+  await k.sesion('T1', { niveles: { 1: [2], 2: [1] }, controles: [['b', [2, 2]]] });
   await k.sesion('P2', { niveles: { 1: [4, 4, 4], 2: [2, 2, 2] }, faltan: ['d'] });
   await k.sesion('P3', { niveles: { 1: [3, 3, 3], 2: [4, 4, 4] }, faltan: ['b'], controles: [['d', [1, 1, 2]]] });
-  await k.sesion('T3', { niveles: { 1: [2.5], 2: [5] }, retirados: ['c'] });
+  await k.sesion('T3', { niveles: { 1: [1], 2: [2] }, retirados: ['c'] });
   // d faltó a P2 con justificación y recuperó en otra sesión con 8/10.
   await guardarRecuperacion(k.db, 'GR2QB:P2', 'd', { estado: 'realizada', nota: 0.8, detalle: 'GR3QA, jue 29 oct' }, AHORA);
   return k;
@@ -142,10 +142,10 @@ test('Clásica, 1.er bimestre completo: la nota de cada estudiante coincide con 
 test('SQI, 1.er bimestre completo (GR1AA pierde el T2): prácticas 20/30/50, TC 40/25/35 y talleres', async () => {
   const k = await curso('GR1AA', { a: '1', b: '1', c: '2' });
   await k.sesion('P1', { niveles: { 1: [3, 1, 2], 2: [3, 3, 2] }, controles: [['a', true]] });
-  await k.sesion('T1', { niveles: { 1: [5], 2: [2.5] } });
+  await k.sesion('T1', { niveles: { 1: [2], 2: [1] } });
   await k.sesion('P2', { niveles: { 1: [3, 3, 2, 1], 2: [1, 1, 1, 0] }, faltan: ['b'] });
   await k.sesion('P3', { niveles: { 1: [3, 3, 3, 2, 1], 2: [3, 2, 1, 1, 0] } });
-  await k.sesion('T3', { niveles: { 1: [5], 2: [5] } });
+  await k.sesion('T3', { niveles: { 1: [2], 2: [2] } });
   const tc = async (codigo, grupo, puntos) => {
     const ev = await k.evento(codigo);
     if (puntos === null) return marcarEntrega(k.db, ev.id, 'grupo', grupo, false, AHORA);
@@ -286,7 +286,7 @@ test('antes del envío: bimestre en curso, eventos pendientes por evaluar y qui�
   const k = await curso('GR2QB', { a: '1', b: '1', c: '2' });
   await k.sesion('P1', { niveles: { 1: [4, 4, 4], 2: [4, 4, 4] }, controles: [['a', [2]]] });
   const t1 = await k.evento('T1');
-  await guardarPuntaje(k.db, t1.id, await k.grupos('T1'), '1', 'integral', 5, AHORA);
+  await guardarPuntaje(k.db, t1.id, await k.grupos('T1'), '1', 'integral', 2, AHORA);
   let { ctx } = await k.cargar();
   const { pendientes, porVenir } = pendientesDelBimestre(ctx, 1, '2026-10-26');
   assert.deepEqual(pendientes.map((p) => [p.evento.codigo, p.pendientes, p.motivo]), [['T1', 3, 'falta cerrar el pase'], ['P2', 3, 'falta cerrar el pase']]);

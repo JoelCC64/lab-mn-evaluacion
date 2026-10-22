@@ -164,13 +164,13 @@ test('Clásica: un grupo sin todas las secciones evaluadas queda pendiente', () 
   assert.deepEqual(notaGrupo(s.ctx(), s.e('P1'), '1').faltan, ['Análisis']);
 });
 
-test('Taller: asistencia completa y evaluación integral a mitad de la escala (2.5/5) → 0.75', () => {
-  const s = escenario('GR2QB', { a: '1' }).pase('T1').puntos('T1', '1', { integral: 2.5 });
+test('Taller: asistencia completa y evaluación integral 1/2 → 0.75', () => {
+  const s = escenario('GR2QB', { a: '1' }).pase('T1').puntos('T1', '1', { integral: 1 });
   cerca(notaEvento(s.ctx(), s.e('T1'), 'a').valor, 0.75);
 });
 
-test('Taller: «se retiró antes» con evaluación integral 5/5 → 0.5 × 0.5 + 0.5 × 1 = 0.75', () => {
-  const s = escenario('GR2QB', { a: '1', b: '1' }).pase('T1', { a: 'se_retiro_antes' }).puntos('T1', '1', { integral: 5 });
+test('Taller: «se retiró antes» con evaluación integral 2/2 → 0.5 × 0.5 + 0.5 × 1 = 0.75', () => {
+  const s = escenario('GR2QB', { a: '1', b: '1' }).pase('T1', { a: 'se_retiro_antes' }).puntos('T1', '1', { integral: 2 });
   const n = notaEvento(s.ctx(), s.e('T1'), 'a');
   cerca(n.valor, 0.75);
   assert.equal(n.motivo, 'se retiró antes');
@@ -205,7 +205,7 @@ test('Estudiante movido de grupo en la sesión: recibe la nota del grupo nuevo',
 });
 
 test('Clásica que perdió el T2 por feriado: T1 = 1.0 y T3 = 0.75 → Talleres = 0.875', () => {
-  const s = escenario('GR2QB', { a: '1' }).pase('T1').puntos('T1', '1', { integral: 5 }).pase('T3').puntos('T3', '1', { integral: 2.5 });
+  const s = escenario('GR2QB', { a: '1' }).pase('T1').puntos('T1', '1', { integral: 2 }).pase('T3').puntos('T3', '1', { integral: 1 });
   // T2 y T3 aún no tienen configuración de taller: se usa la del T1 para la prueba.
   const cfg2 = copia(cfg);
   for (const c of ['T2', 'T3']) cfg2.actividades[c] = { ...copia(cfg.actividades.T1), id: c, codigo: c };
@@ -220,7 +220,7 @@ test('Clásica que perdió el T2 por feriado: T1 = 1.0 y T3 = 0.75 → Talleres 
 test('Mismo curso: el estudiante que recuperó el T2 con 0.5 → Talleres = (1.0 + 0.5 + 0.75) / 3 = 0.75', () => {
   const cfg2 = copia(cfg);
   for (const c of ['T2', 'T3']) cfg2.actividades[c] = { ...copia(cfg.actividades.T1), id: c, codigo: c };
-  const s = escenario('GR2QB', { a: '1', b: '1' }, { cfgUsada: cfg2 }).pase('T1').puntos('T1', '1', { integral: 5 }).pase('T3').puntos('T3', '1', { integral: 2.5 });
+  const s = escenario('GR2QB', { a: '1', b: '1' }, { cfgUsada: cfg2 }).pase('T1').puntos('T1', '1', { integral: 2 }).pase('T3').puntos('T3', '1', { integral: 1 });
   s.reg.recuperaciones.push({ evento: 'GR2QB:T2', estudiante: 'a', estado: 'realizada', nota: 0.5 });
   const ctx = s.ctx();
   cerca(notaBimestre(ctx, 'a', 1).componentes.find((c) => c.id === 'talleres').acumulada, 0.75);

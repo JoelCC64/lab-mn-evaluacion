@@ -243,16 +243,16 @@ test('TC: el feedback va pregunta por pregunta y el resumen lista las preguntas 
 test('taller: las plantillas con una frase por metodología y la retro del taller con la versión corta de la práctica anterior', async () => {
   const k = await curso('GR2QB', { 201900001: '1', 201900002: '1', 201900003: '2', 201900004: '2' });
   const p1 = await k.sesion('P1', { niveles: { 1: [4, 4, 1], 2: [3, 3, 3] }, etiquetas: { 1: ['propagacion_mal'] } });
-  const t1 = await k.sesion('T1', { niveles: { 1: [2], 2: [5] }, etiquetas: { 1: ['confunde_exac_prec'] } });
+  const t1 = await k.sesion('T1', { niveles: { 1: [1], 2: [2] }, etiquetas: { 1: ['confunde_exac_prec'] } });
   const { ctx } = await k.cargar();
   const fbT = feedbackDelEvento(ctx, t1);
   const g1 = unidad(fbT, '1');
-  assert.equal(g1.texto.split('\n')[1], 'Evaluación integral del grupo: 2/5');
+  assert.equal(g1.texto.split('\n')[1], 'Evaluación integral del grupo: 1/2');
   // La etiqueta (sin parte) se refiere a la evaluación integral: su frase reemplaza la general.
   assert.deepEqual(seccion(g1.texto, 'A mejorar'), ['Confundieron exactitud con precisión.']);
   assert.match(seccion(g1.texto, 'Sugerencia')[0], /^Exactitud es cercanía al valor de referencia/, 'la variante de Clásica');
   assert.deepEqual(seccion(unidad(fbT, '2').texto, 'Lo mejor'), ['Buen trabajo en las tareas y en las preguntas del taller.']);
-  assert.match(fbT.resumen.texto, /promedio de la evaluación integral 3\.5\/5/);
+  assert.match(fbT.resumen.texto, /promedio de la evaluación integral 1\.5\/2/);
 
   // Retro del T1: la versión corta del feedback de P1, grupo por grupo.
   const retro = retroDelTaller(ctx, t1);
