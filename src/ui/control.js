@@ -19,6 +19,7 @@ export function Control({ ctx, evento }) {
   const cob = coberturaControl(ctx, evento);
   const [manual, setManual] = useState(false);
   const [salida, setSalida] = useState(null);
+  const preguntas = (evento.config && cfg.actividades[evento.config]?.preguntas_control) || [];
   const filas = ctx.reg.controles.filter((c) => c.evento === evento.id).sort((a, b) => a.orden - b.orden);
 
   const sortearN = async (n) => {
@@ -55,6 +56,12 @@ export function Control({ ctx, evento }) {
       </div>
       <button class="boton chico ancho" onClick=${() => setManual(true)}>Elegir a mano…</button>
     </div>
+
+    ${preguntas.length > 0 && html`
+      <details class="tarjeta">
+        <summary><b>Preguntas del coloquio (${preguntas.length})</b></summary>
+        <ol class="pequeno">${preguntas.map((q) => html`<li>${q}</li>`)}</ol>
+      </details>`}
 
     ${filas.length > 0 && html`<div class="seccion-titulo">Sorteados · ${filas.length}</div>`}
     ${filas.map((f) => {

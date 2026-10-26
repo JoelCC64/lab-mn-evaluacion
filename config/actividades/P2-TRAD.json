@@ -1,0 +1,336 @@
+{
+  "id": "P2-TRAD",
+  "codigo": "P2",
+  "fuente": "Guía P02 «Velocidad media de un móvil y MRUV» (Practica_2_clasica.pdf); preguntas de análisis y del coloquio de Joel (26-oct-2026)",
+  "tipo": "practica",
+  "metodologia": "TRAD",
+  "bimestre": 1,
+  "componente": "diseno_datos_analisis",
+  "unidad_calificacion": "grupo",
+  "individual": [
+    "trabajo_preparatorio",
+    "control_oral"
+  ],
+  "asistencia": "pase_final_por_grupo",
+  "cierre": [
+    "trabajo_firmado"
+  ],
+  "penalizacion_total": "equipo_no_ordenado",
+  "criterios": [
+    {
+      "id": "diseno",
+      "corto": "diseño",
+      "nombre": "Diseño experimental",
+      "peso": 0.2,
+      "escala": [
+        0,
+        1,
+        2,
+        3,
+        4
+      ],
+      "indicadores": [
+        "Pista metálica nivelada (con el nivelador) y elevada un extremo a h = 5 cm",
+        "Recorrido L = 90 cm medido desde la parte frontal del DigiCart como referencia",
+        "Posiciones x (10 a 90 cm) señaladas en la pista antes de medir",
+        "DigiCart soltado sin empujarlo y siempre dentro de la pista",
+        "Protocolo de cronometraje definido (quién suelta, quién detiene) e incertidumbre instrumental identificada"
+      ],
+      "niveles": {
+        "4": "Montaje correcto a la primera: pista nivelada, h y L verificadas, marcas hechas, soltado sin empuje y protocolo de cronometraje definido.",
+        "2": "Montaje funcional con correcciones tras la observación; marcas, protocolo o incertidumbre instrumental incompletos.",
+        "0": "Montaje incorrecto o depende totalmente del profesor."
+      }
+    },
+    {
+      "id": "datos",
+      "corto": "datos",
+      "nombre": "Toma de datos",
+      "peso": 0.3,
+      "escala": [
+        0,
+        1,
+        2,
+        3,
+        4
+      ],
+      "indicadores": [
+        "5 mediciones de tiempo por cada posición (9 posiciones: 45 en total)",
+        "Registro ordenado en la Tabla 1.1 con unidades y cifras coherentes con el cronómetro",
+        "Condiciones constantes (mismo punto de salida, mismo cronometrista, sin empuje)",
+        "Reparto de roles con participación de todos",
+        "Descarte de datos con criterio"
+      ],
+      "niveles": {
+        "4": "Tabla completa, ordenada, con unidades; datos consistentes y trabajo repartido.",
+        "2": "Tabla completa pero con desorden, unidades faltantes o condiciones variables.",
+        "0": "Datos incompletos o no registrados."
+      }
+    },
+    {
+      "id": "analisis",
+      "corto": "análisis",
+      "nombre": "Análisis",
+      "peso": 0.5,
+      "escala": [
+        0,
+        1,
+        2,
+        3,
+        4
+      ],
+      "indicadores": [
+        "Tabla 1.1 completa: t̄, t̄² e incertidumbres de cada magnitud",
+        "Velocidades medias de la Tabla 1.2 (0–30, 30–60 y 60–90 cm) y tramo de mayor velocidad media justificado",
+        "Gráfica x vs t̄ con las rectas secantes de cada intervalo; tipo de curva y su significado físico",
+        "Bosquejo de x–t con la velocidad media en el tramo AP y la instantánea en P, y la diferencia entre ambas",
+        "Bosquejo de las gráficas de velocidad y de aceleración vs t",
+        "Si se duplica h: la pendiente de v–t y el valor de a–t se duplican aproximadamente",
+        "Con un pequeño empujón: aparece una ordenada en el origen v₀ ≠ 0 en v–t y a–t no cambia",
+        "Con más fricción: la aceleración (el valor de a–t) disminuye"
+      ],
+      "niveles": {
+        "4": "Cálculos y gráficas correctos, con incertidumbres; distingue velocidad media de instantánea; los bosquejos y las predicciones (h, empujón, fricción) son correctos y se apoyan en sus datos.",
+        "2": "Cálculos o gráficas correctos con fallas (sin secantes, incertidumbres omitidas) o predicciones parciales o memorizadas sin conexión con sus datos.",
+        "0": "Sin gráficas ni interpretación del movimiento."
+      }
+    }
+  ],
+  "etiquetas": [
+    {
+      "id": "montaje_ok",
+      "criterio": "diseno",
+      "signo": "+",
+      "texto": "Montaje correcto, pista nivelada y marcas hechas"
+    },
+    {
+      "id": "pista_no_nivelada",
+      "criterio": "diseno",
+      "signo": "-",
+      "texto": "Pista sin nivelar antes de elevar el extremo"
+    },
+    {
+      "id": "h_l_mal_medida",
+      "criterio": "diseno",
+      "signo": "-",
+      "texto": "h o L medidas desde un punto equivocado"
+    },
+    {
+      "id": "empuja_digicart",
+      "criterio": "diseno",
+      "signo": "-",
+      "texto": "Empujó el DigiCart al soltarlo"
+    },
+    {
+      "id": "sin_protocolo",
+      "criterio": "diseno",
+      "signo": "-",
+      "texto": "Sin protocolo de cronometraje"
+    },
+    {
+      "id": "tabla_ok",
+      "criterio": "datos",
+      "signo": "+",
+      "texto": "Tabla ordenada y con unidades"
+    },
+    {
+      "id": "condiciones_var",
+      "criterio": "datos",
+      "signo": "-",
+      "texto": "Condiciones variables entre mediciones"
+    },
+    {
+      "id": "cifras_incoh",
+      "criterio": "datos",
+      "signo": "-",
+      "texto": "Cifras incoherentes con el cronómetro"
+    },
+    {
+      "id": "faltan_repeticiones",
+      "criterio": "datos",
+      "signo": "-",
+      "texto": "Menos de 5 mediciones por posición"
+    },
+    {
+      "id": "un_solo_integrante",
+      "criterio": "datos",
+      "signo": "-",
+      "texto": "Solo un integrante trabaja"
+    },
+    {
+      "id": "secantes_ok",
+      "criterio": "analisis",
+      "signo": "+",
+      "texto": "Gráfica x–t con secantes correctas"
+    },
+    {
+      "id": "sin_secantes",
+      "criterio": "analisis",
+      "signo": "-",
+      "texto": "Gráfica sin las secantes de los intervalos"
+    },
+    {
+      "id": "confunde_media_inst",
+      "criterio": "analisis",
+      "signo": "-",
+      "texto": "Confunde velocidad media con instantánea"
+    },
+    {
+      "id": "curva_sin_justificar",
+      "criterio": "analisis",
+      "signo": "-",
+      "texto": "No explica el tipo de curva ni su significado físico"
+    },
+    {
+      "id": "bosquejos_ok",
+      "criterio": "analisis",
+      "signo": "+",
+      "texto": "Bosquejos de v–t y a–t correctos"
+    },
+    {
+      "id": "bosquejos_mal",
+      "criterio": "analisis",
+      "signo": "-",
+      "texto": "Bosquejos de v–t o a–t incorrectos"
+    },
+    {
+      "id": "sin_prediccion",
+      "criterio": "analisis",
+      "signo": "-",
+      "texto": "No predice el efecto de h, del empujón o de la fricción"
+    },
+    {
+      "id": "memorizado",
+      "criterio": "analisis",
+      "signo": "-",
+      "texto": "Respuesta memorizada, sin conexión con sus datos"
+    }
+  ],
+  "preguntas_discusion": [
+    "¿En qué tramo es mayor la velocidad media y qué indica la forma de la curva x–t?",
+    "¿Qué diferencia hay entre la velocidad media en el tramo AP y la velocidad instantánea en P? ¿Cómo se ven en la gráfica?",
+    "Si se duplica h, ¿cómo cambian las gráficas x–t, v–t y a–t?",
+    "Si se suelta el DigiCart con un pequeño empujón, ¿qué cambia en v–t y qué no cambia en a–t?",
+    "Si hubiera más fricción, ¿qué pasa con la aceleración y con la pendiente de v–t?"
+  ],
+  "preguntas_control": [
+    "¿Qué diferencia hay entre velocidad media e instantánea?",
+    "En un MRUV, ¿la aceleración y la velocidad tienen la misma dirección?",
+    "¿En qué caso la aceleración y la velocidad tienen la misma dirección?",
+    "En el MRUV, si grafico x vs t, ¿qué forma esperaría que tenga la curva?",
+    "Si el movimiento es acelerado, ¿cómo se vería un gráfico de velocidad vs tiempo?",
+    "¿Qué es la aceleración?",
+    "¿Cómo se obtiene la velocidad media a partir de una gráfica de posición vs tiempo? (sugerida)",
+    "¿Qué significa que la pendiente de v–t sea constante? (sugerida)",
+    "Si la aceleración es positiva, ¿el DigiCart siempre aumenta su rapidez? (sugerida)",
+    "¿Qué diferencia hay entre rapidez y velocidad? (sugerida)",
+    "¿Por qué se miden varias veces el tiempo en cada posición y qué se hace con ellas? (sugerida)"
+  ],
+  "conceptos_control": [
+    {
+      "id": "media_instantanea",
+      "texto": "Velocidad media e instantánea"
+    },
+    {
+      "id": "direccion_a_v",
+      "texto": "Dirección de la aceleración y de la velocidad"
+    },
+    {
+      "id": "grafica_x_t",
+      "texto": "Forma de la gráfica x–t en el MRUV"
+    },
+    {
+      "id": "grafica_v_t",
+      "texto": "Gráfica v–t del movimiento acelerado"
+    },
+    {
+      "id": "aceleracion",
+      "texto": "Concepto de aceleración"
+    },
+    {
+      "id": "pendiente_secante",
+      "texto": "Velocidad media como pendiente de la secante"
+    },
+    {
+      "id": "procedimiento",
+      "texto": "Procedimiento de la guía"
+    }
+  ],
+  "feedback": {
+    "etiquetas": {
+      "pista_no_nivelada": {
+        "mejorar": "La pista no se niveló antes de elevar el extremo.",
+        "sugerencia": "Usen el nivelador para dejar la pista horizontal y recién después eleven un extremo a h = 5 cm.",
+        "reforzar": "Nivelar la pista antes de elevarla."
+      },
+      "h_l_mal_medida": {
+        "mejorar": "h o L se midieron desde un punto equivocado.",
+        "sugerencia": "Midan L desde la parte frontal del DigiCart y verifiquen h con la cinta métrica antes de soltarlo.",
+        "reforzar": "Medir h y L desde la referencia correcta."
+      },
+      "empuja_digicart": {
+        "mejorar": "Empujaron el DigiCart al soltarlo.",
+        "sugerencia": "Suelten el DigiCart sin impulso: con un empujón aparece una velocidad inicial y los datos ya no corresponden a partir del reposo.",
+        "reforzar": "Soltar el DigiCart sin aplicar fuerzas externas."
+      },
+      "sin_protocolo": {
+        "mejorar": "No definieron un protocolo de cronometraje.",
+        "sugerencia": "Definan antes de medir quién suelta, quién cronometra y cuándo se detiene el cronómetro, y mantengan ese protocolo.",
+        "reforzar": "Definir el protocolo de cronometraje antes de medir."
+      },
+      "condiciones_var": {
+        "sugerencia": "Mantengan constantes el punto de salida y el cronometrista en todas las mediciones de una misma posición.",
+        "reforzar": "Mantener constantes las condiciones de medición."
+      },
+      "cifras_incoh": {
+        "sugerencia": "Anoten los tiempos con las cifras que muestra el cronómetro y redondeen cada resultado según su incertidumbre.",
+        "reforzar": "Cifras coherentes con el instrumento y con la incertidumbre."
+      },
+      "faltan_repeticiones": {
+        "mejorar": "No completaron las 5 mediciones por posición.",
+        "sugerencia": "Midan 5 veces el tiempo en cada posición: con ellas se obtiene el promedio y su incertidumbre.",
+        "reforzar": "Repetir las mediciones para estimar la incertidumbre."
+      },
+      "un_solo_integrante": {
+        "mejorar": "El trabajo recayó en un solo integrante.",
+        "sugerencia": "Repartan los roles (soltar, cronometrar, anotar) y túrnenlos entre las posiciones.",
+        "reforzar": "Reparto de roles dentro del grupo."
+      },
+      "secantes_ok": {
+        "mejor": "Graficaron x–t con las secantes de cada intervalo."
+      },
+      "sin_secantes": {
+        "mejorar": "La gráfica x–t no incluye las rectas secantes de los intervalos.",
+        "sugerencia": "Tracen la recta que une los extremos de cada intervalo: su pendiente es la velocidad media de ese tramo.",
+        "reforzar": "Representar la velocidad media como la pendiente de una secante."
+      },
+      "confunde_media_inst": {
+        "mejorar": "Confundieron la velocidad media con la instantánea.",
+        "sugerencia": "La media es la pendiente de la secante entre dos puntos; la instantánea, la pendiente de la tangente en un punto. Si el intervalo se hace muy pequeño, la secante se acerca a la tangente.",
+        "reforzar": "Diferencia entre velocidad media e instantánea."
+      },
+      "curva_sin_justificar": {
+        "mejorar": "No explicaron qué tipo de curva es x–t ni su significado físico.",
+        "sugerencia": "Relacionen la forma parabólica de x–t con un movimiento de aceleración constante: la pendiente (velocidad) crece con el tiempo.",
+        "reforzar": "Interpretar la forma de la gráfica x–t."
+      },
+      "bosquejos_ok": {
+        "mejor": "Bosquejaron correctamente las gráficas de velocidad y de aceleración."
+      },
+      "bosquejos_mal": {
+        "mejorar": "Los bosquejos de v–t o a–t no son correctos.",
+        "sugerencia": "En un MRUV desde el reposo, v–t es una recta que sale del origen y a–t es una recta horizontal con el valor de la pendiente de v–t.",
+        "reforzar": "Gráficas v–t y a–t del MRUV."
+      },
+      "sin_prediccion": {
+        "mejorar": "No predijeron cómo cambian las gráficas al variar h, al dar un empujón o al aumentar la fricción.",
+        "sugerencia": "Si duplican h, la pendiente de v–t y el valor de a–t se duplican aproximadamente; con un empujón aparece v₀ ≠ 0 y a–t no cambia; con más fricción, a–t disminuye.",
+        "reforzar": "Predecir cómo cambian x–t, v–t y a–t al variar las condiciones."
+      },
+      "memorizado": {
+        "sugerencia": "Apoyen cada conclusión en un número de su tabla o en un punto de su gráfica.",
+        "reforzar": "Discutir los resultados con los datos propios."
+      }
+    }
+  }
+}
