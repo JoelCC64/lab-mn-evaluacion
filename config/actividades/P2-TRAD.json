@@ -87,10 +87,10 @@
         "Bosquejo de las gráficas de velocidad y de aceleración vs t",
         "Si se duplica h: la pendiente de v–t y el valor de a–t se duplican aproximadamente",
         "Con un pequeño empujón: aparece una ordenada en el origen v₀ ≠ 0 en v–t y a–t no cambia",
-        "Con más fricción: la aceleración (el valor de a–t) disminuye"
+        "Con más fricción (soltando desde el reposo): si no alcanza a detener el carro, el movimiento continúa, la curva x–t se abre (menos pendiente), v–t es una recta de menor pendiente y a–t se reduce; si la fricción lo puede detener, el carro no se mueve (x, v y a son constantes en 0)"
       ],
       "niveles": {
-        "4": "Cálculos y gráficas correctos, con incertidumbres; distingue velocidad media de instantánea; los bosquejos y las predicciones (h, empujón, fricción) son correctos y se apoyan en sus datos.",
+        "4": "Cálculos y gráficas correctos, con incertidumbres; distingue velocidad media de instantánea; los bosquejos y las predicciones (h, empujón, y los dos casos de fricción) son correctos y se apoyan en sus datos.",
         "2": "Cálculos o gráficas correctos con fallas (sin secantes, incertidumbres omitidas) o predicciones parciales o memorizadas sin conexión con sus datos.",
         "0": "Sin gráficas ni interpretación del movimiento."
       }
@@ -200,6 +200,12 @@
       "texto": "No predice el efecto de h, del empujón o de la fricción"
     },
     {
+      "id": "friccion_sin_distinguir",
+      "criterio": "analisis",
+      "signo": "-",
+      "texto": "No distingue si la fricción detiene o no al carro"
+    },
+    {
       "id": "memorizado",
       "criterio": "analisis",
       "signo": "-",
@@ -211,7 +217,7 @@
     "¿Qué diferencia hay entre la velocidad media en el tramo AP y la velocidad instantánea en P? ¿Cómo se ven en la gráfica?",
     "Si se duplica h, ¿cómo cambian las gráficas x–t, v–t y a–t?",
     "Si se suelta el DigiCart con un pequeño empujón, ¿qué cambia en v–t y qué no cambia en a–t?",
-    "Si hubiera más fricción, ¿qué pasa con la aceleración y con la pendiente de v–t?"
+    "Si hubiera más fricción, ¿qué pasa con x–t, v–t y a–t si la fricción no detiene al carro? ¿Y si es suficiente para detenerlo, soltándolo desde el reposo?"
   ],
   "preguntas_control": [
     "¿Qué diferencia hay entre velocidad media e instantánea?",
@@ -220,6 +226,9 @@
     "En el MRUV, si grafico x vs t, ¿qué forma esperaría que tenga la curva?",
     "Si el movimiento es acelerado, ¿cómo se vería un gráfico de velocidad vs tiempo?",
     "¿Qué es la aceleración?",
+    "¿Cuál es la gráfica de aceleración vs tiempo en un MRUV retardado? (recta horizontal, con valor de signo contrario a la velocidad)",
+    "En un MRUV acelerado con velocidad inicial cero, ¿cómo crece la posición con el tiempo? (cuadráticamente)",
+    "Si el carro parte del reposo con aceleración negativa, ¿cómo cambia la posición? ¿El movimiento es acelerado o retardado? (decrece cuadráticamente; es acelerado porque v y a tienen el mismo sentido)",
     "¿Cómo se obtiene la velocidad media a partir de una gráfica de posición vs tiempo? (sugerida)",
     "¿Qué significa que la pendiente de v–t sea constante? (sugerida)",
     "Si la aceleración es positiva, ¿el DigiCart siempre aumenta su rapidez? (sugerida)",
@@ -246,6 +255,14 @@
     {
       "id": "aceleracion",
       "texto": "Concepto de aceleración"
+    },
+    {
+      "id": "retardado",
+      "texto": "MRUV retardado: a–t y sentido de a respecto de v"
+    },
+    {
+      "id": "x_cuadratica",
+      "texto": "Posición cuadrática desde el reposo"
     },
     {
       "id": "pendiente_secante",
@@ -324,12 +341,17 @@
       },
       "sin_prediccion": {
         "mejorar": "No predijeron cómo cambian las gráficas al variar h, al dar un empujón o al aumentar la fricción.",
-        "sugerencia": "Si duplican h, la pendiente de v–t y el valor de a–t se duplican aproximadamente; con un empujón aparece v₀ ≠ 0 y a–t no cambia; con más fricción, a–t disminuye.",
+        "sugerencia": "Si duplican h, la pendiente de v–t y el valor de a–t se duplican aproximadamente; con un empujón aparece v₀ ≠ 0 y a–t no cambia; con más fricción que no detiene al carro, a–t y la pendiente de v–t disminuyen.",
         "reforzar": "Predecir cómo cambian x–t, v–t y a–t al variar las condiciones."
       },
       "memorizado": {
         "sugerencia": "Apoyen cada conclusión en un número de su tabla o en un punto de su gráfica.",
         "reforzar": "Discutir los resultados con los datos propios."
+      },
+      "friccion_sin_distinguir": {
+        "mejorar": "No distinguieron los dos casos de fricción.",
+        "sugerencia": "Si la fricción no basta para detener al carro, se mueve con menor aceleración (x–t más abierta, v–t con menos pendiente, a–t menor); si basta, el carro no se mueve al soltarlo desde el reposo.",
+        "reforzar": "Efecto de la fricción: movimiento con menor aceleración o carro detenido."
       }
     }
   }
