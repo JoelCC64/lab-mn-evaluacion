@@ -1,0 +1,251 @@
+{
+  "id": "P2-SQI",
+  "codigo": "P2",
+  "fuente": "Guía P2 SQI (Unit 1 «Model testing»); Reglamento SQI para profesores, Tablas 5 y 6; decisión de Joel (6-oct-2026) para la escala",
+  "tipo": "practica",
+  "metodologia": "SQI",
+  "bimestre": 1,
+  "unidad_calificacion": "grupo",
+  "individual": [
+    "control_oral_sin_nota"
+  ],
+  "asistencia": "pase_final_por_grupo",
+  "cierre": [
+    "trabajo_firmado"
+  ],
+  "penalizacion_total": "equipo_no_ordenado",
+  "aspectos_aplicables": [
+    "resp_pred_plan",
+    "ejec_registro",
+    "analisis",
+    "discusion"
+  ],
+  "indicadores": {
+    "resp_pred_plan": [
+      "Indica su confianza (1 a 5) en que las mediciones A–B, A–C y A–D son distinguibles y explica su razonamiento",
+      "Identifica las fuentes de incertidumbre del período del péndulo y las ordena por tamaño estimado",
+      "Escribe un plan para medir el período a 10° y 20° (cómo medir y cómo reducir la incertidumbre) justificado con lo discutido en clase",
+      "Reconoce los supuestos del modelo (fuerzas, cuerda sin masa, ángulo pequeño, masa puntual)"
+    ],
+    "ejec_registro": [
+      "Documenta las mediciones piloto en el diario",
+      "Mide el período a 10° y 20° con el procedimiento planeado y registra datos con unidades y observaciones",
+      "Registra los cambios al método durante la toma de datos y los justifica con los datos",
+      "Anota las fuentes de incertidumbre y de errores sistemáticos que observó"
+    ],
+    "analisis": [
+      "Cuantifica la distinguibilidad de pares de mediciones con incertidumbre y estadística (método acordado en clase)",
+      "Calcula el promedio y la incertidumbre de cada ángulo y compara 10° con 20°",
+      "Interpreta si el período depende de la amplitud y considera más de una interpretación posible",
+      "Concluye con base en sus datos y decide qué proponer para mejorar la medición o el modelo"
+    ],
+    "discusion": [
+      "Participa en la discusión grupal sobre cómo cuantificar la distinguibilidad y anota las ideas",
+      "Reflexiona sobre las expectativas del resultado (cuándo ayudan y cuándo estorban) y propone estrategias accionables",
+      "Registra la retroalimentación y la discusión dirigida"
+    ]
+  },
+  "etiquetas": [
+    {
+      "id": "justifica_confianza",
+      "aspecto": "resp_pred_plan",
+      "signo": "+",
+      "texto": "Justifica su confianza en la distinguibilidad con las incertidumbres"
+    },
+    {
+      "id": "confianza_sin_razon",
+      "aspecto": "resp_pred_plan",
+      "signo": "-",
+      "texto": "Da su confianza (1 a 5) sin explicar su razonamiento"
+    },
+    {
+      "id": "fuentes_ordenadas",
+      "aspecto": "resp_pred_plan",
+      "signo": "+",
+      "texto": "Identifica y ordena las fuentes de incertidumbre"
+    },
+    {
+      "id": "plan_vago",
+      "aspecto": "resp_pred_plan",
+      "signo": "-",
+      "texto": "Plan de medición vago, sin cómo reducir la incertidumbre"
+    },
+    {
+      "id": "piloto_documentado",
+      "aspecto": "ejec_registro",
+      "signo": "+",
+      "texto": "Documenta las mediciones piloto"
+    },
+    {
+      "id": "registro_incompleto",
+      "aspecto": "ejec_registro",
+      "signo": "-",
+      "texto": "Registro sin unidades o incompleto"
+    },
+    {
+      "id": "mejora_en_marcha",
+      "aspecto": "ejec_registro",
+      "signo": "+",
+      "texto": "Mejora su método mientras mide y lo justifica con datos"
+    },
+    {
+      "id": "sin_mejoras",
+      "aspecto": "ejec_registro",
+      "signo": "-",
+      "texto": "No registra cambios ni mejoras del método"
+    },
+    {
+      "id": "compara_con_incertidumbre",
+      "aspecto": "analisis",
+      "signo": "+",
+      "texto": "Compara las mediciones usando incertidumbre y estadística"
+    },
+    {
+      "id": "compara_sin_incertidumbre",
+      "aspecto": "analisis",
+      "signo": "-",
+      "texto": "Compara solo los promedios, sin incertidumbre"
+    },
+    {
+      "id": "una_interpretacion",
+      "aspecto": "analisis",
+      "signo": "-",
+      "texto": "Una sola interpretación, sin considerar otras posibles"
+    },
+    {
+      "id": "concluye_sin_datos",
+      "aspecto": "analisis",
+      "signo": "-",
+      "texto": "Concluye sin apoyarse en sus datos"
+    },
+    {
+      "id": "propone_seguimiento",
+      "aspecto": "analisis",
+      "signo": "+",
+      "texto": "Propone cómo probar o mejorar el modelo"
+    },
+    {
+      "id": "participa_discusion",
+      "aspecto": "discusion",
+      "signo": "+",
+      "texto": "Participa y anota las ideas de la discusión"
+    },
+    {
+      "id": "estrategias_accionables",
+      "aspecto": "discusion",
+      "signo": "+",
+      "texto": "Propone estrategias accionables ante sus expectativas"
+    },
+    {
+      "id": "no_registra_discusion",
+      "aspecto": "discusion",
+      "signo": "-",
+      "texto": "No registra la discusión ni la reflexión"
+    }
+  ],
+  "preguntas_discusion": [
+    "¿Cómo decidirías si dos mediciones son distinguibles? ¿Qué número de tus datos lo muestra?",
+    "¿Cuál es la mayor fuente de incertidumbre en el período y qué harías para reducirla?",
+    "¿Depende el período de la amplitud? ¿Qué evidencia tienes y qué más te dirían tus datos si midieras con mayor precisión?",
+    "Si tus resultados no coinciden con el modelo, ¿qué explicaciones posibles hay y cómo las pondrías a prueba?",
+    "¿Cuándo ayuda y cuándo estorba tener una expectativa sobre el resultado? ¿Qué harías en el laboratorio para mitigarlo?"
+  ],
+  "preguntas_control": [
+    "¿Qué supuestos hace el modelo del período del péndulo?",
+    "¿Cómo sabes si dos mediciones son distinguibles?",
+    "¿Cuál es la principal fuente de incertidumbre al medir el período y cómo la reducirías?",
+    "¿Qué diferencia hay entre incertidumbre y error sistemático?",
+    "¿Por qué se repite la medición del período y qué se hace con los datos?",
+    "¿Qué pasaría con la incertidumbre del promedio si tomaran más datos?"
+  ],
+  "conceptos_control": [
+    {
+      "id": "distinguibilidad",
+      "texto": "Distinguibilidad de dos mediciones"
+    },
+    {
+      "id": "fuentes_incertidumbre",
+      "texto": "Fuentes de incertidumbre y de errores sistemáticos"
+    },
+    {
+      "id": "supuestos_modelo",
+      "texto": "Supuestos del modelo del péndulo"
+    },
+    {
+      "id": "incertidumbre_promedio",
+      "texto": "Incertidumbre del promedio y número de datos"
+    },
+    {
+      "id": "procedimiento",
+      "texto": "Procedimiento de la guía"
+    }
+  ],
+  "feedback": {
+    "etiquetas": {
+      "justifica_confianza": {
+        "mejor": "Justificaron su confianza en la distinguibilidad con las incertidumbres."
+      },
+      "confianza_sin_razon": {
+        "mejorar": "Dieron su confianza sin explicar el razonamiento.",
+        "sugerencia": "¿Qué dato, además del promedio, les haría más o menos confiados de que dos mediciones son distinguibles? Escríbanlo en el diario.",
+        "reforzar": "Justificar la distinguibilidad con incertidumbres."
+      },
+      "fuentes_ordenadas": {
+        "mejor": "Identificaron y ordenaron las fuentes de incertidumbre."
+      },
+      "plan_vago": {
+        "mejorar": "El plan de medición no dice cómo reducir la incertidumbre.",
+        "sugerencia": "¿Qué cambiarían en su plan para que la incertidumbre del período fuera menor? ¿Cómo lo comprobarían con sus datos?",
+        "reforzar": "Planificar la medición para reducir la incertidumbre."
+      },
+      "piloto_documentado": {
+        "mejor": "Documentaron las mediciones piloto."
+      },
+      "registro_incompleto": {
+        "sugerencia": "Si alguien leyera solo su diario, ¿sabría qué midieron, con qué unidades y en qué condiciones?",
+        "reforzar": "Registro completo en el diario, con unidades y observaciones."
+      },
+      "mejora_en_marcha": {
+        "mejor": "Mejoraron su método mientras medían y lo justificaron con datos."
+      },
+      "sin_mejoras": {
+        "mejorar": "No registraron cambios ni mejoras del método.",
+        "sugerencia": "Cuando cambiaron algo mientras medían, ¿qué dato los llevó a hacerlo? Anótenlo sin borrar lo anterior.",
+        "reforzar": "Registrar y justificar los cambios del método."
+      },
+      "compara_con_incertidumbre": {
+        "mejor": "Compararon las mediciones usando incertidumbre y estadística."
+      },
+      "compara_sin_incertidumbre": {
+        "mejorar": "Compararon solo los promedios.",
+        "sugerencia": "¿Alcanza la diferencia entre los promedios para decir que los períodos son distintos? ¿Qué muestra la incertidumbre de cada uno?",
+        "reforzar": "Comparar mediciones con su incertidumbre."
+      },
+      "una_interpretacion": {
+        "mejorar": "Presentaron una sola interpretación de los resultados.",
+        "sugerencia": "¿Qué otra explicación razonable tendrían sus datos y cómo la pondrían a prueba?",
+        "reforzar": "Considerar más de una interpretación."
+      },
+      "concluye_sin_datos": {
+        "mejorar": "La conclusión no se apoya en sus datos.",
+        "sugerencia": "¿Qué número de su tabla respalda su conclusión? ¿Qué dirían si ese número fuera distinto?",
+        "reforzar": "Concluir con base en los datos."
+      },
+      "propone_seguimiento": {
+        "mejor": "Propusieron cómo probar o mejorar el modelo.",
+        "sugerencia": "¿Qué medición nueva les diría si el modelo falla o se mantiene a mayor precisión?"
+      },
+      "participa_discusion": {
+        "mejor": "Participaron en la discusión y anotaron las ideas."
+      },
+      "estrategias_accionables": {
+        "mejor": "Propusieron estrategias accionables ante sus expectativas."
+      },
+      "no_registra_discusion": {
+        "mejorar": "No registraron la discusión ni la reflexión.",
+        "sugerencia": "¿Qué idea de la discusión les pareció más discutible? Anótenla y digan si sus datos la apoyan.",
+        "reforzar": "Registrar la discusión y la reflexión en el diario."
+      }
+    }
+  }
+}
