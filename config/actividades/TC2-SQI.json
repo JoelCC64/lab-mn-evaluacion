@@ -71,5 +71,80 @@
       ]
     }
   ],
-  "etiquetas": []
+  "etiquetas": [
+    {
+      "id": "comparacion_cuantitativa",
+      "pregunta": "1",
+      "signo": "+",
+      "texto": "Compara los períodos con sus incertidumbres y concluye con datos"
+    },
+    {
+      "id": "compara_sin_incertidumbre",
+      "pregunta": "1",
+      "signo": "-",
+      "texto": "Compara los períodos solo con los promedios, sin incertidumbre"
+    },
+    {
+      "id": "expectativa_generica",
+      "pregunta": "2a-i",
+      "signo": "-",
+      "texto": "Respuesta genérica sobre las expectativas, sin ejemplo del experimento"
+    },
+    {
+      "id": "practicas_concretas",
+      "pregunta": "2b",
+      "signo": "+",
+      "texto": "Propone prácticas concretas para reducir sesgos"
+    },
+    {
+      "id": "practicas_vagas",
+      "pregunta": "2b",
+      "signo": "-",
+      "texto": "Prácticas vagas («no ser sesgado»), sin acciones concretas"
+    }
+  ],
+  "feedback": {
+    "partes": {
+      "1": {
+        "mejorar": "La comparación cuantitativa del período a 10° y 20° está incompleta o con errores (1).",
+        "sugerencia": "¿La diferencia entre los períodos es mayor que sus incertidumbres? ¿Qué número lo muestra?",
+        "reforzar": "Comparar mediciones con sus incertidumbres."
+      },
+      "2a-i": {
+        "mejorar": "Faltó explicar cómo una expectativa previa puede ser productiva (2a-i).",
+        "sugerencia": "¿En qué momento de su experimento les ayudó saber qué esperaban?"
+      },
+      "2a-ii": {
+        "mejorar": "Faltó explicar cómo una expectativa previa puede ser contraproducente (2a-ii).",
+        "sugerencia": "¿Qué dato habrían pasado por alto o descartado por no coincidir con lo que esperaban?"
+      },
+      "2b": {
+        "mejorar": "Faltaron prácticas concretas para reducir el efecto de las expectativas (2b).",
+        "sugerencia": "¿Qué harían distinto en la próxima práctica, antes y mientras miden, para que su expectativa no decida el resultado?",
+        "reforzar": "Prácticas concretas para reducir sesgos."
+      }
+    },
+    "etiquetas": {
+      "comparacion_cuantitativa": {
+        "mejor": "Compararon los períodos con sus incertidumbres y concluyeron con datos."
+      },
+      "compara_sin_incertidumbre": {
+        "mejorar": "Compararon los períodos solo con los promedios.",
+        "sugerencia": "¿Alcanza la diferencia entre los promedios para decir que los períodos son distintos? ¿Qué muestran sus incertidumbres?",
+        "reforzar": "Comparar mediciones con su incertidumbre."
+      },
+      "expectativa_generica": {
+        "mejorar": "Respondieron de forma genérica sobre las expectativas.",
+        "sugerencia": "¿Qué situación concreta de su experimento ilustra su respuesta?"
+      },
+      "practicas_concretas": {
+        "mejor": "Propusieron prácticas concretas para reducir sesgos."
+      },
+      "practicas_vagas": {
+        "mejorar": "Las prácticas propuestas son vagas.",
+        "sugerencia": "Escriban acciones que otra persona pueda repetir (por ejemplo, decidir cuántos datos tomar antes de medir).",
+        "reforzar": "Acciones concretas contra los sesgos."
+      }
+    }
+  }
 }

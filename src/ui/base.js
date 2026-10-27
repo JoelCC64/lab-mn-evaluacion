@@ -104,6 +104,7 @@ export function Persona({ estudiante, detalle, children }) {
         <div class="codigo fila-flex">
           <span>${estudiante.codigo}</span>
           ${estudiante.estado === 'pendiente' && html`<${Chip} tono="aviso">${estudiante.agregado ? 'pendiente · agregado en la app' : 'pendiente'}<//>`}
+          ${estudiante.ajustes_razonables && html`<${Chip} tono="info" titulo="Ajustes razonables (Bienestar Estudiantil)">AR<//>`}
           ${estudiante.estado === 'baja' && html`<${Chip} tono="mal">baja<//>`}
           ${estudiante.estado === 'visitante' && html`<${Chip} tono="info">otro curso${estudiante.visita?.paralelo ? ` · ${estudiante.visita.paralelo}` : ''}<//>`}
           ${detalle}

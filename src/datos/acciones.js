@@ -604,3 +604,18 @@ export async function guardarAjuste(db, evento, estudiante, valor, motivo, ahora
 export async function borrarAjuste(db, evento, estudiante) {
   await db.ajustes.delete([evento, estudiante]);
 }
+
+// ---------- Ajustes razonables (Bienestar Estudiantil) ----------
+
+/**
+ * Marca (o desmarca) a un estudiante que, según Bienestar Estudiantil, requiere ajustes razonables. Solo se guarda la marca,
+ * nunca el motivo (salud o necesidades educativas específicas). No cambia ninguna nota ni aparece en el feedback ni en el Excel.
+ */
+export async function marcarAjustesRazonables(db, estudiante, marcado = true, ahora = ahoraISO()) {
+  await db.transaction('rw', db.estudiantes, async () => {
+    const actual = await db.estudiantes.get(estudiante);
+    if (!actual) throw new Error('No existe ese estudiante.');
+    const { ajustes_razonables: _antes, ...resto } = actual;
+    await db.estudiantes.put({ ...resto, ...(marcado ? { ajustes_razonables: true } : {}), actualizado: ahora });
+  });
+}

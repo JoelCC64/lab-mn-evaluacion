@@ -2,6 +2,7 @@
 import { useState } from '../vendor/preact-htm.js';
 import { html, useApp, Pantalla, Chip, ChipMetodologia, Aviso, Cargando, enlace, Persona } from './base.js';
 import { HojaAgregarEstudiante, HojaCorregirNuevo } from './estudiante-nuevo.js';
+import { marcarAjustesRazonables } from '../datos/acciones.js';
 import { useCurso, textoBimestre, horario } from './curso-datos.js';
 import { nombreEvento } from './evento.js';
 import { eventoSugerido, semanaDeFecha } from '../nucleo/calendario.js';
@@ -98,6 +99,11 @@ function TarjetaNotas({ ctx, paralelo, enCurso, hoy }) {
 }
 
 function Estudiantes({ paralelo, estudiantes }) {
+  const { db, avisar } = useApp();
+  const alternarAR = async (e) => {
+    await marcarAjustesRazonables(db, e.id, !e.ajustes_razonables);
+    avisar(e.ajustes_razonables ? 'Marca «AR» quitada.' : `${e.nombre.split(' ')[0]}: marcado con ajustes razonables (AR).`);
+  };
   const [abierto, setAbierto] = useState(false);
   const [agregando, setAgregando] = useState(false);
   const [corrigiendo, setCorrigiendo] = useState(null);
@@ -115,6 +121,7 @@ function Estudiantes({ paralelo, estudiantes }) {
           <div class="fila">
             <${Persona} estudiante=${e} detalle=${e.viene_de ? html`<span>· viene de ${e.viene_de.curso}</span>` : e.agregado ? null : e.grupo_excel ? html`<span>· grupo del Excel ${e.grupo_excel}</span>` : html`<span>· sin grupo en el Excel</span>`} />
             ${e.agregado && html`<button class="boton chico" onClick=${() => setCorrigiendo(e)}>Corregir</button>`}
+            <button class="boton chico" title="Ajustes razonables (Bienestar Estudiantil)" onClick=${() => alternarAR(e)}>${e.ajustes_razonables ? 'Quitar AR' : 'AR'}</button>
           </div>`)}
       </div>
       <button class="boton ancho" onClick=${() => setAgregando(true)}>Agregar un estudiante</button>

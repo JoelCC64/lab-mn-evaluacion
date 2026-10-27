@@ -1,7 +1,7 @@
 // Datos: leer el Excel del semestre (con vista previa), asistencia de la semana 1, respaldo y restauración, y pasar
 // eventos entre dispositivos.
 import { useEffect, useState } from '../vendor/preact-htm.js';
-import { html, useApp, useVivo, Pantalla, Aviso, Hoja, Chip, enlace } from './base.js';
+import { html, useApp, useVivo, Pantalla, Aviso, Hoja, Chip, Persona, enlace } from './base.js';
 import { leerAsistenciaSemana1, leerExcelSemestre } from '../nucleo/excel-lectura.js';
 import { aplicarAsistenciaSemana1, aplicarExcelSemestre, planificarImportacion } from '../datos/importar.js';
 import { borrarTodo, contarRespaldo, restaurarRespaldo } from '../datos/respaldo.js';
@@ -13,6 +13,9 @@ import { guardarLocal, leerLocal } from '../datos/local.js';
 import { ACEPTA_EXCEL, abrirLibro, elegirArchivo } from './archivos.js';
 import { AjusteProfesor } from './dispositivo.js';
 import { simularClases } from '../datos/simulacion.js';
+import { marcarAjustesRazonables } from '../datos/acciones.js';
+import { BuscarEstudiante } from './buscar.js';
+import { activos } from '../nucleo/grupos.js';
 import { VERSION_APP } from '../version.js';
 import { buscarVersionNueva } from './pwa.js';
 
@@ -159,6 +162,8 @@ export function Datos() {
               <button class="boton chico" disabled=${!!ocupado || !conteo?.estudiantes} onClick=${() => simular(s)}>${t}</button>`)}
           </div>
         </div>`}
+
+      <${AjustesRazonables} />
 
       <div class="tarjeta">
         <h2>Este dispositivo</h2>
@@ -312,4 +317,29 @@ function VistaRespaldo({ vista, cerrar }) {
         ${!errores.length && html`<button class="boton peligro-fuerte" onClick=${restaurar}>Reemplazar todo</button>`}
       </div>
     <//>`;
+}
+
+/** Estudiantes que, según Bienestar Estudiantil, requieren «ajustes razonables» (AR): solo una marca, sin motivo. */
+function AjustesRazonables() {
+  const { db, avisar } = useApp();
+  const todos = useVivo(() => db.estudiantes.toArray(), []) ?? [];
+  const vigentes = activos(todos);
+  const marcados = vigentes.filter((e) => e.ajustes_razonables).sort((a, b) => a.nombre.localeCompare(b.nombre, 'es'));
+  const alternar = async (e) => {
+    await marcarAjustesRazonables(db, e.id, !e.ajustes_razonables);
+    avisar(e.ajustes_razonables ? 'Marca «AR» quitada.' : `${e.nombre.split(' ')[0]}: marcado con ajustes razonables (AR).`);
+  };
+  return html`
+    <div class="tarjeta">
+      <h2>Ajustes razonables (AR)</h2>
+      <p class="tenue pequeno">Para reconocer a quienes Bienestar Estudiantil indicó que requieren ajustes razonables. Solo guarda la marca «AR» junto al nombre: no guarda el motivo, no cambia ninguna nota y no aparece en el feedback ni en el Excel. Sí queda en los respaldos.</p>
+      ${marcados.length > 0 && html`
+        <div class="lista">
+          ${marcados.map((e) => html`
+            <div class="fila"><${Persona} estudiante=${e} detalle=${html`<span>· ${e.curso}</span>`} />
+              <button class="boton chico" onClick=${() => alternar(e)}>Quitar</button></div>`)}
+        </div>`}
+      <${BuscarEstudiante} estudiantes=${vigentes.filter((e) => !e.ajustes_razonables)} placeholder="Apellido de quien se marca…"
+        detalle=${(e) => html`<span>· ${e.curso}</span>`} alElegir=${alternar} />
+    </div>`;
 }
