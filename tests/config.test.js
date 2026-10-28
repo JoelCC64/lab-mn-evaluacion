@@ -44,6 +44,14 @@ test('configuraciones reales de las primeras actividades (Anexos B, C, D y G)', 
   assert.equal(configActividad(cfg, 'T1', 'TRAD').id, 'T1');
   assert.equal(configActividad(cfg, 'T1', 'SQI').id, 'T1');
   for (const n of [1, 2, 3, 4, 5, 6, 7]) assert.ok(configActividad(cfg, `TC${n}`, 'SQI'), `TC${n}`);
+  // T2: misma evaluación integral y mismos pesos que el T1 (su guía aún no llega: sin tareas ni etiquetas inventadas).
+  for (const m of ['TRAD', 'SQI']) {
+    const t2 = configActividad(cfg, 'T2', m);
+    assert.equal(t2.id, 'T2');
+    assert.deepEqual(t2.evaluacion_integral.escala, configActividad(cfg, 'T1', m).evaluacion_integral.escala);
+    assert.deepEqual(t2.pesos, configActividad(cfg, 'T1', m).pesos);
+    assert.equal(t2.tareas, undefined);
+  }
   // P1 Clásica: tres secciones 20/30/50 con escala 0–4; el análisis es una sola sección.
   const p1 = configActividad(cfg, 'P1', 'TRAD');
   assert.deepEqual(p1.criterios.map((c) => [c.id, c.peso]), [['diseno', 0.2], ['datos', 0.3], ['analisis', 0.5]]);

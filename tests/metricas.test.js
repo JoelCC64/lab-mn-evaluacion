@@ -86,7 +86,7 @@ test('listo cuando: con datos ficticios de varios eventos se arma el tablero y l
   assert.equal(m.generales.cursos, 10);
   assert.ok(m.asistencia.porEvento.map((x) => x.codigo).join().includes('P1,T1'), m.asistencia.porEvento.map((x) => x.codigo).join());
   assert.ok(m.asistencia.porEvento.length >= 7);
-  assert.deepEqual(m.rubricas.map((x) => x.clave), ['P1-TRAD|TRAD', 'P1-SQI|SQI', 'T1|TRAD', 'T1|SQI', 'P2-TRAD|TRAD', 'P2-SQI|SQI']);
+  assert.deepEqual(m.rubricas.map((x) => x.clave), ['P1-TRAD|TRAD', 'P1-SQI|SQI', 'T1|TRAD', 'T1|SQI', 'P2-TRAD|TRAD', 'P2-SQI|SQI', 'T2|TRAD', 'T2|SQI']);
   assert.deepEqual(m.trabajos.map((x) => x.codigo), ['TC1', 'TC2', 'TC3']);
   assert.equal(m.control.cobertura.length, 10);
   assert.ok(m.preparatorio.length >= 5, 'preparatorio en P1, T1, P2, T2/P3, T3 (Clásica)');

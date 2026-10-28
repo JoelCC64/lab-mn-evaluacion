@@ -1,0 +1,59 @@
+{
+  "id": "T2",
+  "codigo": "T2",
+  "fuente": "Rúbrica del T1 (evaluación integral 0–2; Lineamientos profesores §19); la guía T02 aún no llega",
+  "tipo": "taller",
+  "metodologia": [
+    "TRAD",
+    "SQI"
+  ],
+  "bimestre": 1,
+  "pesos": {
+    "asistencia_permanencia": 0.5,
+    "evaluacion_integral": 0.5
+  },
+  "asistencia_permanencia": {
+    "unidad": "estudiante",
+    "fuente": "pase_final_por_grupo",
+    "se_retiro_antes": 0.5
+  },
+  "evaluacion_integral": {
+    "unidad": "grupo",
+    "escala": [
+      0,
+      1,
+      2
+    ],
+    "descripcion": "Preguntas u observaciones del docente, ejecución de las actividades y tareas. No exige que el grupo termine el taller.",
+    "incluye": [
+      "preguntas_y_observaciones_del_docente",
+      "ejecucion",
+      "tareas"
+    ],
+    "exige_terminar_taller": false
+  },
+  "individual": {
+    "TRAD": [
+      "trabajo_preparatorio",
+      "control_oral"
+    ],
+    "SQI": [
+      "control_oral_sin_nota"
+    ]
+  },
+  "retro_practica_anterior": true,
+  "cierre": [
+    "trabajo_firmado"
+  ],
+  "feedback": {
+    "partes": {
+      "integral": {
+        "sugerencia": {
+          "TRAD": "Completen las tareas pendientes del taller y revisen las preguntas de discusión con sus propios datos.",
+          "SQI": "¿Cuál de las preguntas del taller les dejó más dudas? Tráiganla a la próxima sesión con una propuesta para resolverla."
+        },
+        "reforzar": "Tareas y preguntas del taller de presentación de gráficas."
+      }
+    }
+  }
+}

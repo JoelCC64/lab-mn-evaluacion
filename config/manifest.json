@@ -1,6 +1,6 @@
 {
   "aviso": "Generado por «npm run config». No editar a mano.",
-  "version": "58db66ac1dc0",
+  "version": "88337890ff6c",
   "semestre": "semestre-2026B.json",
   "cursos": "cursos-2026B.json",
   "catalogo": "actividades-catalogo.json",
@@ -22,6 +22,7 @@
     "actividades/P2-SQI.json",
     "actividades/P2-TRAD.json",
     "actividades/T1.json",
+    "actividades/T2.json",
     "actividades/TC1-SQI.json",
     "actividades/TC2-SQI.json",
     "actividades/TC3-SQI.json",
