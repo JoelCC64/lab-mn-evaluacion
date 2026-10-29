@@ -15,6 +15,7 @@ import { AjusteProfesor } from './dispositivo.js';
 import { simularClases } from '../datos/simulacion.js';
 import { marcarAjustesRazonables } from '../datos/acciones.js';
 import { BuscarEstudiante } from './buscar.js';
+import { NotasDeObservaciones } from './notas-observaciones.js';
 import { activos } from '../nucleo/grupos.js';
 import { VERSION_APP } from '../version.js';
 import { buscarVersionNueva } from './pwa.js';
@@ -162,6 +163,8 @@ export function Datos() {
               <button class="boton chico" disabled=${!!ocupado || !conteo?.estudiantes} onClick=${() => simular(s)}>${t}</button>`)}
           </div>
         </div>`}
+
+      <${NotasDeObservaciones} />
 
       <${AjustesRazonables} />
 

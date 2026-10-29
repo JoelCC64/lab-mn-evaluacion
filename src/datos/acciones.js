@@ -110,6 +110,27 @@ export async function revisarGrupo(db, evento, grupos, grupo, cambios, ahora = a
   });
 }
 
+/**
+ * Nota fijada de un grupo, con decimales, en las unidades de la actividad (sobre 10 en una práctica; sobre el máximo de la
+ * escala en un taller). Manda sobre la de la rúbrica, que se conserva. `valor` = null la quita. El valor se redondea a
+ * centésimas y debe estar entre 0 y `tope`.
+ */
+export async function fijarNotaGrupo(db, evento, grupos, grupo, valor, tope, ahora = ahoraISO()) {
+  if (valor !== null && valor !== undefined) {
+    if (typeof valor !== 'number' || !Number.isFinite(valor) || valor < 0 || valor > tope) throw new Error(`La nota debe estar entre 0 y ${tope}`);
+    valor = Math.round(valor * 100) / 100;
+  }
+  if (valor === null || valor === undefined) {
+    const actual = await db.revisiones_grupo.get([evento, grupo]);
+    if (actual && actual.nota_fijada !== undefined) {
+      const { nota_fijada, ...resto } = actual;
+      await db.revisiones_grupo.put({ ...resto, fecha: ahora });
+    }
+    return;
+  }
+  await revisarGrupo(db, evento, grupos, grupo, { nota_fijada: valor }, ahora);
+}
+
 // ---------- Asistencia (pase final) ----------
 
 /** Estado de asistencia de un estudiante (presente, no_vino, salio, se_retiro_antes; null = sin registro). */

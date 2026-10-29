@@ -94,11 +94,23 @@ export function notaGrupo(ctx, evento, grupo) {
   const puntos = new Map((ctx.puntajes.get(`${evento.id}|${grupo}`) ?? []).map((p) => [p.aspecto, p.valor]));
   const partes = rubrica(ctx.cfg, config).map((r) => ({ ...r, valor: puntos.has(r.id) ? puntos.get(r.id) : null }));
   const faltan = partes.filter((p) => p.valor === null || p.valor === undefined);
-  if (!partes.length || faltan.length) return { valor: null, completo: false, partes, faltan: faltan.map((p) => p.nombre) };
-  const valor = partes[0].peso !== null
+  const completa = partes.length > 0 && !faltan.length;
+  const valorRubrica = !completa ? null : partes[0].peso !== null
     ? partes.reduce((s, p) => s + (p.peso * p.valor) / p.max, 0)
     : partes.reduce((s, p) => s + p.valor, 0) / partes.reduce((s, p) => s + p.max, 0);
-  return { valor, completo: true, partes };
+  // Nota fijada por el profesor (decimales): manda sobre la de la rúbrica, que se conserva para el feedback y las métricas.
+  const fijada = rev?.nota_fijada;
+  if (typeof fijada === 'number') {
+    const tope = topeDeNota(config);
+    return { valor: Math.min(1, Math.max(0, fijada / tope)), completo: true, partes, fijada: true, nota_fijada: fijada, tope, valor_rubrica: valorRubrica };
+  }
+  if (!completa) return { valor: null, completo: false, partes, faltan: faltan.map((p) => p.nombre) };
+  return { valor: valorRubrica, completo: true, partes };
+}
+
+/** Tope de la nota de un grupo en las unidades en que se escribe: 10 en una práctica; el máximo de la escala en un taller. */
+export function topeDeNota(config) {
+  return config?.tipo === 'taller' ? Math.max(...config.evaluacion_integral.escala) : 10;
 }
 
 /** Unidad que se califica en un trabajo en casa: 'grupo' (por defecto) o 'estudiante' (configurable por TC). */

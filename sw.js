@@ -2,7 +2,7 @@
 // Guarda todos los archivos de la app para que funcione sin conexión.
 // En localhost usa primero la red (desarrollo); publicada, usa primero lo guardado (rápido y sin conexión).
 
-const VERSION = '0.12.28-e69aafc272';
+const VERSION = '0.12.29-4720786732';
 const CACHE = `lab-mn-${VERSION}`;
 const ARCHIVOS = [
   "./",
@@ -18,6 +18,7 @@ const ARCHIVOS = [
   "src/datos/excel-datos.js",
   "src/datos/importar.js",
   "src/datos/local.js",
+  "src/datos/notas-observaciones.js",
   "src/datos/paquete.js",
   "src/datos/respaldo.js",
   "src/datos/simulacion.js",
@@ -37,6 +38,7 @@ const ARCHIVOS = [
   "src/nucleo/metricas.js",
   "src/nucleo/motor-vista.js",
   "src/nucleo/motor.js",
+  "src/nucleo/notas-observaciones.js",
   "src/nucleo/pdf.js",
   "src/nucleo/periodos.js",
   "src/nucleo/respaldo-completo.js",
@@ -70,6 +72,7 @@ const ARCHIVOS = [
   "src/ui/grupos.js",
   "src/ui/inicio.js",
   "src/ui/metricas.js",
+  "src/ui/notas-observaciones.js",
   "src/ui/notas.js",
   "src/ui/paquetes.js",
   "src/ui/plic.js",

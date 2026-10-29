@@ -3,11 +3,11 @@ import { useEffect, useRef, useState } from '../vendor/preact-htm.js';
 import { html, useApp, Pantalla, Chip, Hoja, Aviso, Cargando, Persona, enlace, ir } from './base.js';
 import { useEvento, nombreEvento } from './evento.js';
 import {
-  agregarEstudianteNuevo, alternarEtiqueta, guardarNotaProfesor, guardarObservacion, guardarPuntaje, marcarAsistencia, moverEstudiante, revisarGrupo,
+  agregarEstudianteNuevo, alternarEtiqueta, fijarNotaGrupo, guardarNotaProfesor, guardarObservacion, guardarPuntaje, marcarAsistencia, moverEstudiante, revisarGrupo,
 } from '../datos/acciones.js';
-import { gruposDe, notaControl, notaGrupo, rubrica } from '../nucleo/motor.js';
+import { gruposDe, notaControl, notaGrupo, rubrica, topeDeNota } from '../nucleo/motor.js';
 import { esVisitante, grupoNuevo, listaDeGrupos } from '../nucleo/grupos.js';
-import { seEvaluaPorGrupo, sobreDiez, textoNotaGrupo } from '../nucleo/motor-vista.js';
+import { seEvaluaPorGrupo, sobreDiez, textoNotaGrupo, textoPuntos } from '../nucleo/motor-vista.js';
 import { preparatorioCalifica } from '../nucleo/config.js';
 import { HojaVisitante } from './visitantes.js';
 import { HojaCorregirNuevo } from './estudiante-nuevo.js';
@@ -77,6 +77,7 @@ function Evaluacion({ ctx, evento, grupo, config, grupos }) {
             ${p.escala.map((v) => html`<button class=${puntos.get(p.id) === v ? 'elegido' : ''} onClick=${() => elegir(p.id, v)}>${v}</button>`)}
           </div>
         </div>`)}
+      ${!penalizado && html`<${NotaFina} key=${`fina-${evento.id}-${grupo}-${nota.fijada ? nota.nota_fijada : 'r'}`} evento=${evento} grupo=${grupo} grupos=${grupos} nota=${nota} config=${config} />`}
       <${Preguntas} config=${config} abierto=${esTaller} />
       <${Etiquetas} ctx=${ctx} evento=${evento} grupo=${grupo} config=${config} grupos=${grupos} />
       <${NotaTexto} key=${`nota-${evento.id}-${grupo}`} evento=${evento} unidad="grupo" unidadId=${grupo}
@@ -91,6 +92,49 @@ function Evaluacion({ ctx, evento, grupo, config, grupos }) {
           <button class="boton peligro-fuerte" onClick=${borrarTodo}>Borrar</button>
         </div>
       <//>`}`;
+}
+
+const PASOS_NOTA = [-0.25, -0.1, 0.1, 0.25];
+
+/**
+ * Nota del grupo con decimales (0.25, 1.8…), en las unidades de la actividad: sobre 10 en una práctica, sobre el máximo
+ * de la escala en un taller. Manda sobre la de la rúbrica, que se conserva; «Quitar» vuelve a la rúbrica.
+ */
+function NotaFina({ evento, grupo, grupos, nota, config }) {
+  const { db } = useApp();
+  const tope = topeDeNota(config);
+  const deRubrica = nota.fijada ? nota.valor_rubrica : nota.valor;
+  const base = nota.fijada ? nota.nota_fijada : deRubrica === null || deRubrica === undefined ? null : Math.round(deRubrica * tope * 100) / 100;
+  const [texto, setTexto] = useState(nota.fijada ? String(nota.nota_fijada) : '');
+  const [error, setError] = useState(null);
+  const guardar = async (v) => {
+    const valor = Math.round(v * 100) / 100;
+    if (!Number.isFinite(valor) || valor < 0 || valor > tope) { setError(`La nota va de 0 a ${tope}.`); return; }
+    setError(null);
+    await fijarNotaGrupo(db, evento.id, grupos, grupo, valor, tope);
+    setTexto(String(valor));
+  };
+  const escrita = Number(texto.trim().replace(',', '.'));
+  const sumar = (paso) => guardar(Math.min(tope, Math.max(0, (base ?? 0) + paso)));
+  return html`
+    <div class="criterio">
+      <div class="separado">
+        <b>Nota con decimales</b>
+        <span class="tenue pequeno">0–${tope}${nota.fijada && deRubrica !== null && deRubrica !== undefined ? ` · rúbrica: ${textoPuntos(deRubrica * tope)}` : ''}</span>
+      </div>
+      <div class="fila-flex" style="gap:6px;flex-wrap:wrap">
+        ${PASOS_NOTA.map((p) => html`<button class="boton chico" disabled=${base === null} onClick=${() => sumar(p)}>${p > 0 ? '+' : '−'}${Math.abs(p)}</button>`)}
+      </div>
+      <div class="fila-flex" style="gap:6px">
+        <input class="entrada" inputmode="decimal" placeholder=${base === null ? `Nota (0–${tope})` : `Otra nota (0–${tope})`} value=${texto}
+          onInput=${(e) => setTexto(e.currentTarget.value)}
+          onKeyDown=${(e) => { if (e.key === 'Enter' && texto.trim()) guardar(escrita); }} />
+        <button class="boton chico primario" disabled=${!texto.trim() || !Number.isFinite(escrita)} onClick=${() => guardar(escrita)}>Fijar</button>
+        ${nota.fijada && html`<button class="boton chico" onClick=${async () => { await fijarNotaGrupo(db, evento.id, grupos, grupo, null, tope); setTexto(''); }}>Quitar</button>`}
+      </div>
+      ${error && html`<p class="tenue pequeno" style="color:var(--mal)">${error}</p>`}
+      ${nota.fijada && html`<p class="tenue pequeno">Nota fijada por el profesor: reemplaza a la de la rúbrica en el Resumen, el Excel y el feedback.</p>`}
+    </div>`;
 }
 
 function Guia({ ctx, config, parte }) {

@@ -3,7 +3,7 @@ import { useState } from '../vendor/preact-htm.js';
 import { html, useApp, Chip, Hoja, Aviso, Persona } from './base.js';
 import { borrarAjuste, guardarAjuste } from '../datos/acciones.js';
 import { resumenEvento, unidadTrabajo } from '../nucleo/motor.js';
-import { sobreDiez, textoPuntos } from '../nucleo/motor-vista.js';
+import { sobreDiez, textoNotaGrupo, textoPuntos } from '../nucleo/motor-vista.js';
 import { esVisitante, eventoBase } from '../nucleo/grupos.js';
 import { RecuperacionDelEstudiante, RecuperacionesDelEvento } from './recuperacion.js';
 import { TarjetaVisitantes } from './visitantes.js';
@@ -112,6 +112,7 @@ function HojaDetalle({ fila, evento, ctx, cerrar }) {
         ${nota.valor_sin_ajuste !== undefined && html`<tr><td>Sin el ajuste</td><td>${sobreDiez(nota.valor_sin_ajuste)}/10</td></tr>`}
         ${nota.partes?.asistencia_permanencia !== undefined && html`<tr><td>Asistencia y permanencia</td><td>${nota.partes.asistencia_permanencia}${nota.partes.asistencia_permanencia < 1 ? ' (se retiró antes)' : ''}</td></tr>`}
         ${partes.length > 0 && html`<tr><td>${evento.tipo === 'taller' ? 'Evaluación del grupo' : 'Rúbrica del grupo'}</td><td>${partes.map((p) => `${p.nombre}: ${p.valor ?? '—'}/${p.max}`).join(' · ')}</td></tr>`}
+        ${nota.partes?.grupo?.fijada && html`<tr><td>Nota fijada del grupo</td><td><b>${textoNotaGrupo(nota.partes.grupo)}</b> (reemplaza a la de la rúbrica)</td></tr>`}
         ${trabajo?.registrado && html`<tr><td>${unidadTrabajo(ctx.cfg.actividades[evento.config]) === 'grupo' ? `TC del grupo ${fila.grupo}` : 'Su TC'}</td>
           <td>${trabajo.entregado === false ? 'no entregó' : html`<b>${textoPuntos(trabajo.puntos)}/${trabajo.total}</b>${trabajo.faltan.length ? ` (faltan ${trabajo.faltan.length})` : ''} · ${trabajo.partes.map((p) => `${p.id}: ${p.valor ?? '—'}`).join(' · ')}${trabajo.descuento > 0 ? ` · descuento −${textoPuntos(trabajo.descuento)}${trabajo.descuento_motivo ? ` (${trabajo.descuento_motivo})` : ''}` : ''}`}</td></tr>`}
         ${preparatorio.estado !== 'sin_nota' && html`<tr><td>Preparatorio</td><td>${preparatorio.estado === 'calculada' ? `${preparatorio.nivel}/2` : preparatorio.estado}${preparatorio.motivo ? ` · ${preparatorio.motivo}` : ''}</td></tr>`}

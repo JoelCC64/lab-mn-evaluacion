@@ -6,7 +6,7 @@
 // códigos. Funciones puras sobre el contexto del motor.
 import { gruposDe, notaControl, notaGrupo, rubrica, unidadTrabajo } from './motor.js';
 import { listaDeGrupos } from './grupos.js';
-import { seCalificaTrabajo, seEvaluaPorGrupo, sobreDiez, textoPuntos, unidadesDelTrabajo } from './motor-vista.js';
+import { seCalificaTrabajo, seEvaluaPorGrupo, sobreDiez, textoNotaGrupo, textoPuntos, unidadesDelTrabajo } from './motor-vista.js';
 import { enLista, redondear } from './util.js';
 
 /** ¿El evento tiene feedback? Prácticas y talleres evaluados por grupo y TC que se califican, si se hicieron. */
@@ -198,6 +198,9 @@ function unidadDeGrupo(ctx, evento, config, { grupo, integrantes }) {
     const faltan = partes.filter((p) => p.valor === null).map((p) => p.corto);
     notaTexto = `${esTaller ? 'Evaluación integral del grupo' : 'Nota del grupo'}: pendiente${faltan.length && !esTaller ? ` (falta: ${enLista(faltan)})` : ''}`;
     notaCorta = 'nota pendiente';
+  } else if (nota.fijada) {
+    notaTexto = esTaller ? `Evaluación integral del grupo: ${textoNotaGrupo(nota)}` : `Nota del grupo: ${textoNotaGrupo(nota)}`;
+    notaCorta = textoNotaGrupo(nota);
   } else if (esTaller) {
     notaTexto = `Evaluación integral del grupo: ${partes[0].valor}/${partes[0].max}`;
     notaCorta = `${partes[0].valor}/${partes[0].max}`;

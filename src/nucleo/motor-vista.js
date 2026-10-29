@@ -86,6 +86,7 @@ export function sobreDiez(valor) {
  * Nota del grupo como texto: en un taller, el nivel de la evaluación integral («1/2»); en una práctica, sobre 10.
  */
 export function textoNotaGrupo(nota) {
+  if (nota.fijada) return nota.tope === 10 ? `${sobreDiez(nota.valor)}/10` : `${redondear(nota.nota_fijada, 2)}/${nota.tope}`;
   if (nota.partes?.length === 1 && nota.partes[0].id === 'integral' && !nota.penalizacion) {
     const p = nota.partes[0];
     return `${p.valor}/${p.max}`;
