@@ -65,7 +65,7 @@ export async function recuperacionesVinculadas(db, cfg, curso, reg) {
  * Décimas vinculadas: los premios que un estudiante de este curso ganó como visitante en otra de mis clases (misma
  * metodología) cuentan en su propio curso, como si los hubiera ganado aquí. Cada fila lleva el evento donde se ganó
  * (`evento`, con su `evento_fecha`, porque ese evento no está en este curso) y `vinculada`. Un premio de grupo no cuenta si
- * faltó a esa sesión. Se suman a la primera práctica propia posterior a esa fecha (ver `destinoDecimas`). No se guardan.
+ * faltó a esa sesión. Cuentan en el bono de su bimestre (`evento_bimestre`, el del evento donde se ganaron). No se guardan.
  */
 export async function decimasVinculadas(db, cfg, curso, reg) {
   const { visitas, porCodigo } = await visitasMias(db, cfg, curso, reg);
@@ -77,7 +77,7 @@ export async function decimasVinculadas(db, cfg, curso, reg) {
     const { ctx, eventoA } = anfitrion;
     for (const f of ctx.reg.decimas ?? []) {
       if (f.estudiante !== v.id || f.evento !== eventoA.id || !premioCuenta(ctx, f)) continue;
-      filas.push({ ...f, id: `${f.id}|vinculada`, estudiante: porCodigo.get(v.codigo).id, evento_fecha: eventoA.fecha, vinculada: { evento: eventoA.id, visitante: v.id } });
+      filas.push({ ...f, id: `${f.id}|vinculada`, estudiante: porCodigo.get(v.codigo).id, evento_fecha: eventoA.fecha, evento_bimestre: eventoA.bimestre, vinculada: { evento: eventoA.id, visitante: v.id } });
     }
   }
   return filas;

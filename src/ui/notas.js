@@ -4,7 +4,7 @@
 import { useState } from '../vendor/preact-htm.js';
 import { html, useApp, Pantalla, Chip, Hoja, Aviso, Cargando, Persona, enlace } from './base.js';
 import { useCurso, textoBimestre } from './curso-datos.js';
-import { notaBimestre } from '../nucleo/motor.js';
+import { BONO_POR_PREMIO, BONO_TOPE, notaBimestre } from '../nucleo/motor.js';
 import { activos } from '../nucleo/grupos.js';
 import { esquemaDe, nombreMetodologia } from '../nucleo/config.js';
 import { avisoControlCierre, bimestreEnCurso, pendientesDelBimestre } from '../nucleo/bimestre.js';
@@ -110,8 +110,22 @@ function HojaDesglose({ ctx, fila, bimestre, esquema, cerrar }) {
         <div><b>${final === null ? '—' : dos(final)}</b><span>${final === null ? 'final: falta evaluar' : 'final (Excel)'}</span></div>
       </div>
       ${nb.componentes.map((c) => html`<${Componente} c=${c} pesos=${esquema.componentes.find((x) => x.id === c.id)?.items} />`)}
+      <${BonoDecimas} bono=${nb.bono} />
       <button class="boton ancho" onClick=${cerrar}>Cerrar</button>
     <//>`;
+}
+
+/** Bono del bimestre por las décimas de premio (nada si no ganó ninguna). */
+export function BonoDecimas({ bono }) {
+  if (!bono || !bono.premio) return null;
+  return html`
+    <div class="tarjeta desglose">
+      <div class="separado">
+        <h3>Bono por décimas de premio</h3>
+        <span class="pequeno"><b>+${dos(bono.puntos)}</b></span>
+      </div>
+      <p class="tenue pequeno">${`Premio ganado: ${bono.premio} · cada punto de premio vale ${BONO_POR_PREMIO} del bimestre${bono.topado ? ` (tope ${BONO_TOPE})` : ''}. Se suma a la nota del bimestre, sin pasar de su total.`}</p>
+    </div>`;
 }
 
 /** Un componente del bimestre con su desglose (también en la revisión de notas). */

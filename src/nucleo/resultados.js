@@ -10,7 +10,7 @@ import { controlCalifica, esquemaDe } from './config.js';
 import { TIPOS_SESION } from './calendario.js';
 import { gruposDelEvento } from './grupos.js';
 import {
-  asistenciaDe, crearContexto, gruposDe, notaBimestre, notaControl, notaEvento, notaGrupo, notaPreparatorio, notaTrabajo,
+  asistenciaDe, bonoDecimas, crearContexto, gruposDe, notaBimestre, notaControl, notaEvento, notaGrupo, notaPreparatorio, notaTrabajo,
   unidadTrabajo,
 } from './motor.js';
 
@@ -119,6 +119,10 @@ function observaciones(ctx, id, { hoy, fijadas }) {
   for (const b of [1, 2]) {
     if (bimestreTerminado(ctx, b) && !tuvoControl(ctx, id, b)) partes.push(`B${b}: sin control oral`);
   }
+  for (const b of [1, 2]) {
+    const bono = bonoDecimas(ctx, id, b);
+    if (bono.puntos > 0) partes.push(`B${b}: +${redondear(bono.puntos, 2)} de bono por décimas de premio (${bono.premio})`);
+  }
   return partes.length ? partes.join(' · ') : null;
 }
 
@@ -132,7 +136,10 @@ function finalDelBimestre(ctx, id, b) {
   const terminado = bimestreTerminado(ctx, b);
   const porId = new Map(nb.componentes.map((c) => [c.id, c]));
   const finales = nb.componentes.map((c) => valorComponente(c, terminado));
-  return { porId, terminado, nota: finales.every((v) => v !== null && v !== undefined) ? finales.reduce((s, v) => s + v, 0) : null };
+  const total = esquemaDe(ctx.cfg, ctx.curso.metodologia, b)?.total ?? Infinity;
+  const base = finales.every((v) => v !== null && v !== undefined) ? finales.reduce((s, v) => s + v, 0) : null;
+  // Con todo evaluado, el bono por décimas de premio se suma a la nota del bimestre (sin pasar de su total).
+  return { porId, terminado, nota: base === null ? null : Math.min(total, base + nb.bono.puntos) };
 }
 
 /** Nota final del bimestre (la del Excel y de coordinación): solo cuando todo está evaluado; si no, null. */

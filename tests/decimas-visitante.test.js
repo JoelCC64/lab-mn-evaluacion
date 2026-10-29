@@ -1,5 +1,5 @@
-// Décimas ganadas por un visitante («recupera aquí») con el grupo de otro de mis cursos: cuentan en su propio curso, en la
-// primera práctica propia posterior a la sesión donde las ganó, sin copiarse.
+// Décimas ganadas por un visitante («recupera aquí») con el grupo de otro de mis cursos: cuentan en el bono del bimestre de
+// su propio curso (el del evento donde las ganó), sin copiarse.
 import 'fake-indexeddb/auto';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
@@ -9,7 +9,7 @@ import { abrirBase } from '../src/db.js';
 import { registrosDelCurso } from '../src/datos/consultas.js';
 import { agregarVisitante, marcarAsistencia, otorgarDecimas, quitarDecimas } from '../src/datos/acciones.js';
 import { generarEventos } from '../src/nucleo/calendario.js';
-import { crearContexto, decimasDelEvento, destinoDecimas, gruposDe } from '../src/nucleo/motor.js';
+import { bonoDecimas, crearContexto, gruposDe } from '../src/nucleo/motor.js';
 import { idVisitante, textoParaSuProfesor } from '../src/nucleo/visitantes.js';
 import { configReal, copia } from './ayudas.js';
 
@@ -42,7 +42,7 @@ async function conVisita(k, paralelo = 'GR1QA', host = 'P1') {
   return { e, v: idVisitante(e.id, 'x1') };
 }
 
-test('el premio de grupo incluye a la visita y llega a su curso, en su primera práctica posterior a la sesión', async () => {
+test('el premio de grupo incluye a la visita y llega a su curso como bono del bimestre de la sesión', async () => {
   const k = await escenario();
   const { e, v } = await conVisita(k);
   await otorgarDecimas(k.db, e.id, ['h1', v], { valor: 0.3, motivo: 'pregunta', unidad: 'grupo', grupo: '1' }, AHORA);
@@ -53,21 +53,21 @@ test('el premio de grupo incluye a la visita y llega a su curso, en su primera p
   assert.equal(filas[0].valor, 0.3);
   assert.equal(filas[0].evento, e.id);
   assert.equal(filas[0].vinculada.visitante, v);
-  const destino = destinoDecimas(ctx, filas[0].evento, 'x1', filas[0].evento_fecha);
-  assert.ok(destino && destino.tipo === 'practica' && destino.fecha > e.fecha);
-  assert.equal(decimasDelEvento(ctx, destino, 'x1').total, 0.3);
-  // La práctica recuperada (P1 de GR7SA) no recibe las décimas.
-  assert.equal(decimasDelEvento(ctx, ev.find((x) => x.codigo === 'P1'), 'x1').total, 0);
+  assert.equal(filas[0].evento_bimestre, e.bimestre);
+  const bono = bonoDecimas(ctx, 'x1', e.bimestre);
+  assert.equal(bono.premio, 0.3);
+  assert.ok(Math.abs(bono.puntos - 0.1875) < 1e-9);
+  assert.equal(bonoDecimas(ctx, 'x1', e.bimestre === 1 ? 2 : 1).puntos, 0, 'en el otro bimestre no cuenta');
   // No se copió nada a la base de GR7SA ni a sus lecturas sin vínculos.
   assert.equal((await registrosDelCurso(k.db, 'GR7SA')).decimas.length, 0);
 });
 
-test('en la sesión anfitriona la visita no tiene destino; quitar el premio lo quita también de su curso', async () => {
+test('en la sesión anfitriona la visita no tiene bono; quitar el premio lo quita también de su curso', async () => {
   const k = await escenario();
   const { e, v } = await conVisita(k);
   const lote = await otorgarDecimas(k.db, e.id, ['h1', v], { valor: 0.2, unidad: 'grupo', grupo: '1' }, AHORA);
   const { ctx } = await k.cargar('GR1QA');
-  assert.equal(destinoDecimas(ctx, e.id, v), null);
+  assert.equal(bonoDecimas(ctx, v, e.bimestre).puntos, 0);
   assert.equal((await k.cargar('GR7SA')).ctx.decimas.get('x1')?.length, 1);
   await quitarDecimas(k.db, e.id, lote);
   assert.equal((await k.cargar('GR7SA')).ctx.decimas.get('x1'), undefined);
@@ -100,7 +100,7 @@ test('el texto para el profesor de una visita ajena menciona las décimas ganada
   await otorgarDecimas(k.db, e.id, ['h1', v], { valor: 0.3, motivo: 'incertidumbre', unidad: 'grupo', grupo: '1' }, AHORA);
   const { ctx } = await k.cargar('GR1QA');
   const { texto } = textoParaSuProfesor(ctx, e, ctx.estudiantePorId.get(v));
-  assert.match(texto, /Décimas ganadas con su grupo: \+0\.3.*incertidumbre/);
+  assert.match(texto, /Décimas ganadas con su grupo: \+0\.3.*bono de \+0\.188.*incertidumbre/);
 });
 
 test('al refuerzo (sesión sin nota) puede asistir una visita: gana décimas con su grupo y llegan a su curso; su texto no habla de nota', async () => {
@@ -108,12 +108,10 @@ test('al refuerzo (sesión sin nota) puede asistir una visita: gana décimas con
   const { e, v } = await conVisita(k, 'GR1QA', 'REFUERZO');
   assert.equal(e.con_nota, false);
   await otorgarDecimas(k.db, e.id, ['h1', v], { valor: 0.2, motivo: 'pregunta', unidad: 'grupo', grupo: '1' }, AHORA);
-  const { ctx, ev } = await k.cargar('GR7SA');
+  const { ctx } = await k.cargar('GR7SA');
   const f = ctx.decimas.get('x1');
   assert.equal(f.length, 1);
-  const destino = destinoDecimas(ctx, f[0].evento, 'x1', f[0].evento_fecha);
-  assert.equal(destino.tipo, 'practica');
-  assert.equal(decimasDelEvento(ctx, destino, 'x1').total, 0.2);
+  assert.ok(Math.abs(bonoDecimas(ctx, 'x1', e.bimestre).puntos - 0.125) < 1e-9, '0.2 × 0.625');
   assert.equal((await registrosDelCurso(k.db, 'GR7SA', cfg)).recuperaciones.length, 0, 'sin nota no hay recuperación vinculada');
   const anfitrion = (await k.cargar('GR1QA')).ctx;
   const { texto, final } = textoParaSuProfesor(anfitrion, e, anfitrion.estudiantePorId.get(v));

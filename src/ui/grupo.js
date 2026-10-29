@@ -46,9 +46,13 @@ function Evaluacion({ ctx, evento, grupo, config, grupos }) {
   const puntos = new Map((ctx.puntajes.get(`${evento.id}|${grupo}`) ?? []).map((p) => [p.aspecto, p.valor]));
   const [abierto, setAbierto] = useState(null);
   const [borrando, setBorrando] = useState(false);
+  // Nota directa (con decimales): mientras esté abierta o fijada, los botones de la rúbrica quedan bloqueados, para que el
+  // grupo tenga una sola nota.
+  const [directa, setDirecta] = useState(Boolean(nota.fijada));
+  const bloqueada = directa || Boolean(nota.fijada);
   const penalizado = ctx.revisiones.get(`${evento.id}|${grupo}`)?.penalizacion_total;
   // Tocar un nivel siempre lo elige (un doble toque accidental no borra la nota).
-  const elegir = (aspecto, v) => { if (puntos.get(aspecto) !== v) guardarPuntaje(db, evento.id, grupos, grupo, aspecto, v); };
+  const elegir = (aspecto, v) => { if (!bloqueada && puntos.get(aspecto) !== v) guardarPuntaje(db, evento.id, grupos, grupo, aspecto, v); };
   const borrarTodo = async () => {
     for (const p of partes) await guardarPuntaje(db, evento.id, grupos, grupo, p.id, null);
     setBorrando(false);
@@ -73,11 +77,11 @@ function Evaluacion({ ctx, evento, grupo, config, grupos }) {
             <span class="mas">${abierto === p.id ? 'ocultar' : 'ver guía'}</span>
           </button>
           ${abierto === p.id && html`<${Guia} ctx=${ctx} config=${config} parte=${p} />`}
-          <div class="niveles">
-            ${p.escala.map((v) => html`<button class=${puntos.get(p.id) === v ? 'elegido' : ''} onClick=${() => elegir(p.id, v)}>${v}</button>`)}
+          <div class=${`niveles${bloqueada ? ' bloqueados' : ''}`}>
+            ${p.escala.map((v) => html`<button class=${puntos.get(p.id) === v ? 'elegido' : ''} disabled=${bloqueada} onClick=${() => elegir(p.id, v)}>${v}</button>`)}
           </div>
         </div>`)}
-      ${!penalizado && html`<${NotaFina} key=${`fina-${evento.id}-${grupo}-${nota.fijada ? nota.nota_fijada : 'r'}`} evento=${evento} grupo=${grupo} grupos=${grupos} nota=${nota} config=${config} />`}
+      ${!penalizado && html`<${NotaDirecta} key=${`directa-${evento.id}-${grupo}-${nota.fijada ? nota.nota_fijada : 'r'}`} evento=${evento} grupo=${grupo} grupos=${grupos} nota=${nota} config=${config} abierta=${bloqueada} setAbierta=${setDirecta} />`}
       <${Preguntas} config=${config} abierto=${esTaller} />
       <${Etiquetas} ctx=${ctx} evento=${evento} grupo=${grupo} config=${config} grupos=${grupos} />
       <${NotaTexto} key=${`nota-${evento.id}-${grupo}`} evento=${evento} unidad="grupo" unidadId=${grupo}
@@ -97,16 +101,20 @@ function Evaluacion({ ctx, evento, grupo, config, grupos }) {
 const PASOS_NOTA = [-0.25, -0.1, 0.1, 0.25];
 
 /**
- * Nota del grupo con decimales (0.25, 1.8…), en las unidades de la actividad: sobre 10 en una práctica, sobre el máximo
- * de la escala en un taller. Manda sobre la de la rúbrica, que se conserva; «Quitar» vuelve a la rúbrica.
+ * Nota directa del grupo, con decimales (0.25, 1.8…), en las unidades de la actividad: sobre 10 en una práctica, sobre el
+ * máximo de la escala en un taller. Es una opción desplegable: al abrirla, los botones de la rúbrica se bloquean (una sola
+ * nota por grupo); «Volver a los botones» quita la nota directa y los desbloquea. La rúbrica ya marcada se conserva.
  */
-function NotaFina({ evento, grupo, grupos, nota, config }) {
+function NotaDirecta({ evento, grupo, grupos, nota, config, abierta, setAbierta }) {
   const { db } = useApp();
   const tope = topeDeNota(config);
   const deRubrica = nota.fijada ? nota.valor_rubrica : nota.valor;
   const base = nota.fijada ? nota.nota_fijada : deRubrica === null || deRubrica === undefined ? null : Math.round(deRubrica * tope * 100) / 100;
   const [texto, setTexto] = useState(nota.fijada ? String(nota.nota_fijada) : '');
   const [error, setError] = useState(null);
+  if (!abierta) {
+    return html`<button class="boton chico" style="align-self:flex-start" onClick=${() => setAbierta(true)}>Poner la nota directa (decimales) ▸</button>`;
+  }
   const guardar = async (v) => {
     const valor = Math.round(v * 100) / 100;
     if (!Number.isFinite(valor) || valor < 0 || valor > tope) { setError(`La nota va de 0 a ${tope}.`); return; }
@@ -116,12 +124,14 @@ function NotaFina({ evento, grupo, grupos, nota, config }) {
   };
   const escrita = Number(texto.trim().replace(',', '.'));
   const sumar = (paso) => guardar(Math.min(tope, Math.max(0, (base ?? 0) + paso)));
+  const volver = async () => { await fijarNotaGrupo(db, evento.id, grupos, grupo, null, tope); setTexto(''); setAbierta(false); };
   return html`
     <div class="criterio">
       <div class="separado">
-        <b>Nota con decimales</b>
-        <span class="tenue pequeno">0–${tope}${nota.fijada && deRubrica !== null && deRubrica !== undefined ? ` · rúbrica: ${textoPuntos(deRubrica * tope)}` : ''}</span>
+        <b>Nota directa</b>
+        <span class="tenue pequeno">0–${tope}${nota.fijada && deRubrica !== null && deRubrica !== undefined ? ` · botones: ${textoPuntos(deRubrica * tope)}` : ''}</span>
       </div>
+      <p class="tenue pequeno">Los botones de arriba quedan bloqueados mientras uses la nota directa: el grupo tiene una sola nota.</p>
       <div class="fila-flex" style="gap:6px;flex-wrap:wrap">
         ${PASOS_NOTA.map((p) => html`<button class="boton chico" disabled=${base === null} onClick=${() => sumar(p)}>${p > 0 ? '+' : '−'}${Math.abs(p)}</button>`)}
       </div>
@@ -130,10 +140,9 @@ function NotaFina({ evento, grupo, grupos, nota, config }) {
           onInput=${(e) => setTexto(e.currentTarget.value)}
           onKeyDown=${(e) => { if (e.key === 'Enter' && texto.trim()) guardar(escrita); }} />
         <button class="boton chico primario" disabled=${!texto.trim() || !Number.isFinite(escrita)} onClick=${() => guardar(escrita)}>Fijar</button>
-        ${nota.fijada && html`<button class="boton chico" onClick=${async () => { await fijarNotaGrupo(db, evento.id, grupos, grupo, null, tope); setTexto(''); }}>Quitar</button>`}
       </div>
       ${error && html`<p class="tenue pequeno" style="color:var(--mal)">${error}</p>`}
-      ${nota.fijada && html`<p class="tenue pequeno">Nota fijada por el profesor: reemplaza a la de la rúbrica en el Resumen, el Excel y el feedback.</p>`}
+      <button class="boton chico" style="align-self:flex-start" onClick=${volver}>Volver a los botones${nota.fijada ? ' (quita la nota directa)' : ''}</button>
     </div>`;
 }
 

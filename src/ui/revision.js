@@ -4,7 +4,7 @@ import { useState } from '../vendor/preact-htm.js';
 import { html, useApp, Pantalla, Aviso, Cargando, Hoja, enlace } from './base.js';
 import { useCurso, textoBimestre } from './curso-datos.js';
 import { BuscarEstudiante } from './buscar.js';
-import { Componente, dos } from './notas.js';
+import { BonoDecimas, Componente, dos } from './notas.js';
 import { notaBimestre } from '../nucleo/motor.js';
 import { activos } from '../nucleo/grupos.js';
 import { esquemaDe, nombreMetodologia } from '../nucleo/config.js';
@@ -44,6 +44,7 @@ export function RevisionNotas({ paralelo }) {
           : `Acumulada: aún falta evaluar algo (lo pendiente cuenta 0)${nb.proyectada !== null ? `; proyectada ${dos(nb.proyectada)}` : ''}.`}</div>
       </div>
       ${nb.componentes.map((c) => html`<${Componente} key=${c.id} c=${c} pesos=${esquema.componentes.find((x) => x.id === c.id)?.items} />`)}
+      <${BonoDecimas} bono=${nb.bono} />
       <div class="pie-fijo revision-nav">
         <button class="boton" aria-label="Anterior" disabled=${k === 0} onClick=${() => setI(k - 1)}>‹</button>
         <button class="boton crece" onClick=${() => setBuscando(true)}>${k + 1} de ${lista.length} · Buscar</button>

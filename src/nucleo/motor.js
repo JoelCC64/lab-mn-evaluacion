@@ -148,24 +148,6 @@ export function notaTrabajo(ctx, evento, unidadId) {
 }
 
 /**
- * Práctica donde cuentan las décimas de un premio ganado en el evento `origen`: la primera práctica con nota después de
- * ese evento a la que el estudiante sí asiste (si faltó, pasan a la siguiente). null si aún no hay ninguna.
- * Un visitante no tiene destino aquí (sus décimas cuentan en su propio curso). Si el premio se ganó en otro curso (`origen`
- * no está en este), `fecha` es la de esa sesión: cuenta la primera práctica propia posterior a ella.
- */
-export function destinoDecimas(ctx, origen, estudiante, fecha = null) {
-  if (ctx.estudiantePorId.get(estudiante)?.estado === 'visitante') return null;
-  const i = ctx.eventos.findIndex((e) => e.id === origen);
-  if (i < 0 && !fecha) return null;
-  for (const e of i < 0 ? ctx.eventos.filter((x) => x.fecha > fecha) : ctx.eventos.slice(i + 1)) {
-    if (e.tipo !== 'practica' || !e.con_nota || e.estado !== 'normal') continue;
-    if (asistenciaDe(ctx, e, estudiante).falta) continue;
-    return e;
-  }
-  return null;
-}
-
-/**
  * ¿Cuenta este premio? Un premio de grupo no cuenta para quien faltó (no vino o salió) a la clase donde se ganó, aunque
  * se haya marcado su falta después de darlo; uno individual sí (se dio a propósito a esa persona).
  */
@@ -175,10 +157,20 @@ export function premioCuenta(ctx, fila) {
   return !(origen && asistenciaDe(ctx, origen, fila.estudiante).falta);
 }
 
-/** Premios en décimas de un estudiante que cuentan en este evento: { filas, total } (total en décimas de punto sobre 10). */
-export function decimasDelEvento(ctx, evento, estudiante) {
-  const filas = (ctx.decimas?.get(estudiante) ?? []).filter((f) => premioCuenta(ctx, f) && destinoDecimas(ctx, f.evento, estudiante, f.evento_fecha)?.id === evento.id);
-  return { filas, total: redondear(filas.reduce((s, f) => s + f.valor, 0), 1) };
+/**
+ * Bono al bimestre por las décimas de premio (desde 0.12.30). Cada punto de premio vale `BONO_POR_PREMIO` puntos de la nota
+ * del bimestre (0.625: el mayor premio dado, 0.8, vale 0.5) y un estudiante no recibe más de `BONO_TOPE` por bimestre.
+ * El premio cuenta en el bimestre del evento donde se ganó. Devuelve { premio (suma), puntos (bono con tope), filas, topado }.
+ */
+export const BONO_POR_PREMIO = 0.625;
+export const BONO_TOPE = 0.5;
+export function bonoDecimas(ctx, estudiante, bimestre) {
+  if (ctx.estudiantePorId.get(estudiante)?.estado === 'visitante') return { premio: 0, puntos: 0, filas: [], topado: false };
+  const filas = (ctx.decimas?.get(estudiante) ?? []).filter((f) => premioCuenta(ctx, f)
+    && (f.evento_bimestre ?? ctx.eventoPorId.get(f.evento)?.bimestre) === bimestre);
+  const premio = redondear(filas.reduce((s, f) => s + f.valor, 0), 1);
+  const bruto = premio * BONO_POR_PREMIO;
+  return { premio, puntos: Math.min(BONO_TOPE, bruto), filas, topado: bruto > BONO_TOPE + 1e-9 };
 }
 
 function conAjuste(ctx, r) {
@@ -235,16 +227,6 @@ export function notaEvento(ctx, evento, estudiante) {
     r.partes = { grupo: g };
     if (g.valor === null) return conAjuste(ctx, { ...r, motivo: g.sinConfig ? 'falta la rúbrica de la actividad' : `falta evaluar el grupo ${r.grupo}` });
     if (g.penalizacion) return conAjuste(ctx, { ...r, estado: 'calculada', valor: g.valor, motivo: `penalización total (${g.motivo})` });
-    // Décimas de premio (preguntas complejas): se suman a la nota de la práctica, sin pasar de 10. El ajuste individual, si hay, manda.
-    const d = decimasDelEvento(ctx, evento, estudiante);
-    if (d.total > 0) {
-      const valor = Math.min(1, g.valor + d.total / 10);
-      const aplicadas = redondear((valor - g.valor) * 10, 2);
-      return conAjuste(ctx, {
-        ...r, estado: 'calculada', valor, valor_sin_decimas: g.valor, decimas: { total: d.total, aplicadas, filas: d.filas },
-        motivo: aplicadas > 0 ? `incluye +${aplicadas} de décimas de premio` : 'décimas de premio: ya tiene 10',
-      });
-    }
     return conAjuste(ctx, { ...r, estado: 'calculada', valor: g.valor, motivo: null });
   }
 
@@ -403,11 +385,15 @@ export function notaBimestre(ctx, estudiante, bimestre) {
     .map((c) => (c.id === 'planificacion_conocimiento'
       ? componentePyC(ctx, estudiante, c, bimestre)
       : componentePorActividades(ctx, estudiante, c)));
+  // El bono por décimas de premio se suma a la nota del bimestre, que no pasa de su total.
+  const bono = bonoDecimas(ctx, estudiante, bimestre);
+  const conBono = (x) => Math.min(esquema.total, x + bono.puntos);
   return {
     esquema: esquema.id,
     componentes,
-    acumulada: suma(componentes.map((c) => c.acumulada)),
-    proyectada: componentes.every((c) => c.proyectada !== null) ? suma(componentes.map((c) => c.proyectada)) : null,
+    bono,
+    acumulada: conBono(suma(componentes.map((c) => c.acumulada))),
+    proyectada: componentes.every((c) => c.proyectada !== null) ? conBono(suma(componentes.map((c) => c.proyectada))) : null,
     completo: componentes.every((c) => c.completo),
   };
 }

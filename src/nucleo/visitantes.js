@@ -1,7 +1,7 @@
 // Estudiantes de otros docentes que recuperan en una sesión de este curso (Fase 6). Se agregan al evento con su
 // código y nombre, se califican con su grupo y la app arma el texto con la nota para su profesor (que se envía en
 // las 24 h siguientes). No van al Excel ni cuentan en el curso. Funciones puras.
-import { asistenciaDe, notaControl, notaEvento, notaPreparatorio, premioCuenta } from './motor.js';
+import { BONO_POR_PREMIO, BONO_TOPE, asistenciaDe, notaControl, notaEvento, notaPreparatorio, premioCuenta } from './motor.js';
 import { esVisitante } from './grupos.js';
 import { fechaLarga, redondear } from './util.js';
 
@@ -63,7 +63,7 @@ export function textoParaSuProfesor(ctx, evento, visitante, firma = null) {
   const premios = (ctx.decimas?.get(visitante.id) ?? []).filter((f) => f.evento === evento.id && premioCuenta(ctx, f));
   if (premios.length) {
     const total = redondear(premios.reduce((s, f) => s + f.valor, 0), 1);
-    lineas.push(`Décimas ganadas${premios.some((f) => f.unidad === 'grupo') ? ' con su grupo' : ''}: +${total} (para sumar a su próxima práctica)${premios.some((f) => f.motivo) ? ` · ${premios.filter((f) => f.motivo).map((f) => f.motivo).join('; ')}` : ''}`);
+    lineas.push(`Décimas ganadas${premios.some((f) => f.unidad === 'grupo') ? ' con su grupo' : ''}: +${total} (en este curso suman un bono de +${redondear(Math.min(BONO_TOPE, total * BONO_POR_PREMIO), 3)} a la nota del bimestre)${premios.some((f) => f.motivo) ? ` · ${premios.filter((f) => f.motivo).map((f) => f.motivo).join('; ')}` : ''}`);
   }
   if (asis.observacion) lineas.push(`Observación: ${asis.observacion}`);
   if (firma) lineas.push('', firma);

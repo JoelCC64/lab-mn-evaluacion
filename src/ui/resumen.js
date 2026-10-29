@@ -118,7 +118,7 @@ function HojaDetalle({ fila, evento, ctx, cerrar }) {
         ${preparatorio.estado !== 'sin_nota' && html`<tr><td>Preparatorio</td><td>${preparatorio.estado === 'calculada' ? `${preparatorio.nivel}/2` : preparatorio.estado}${preparatorio.motivo ? ` · ${preparatorio.motivo}` : ''}</td></tr>`}
         ${control.estado !== 'sin_control' && html`<tr><td>Control oral</td><td>${control.estado === 'calculada' ? (control.valor !== null ? `${sobreDiez(control.valor)}/10 (${(control.puntajes ?? []).join(', ') || control.motivo})` : (control.aprobado ? 'aprobado' : 'no aprobado')) : control.estado}</td></tr>`}
       </tbody></table>
-      ${!esVisitante(fila.estudiante) && html`<${DecimasDeEstudiante} ctx=${ctx} evento=${evento} estudiante=${fila.estudiante} nota=${nota} />`}
+      ${!esVisitante(fila.estudiante) && html`<${DecimasDeEstudiante} ctx=${ctx} evento=${evento} estudiante=${fila.estudiante} />`}
       ${evento.con_nota && !esVisitante(fila.estudiante) && html`<${RecuperacionDelEstudiante} ctx=${ctx} evento=${evento} estudiante=${fila.estudiante} falta=${asistencia.falta} />`}
       ${evento.con_nota && html`
         <div class="tarjeta">

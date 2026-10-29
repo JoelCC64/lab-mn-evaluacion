@@ -1,13 +1,14 @@
-// Décimas de premio: se dan a un grupo o a un estudiante por responder una pregunta compleja y se suman a la nota de la
-// próxima práctica a la que asista cada uno (sin pasar de 10). Una fila por estudiante; un premio de grupo comparte lote.
+// Décimas de premio: se dan a un grupo o a un estudiante por responder una pregunta compleja y suman un bono a la nota del
+// bimestre (cada punto de premio vale 0.625; hasta 0.5 por bimestre). Una fila por estudiante; un premio de grupo comparte lote.
 import { useState } from '../vendor/preact-htm.js';
 import { html, useApp, Chip, Hoja, Persona } from './base.js';
 import { otorgarDecimas, quitarDecimas } from '../datos/acciones.js';
 import { esVisitante } from '../nucleo/grupos.js';
-import { decimasDelEvento, destinoDecimas, premioCuenta } from '../nucleo/motor.js';
+import { BONO_POR_PREMIO, BONO_TOPE, bonoDecimas, premioCuenta } from '../nucleo/motor.js';
 
 const VALORES = [0.1, 0.2, 0.3, 0.5, 1];
 const texto = (v) => String(Math.round(v * 10) / 10);
+const bonoTexto = (premio) => String(Math.round(Math.min(BONO_TOPE, premio * BONO_POR_PREMIO) * 1000) / 1000);
 
 /** Hoja para dar décimas a `estudiantes` (lista de estudiantes). `unidad`: 'grupo' o 'estudiante'. */
 export function HojaDecimas({ ctx, evento, estudiantes: candidatos, unidad, grupo = null, titulo, alCerrar }) {
@@ -15,14 +16,11 @@ export function HojaDecimas({ ctx, evento, estudiantes: candidatos, unidad, grup
   const [fuera, setFuera] = useState([]);   // quitados a mano antes de confirmar
   const estudiantes = candidatos.filter((e) => !fuera.includes(e.id));
   const visitantes = estudiantes.filter(esVisitante);
-  const propios = estudiantes.filter((e) => !esVisitante(e));
   const [valor, setValor] = useState(0.1);
   const [otro, setOtro] = useState('');
   const [motivo, setMotivo] = useState('');
   const v = otro.trim() !== '' ? Number(otro.replace(',', '.')) : valor;
   const valido = v > 0 && Math.abs(v * 10 - Math.round(v * 10)) < 1e-9;
-  const destinos = [...new Set(propios.map((e) => destinoDecimas(ctx, evento.id, e.id)?.codigo ?? null))];
-  const donde = destinos.length === 1 && destinos[0] ? destinos[0] : destinos.every((d) => d === null) ? null : 'varias';
   const dar = async () => {
     try {
       await otorgarDecimas(db, evento.id, estudiantes.map((e) => e.id), { valor: v, motivo, unidad, grupo });
@@ -32,13 +30,11 @@ export function HojaDecimas({ ctx, evento, estudiantes: candidatos, unidad, grup
   };
   return html`
     <${Hoja} titulo=${titulo} alCerrar=${alCerrar}>
-      <p class="tenue pequeno">${`Por responder una pregunta compleja. Se suman a la nota de ${
-        donde === 'varias' ? 'la próxima práctica a la que asista cada uno' : donde ? `la práctica ${donde}` : 'la próxima práctica (aún no hay una)'
-      } (si falta, pasan a la siguiente a la que asista). La nota no pasa de 10.`}</p>
+      <p class="tenue pequeno">${`Por responder una pregunta compleja. Suman un bono a la nota del bimestre: cada punto de premio vale ${BONO_POR_PREMIO} (+${texto(v > 0 ? v : 0.1)} → +${bonoTexto(v > 0 ? v : 0.1)}), hasta ${BONO_TOPE} por estudiante y bimestre.`}</p>
       ${candidatos.length > 1 && html`
         <p class="pequeno"><b>${estudiantes.length} presentes</b> (toca un nombre para quitarlo o ponerlo):</p>
         <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px">${candidatos.map((e) => html`<button class=${`chip ${fuera.includes(e.id) ? '' : 'ok'}`} onClick=${() => setFuera(fuera.includes(e.id) ? fuera.filter((x) => x !== e.id) : [...fuera, e.id])}>${`${e.nombre.split(' ')[0]}${esVisitante(e) ? ' (visita)' : ''}`}</button>`)}</div>`}
-      ${visitantes.length > 0 && html`<p class="tenue pequeno">${`${visitantes.length === 1 ? 'La visita se lleva' : 'Las visitas se llevan'} sus décimas a su propio curso (a la primera práctica de allá después de hoy). Si es estudiante de otro profesor, van en el texto que le envías.`}</p>`}
+      ${visitantes.length > 0 && html`<p class="tenue pequeno">${`${visitantes.length === 1 ? 'La visita se lleva' : 'Las visitas se llevan'} sus décimas a su propio curso (cuentan en el bono de su bimestre). Si es estudiante de otro profesor, van en el texto que le envías.`}</p>`}
       ${estudiantes.length === 1 && html`<${Persona} estudiante=${estudiantes[0]} />`}
       <div class="segmentado" role="group" aria-label="Décimas">
         ${VALORES.map((x) => html`<button class=${otro.trim() === '' && valor === x ? 'elegido ok' : ''} onClick=${() => { setOtro(''); setValor(x); }}>+${texto(x)}</button>`)}
@@ -77,12 +73,11 @@ export function DecimasDelEvento({ ctx, evento }) {
       ${lotes.map(({ lote, del, primera }) => {
         const validas = del.filter((f) => premioCuenta(ctx, f));
         const sinContar = del.length - validas.length;
-        const destinos = [...new Set(validas.map((f) => (esVisitante(ctx.estudiantePorId.get(f.estudiante) ?? {}) ? 'su curso' : destinoDecimas(ctx, evento.id, f.estudiante)?.codigo ?? '—')))];
         return html`
           <div class="fila">
             <div class="principal">
               <div class="linea1">+${texto(primera.valor)} · ${primera.unidad === 'grupo' ? `grupo ${primera.grupo ?? ''} (${validas.length})` : nombre(primera.estudiante)}</div>
-              <div class="linea2">${`${primera.motivo ?? 'sin motivo'} · ${validas.length ? `cuentan en ${destinos.join(' / ')}` : 'no cuentan'}${sinContar ? ` · ${sinContar} sin contar por faltar` : ''}`}</div>
+              <div class="linea2">${`${primera.motivo ?? 'sin motivo'} · ${validas.length ? `bono: +${bonoTexto(primera.valor)} al bimestre` : 'no cuentan'}${sinContar ? ` · ${sinContar} sin contar por faltar` : ''}`}</div>
             </div>
             <button class="boton chico" onClick=${() => setQuitando({ lote, del })}>Quitar</button>
           </div>`;
@@ -98,22 +93,18 @@ export function DecimasDelEvento({ ctx, evento }) {
       <//>`}`;
 }
 
-/** Fila para la ficha del estudiante: lo que ganó aquí y lo que se suma en este evento (si hay). */
-export function DecimasDeEstudiante({ ctx, evento, estudiante, nota }) {
+/** Fila para la ficha del estudiante: lo que ganó aquí y el bono que le da al bimestre. */
+export function DecimasDeEstudiante({ ctx, evento, estudiante }) {
   const ganadas = (ctx.decimas?.get(estudiante.id) ?? []).filter((f) => f.evento === evento.id);
-  const entran = decimasDelEvento(ctx, evento, estudiante.id);
-  const aplica = nota?.decimas;
-  if (!ganadas.length && !entran.total) return null;
-  const codigo = (id) => ctx.eventoPorId.get(id)?.codigo ?? id.replace(':', ' · ');
+  if (!ganadas.length) return null;
+  const bono = bonoDecimas(ctx, estudiante.id, evento.bimestre);
   return html`
     <div class="tarjeta">
       <h3>Décimas de premio</h3>
-      ${entran.total > 0 && html`
-        <p class="pequeno"><b>${aplica ? `En ${evento.codigo}: +${texto(aplica.aplicadas)}` : `Se suman en ${evento.codigo}: +${texto(entran.total)} (cuando su nota esté calculada)`}</b>${aplica && aplica.aplicadas < aplica.total ? ` de ${texto(aplica.total)} (la nota no pasa de 10)` : ''}${' · '}${
-          entran.filas.map((f) => `${texto(f.valor)} de ${codigo(f.evento)}${f.motivo ? ` (${f.motivo})` : ''}`).join(' + ')}</p>`}
       ${ganadas.map((f) => (premioCuenta(ctx, f)
-        ? html`<p class="pequeno">${`Ganó +${texto(f.valor)}${f.motivo ? ` (${f.motivo})` : ''} aquí; cuenta en `}<b>${esVisitante(estudiante) ? 'su propio curso' : destinoDecimas(ctx, evento.id, estudiante.id)?.codigo ?? 'la próxima práctica (aún sin práctica)'}</b>.</p>`
+        ? html`<p class="pequeno">${`Ganó +${texto(f.valor)}${f.motivo ? ` (${f.motivo})` : ''} aquí: `}<b>${esVisitante(estudiante) ? 'cuenta en el bono de su propio curso' : `+${bonoTexto(f.valor)} al bimestre`}</b>.</p>`
         : html`<p class="pequeno">${`+${texto(f.valor)} del grupo${f.motivo ? ` (${f.motivo})` : ''}: no cuenta, porque faltó a esta clase.`}</p>`))}
+      ${!esVisitante(estudiante) && bono.premio > 0 && html`<p class="pequeno tenue">Bono del bimestre ${evento.bimestre}: <b>+${bonoTexto(bono.premio)}</b> con ${texto(bono.premio)} de premio${bono.topado ? ` (tope ${BONO_TOPE})` : ''}.</p>`}
     </div>`;
 }
 

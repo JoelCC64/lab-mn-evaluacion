@@ -57,7 +57,7 @@ export async function eliminarGrupo(db, evento, grupos, grupo, { destino = null,
 /**
  * Premia con `valor` décimas (múltiplo de 0.1) a cada uno de los `estudiantes` por responder una pregunta compleja en el
  * evento. Es una fila por estudiante; las de un mismo premio comparten `lote` (un premio de grupo se quita de una vez).
- * Las décimas se suman a la próxima práctica a la que asista cada uno (ver `destinoDecimas`). `unidad`: 'grupo' o
+ * Cada premio da un bono a la nota del bimestre (ver `bonoDecimas`). `unidad`: 'grupo' o
  * 'estudiante'; `grupo`: el grupo donde se ganaron (solo informativo). Devuelve el lote.
  */
 export async function otorgarDecimas(db, evento, estudiantes, { valor, motivo = null, unidad = 'estudiante', grupo = null }, ahora = ahoraISO()) {

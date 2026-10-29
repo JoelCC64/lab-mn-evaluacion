@@ -1,5 +1,5 @@
-// Décimas de premio: se suman a la nota de la próxima práctica a la que el estudiante asista (sin pasar de 10);
-// pueden ser de un grupo (una fila por integrante presente) o de un estudiante; solo múltiplos de 0.1.
+// Décimas de premio: dan un bono a la nota del bimestre (0.625 por punto de premio, hasta 0.5 por bimestre) y no tocan la
+// nota de la práctica; pueden ser de un grupo (una fila por integrante presente) o de un estudiante; solo múltiplos de 0.1.
 import 'fake-indexeddb/auto';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
@@ -9,7 +9,7 @@ import { abrirBase } from '../src/db.js';
 import { registrosDelCurso } from '../src/datos/consultas.js';
 import { cerrarPase, guardarAjuste, guardarPuntaje, marcarAsistencia, otorgarDecimas, quitarDecimas } from '../src/datos/acciones.js';
 import { generarEventos } from '../src/nucleo/calendario.js';
-import { crearContexto, decimasDelEvento, destinoDecimas, gruposDe, notaEvento } from '../src/nucleo/motor.js';
+import { BONO_POR_PREMIO, BONO_TOPE, bonoDecimas, crearContexto, gruposDe, notaBimestre, notaEvento } from '../src/nucleo/motor.js';
 import { configReal, copia } from './ayudas.js';
 import { rubrica } from '../src/nucleo/motor.js';
 
@@ -55,59 +55,62 @@ async function curso() {
   return { db, cargar, practica, nota };
 }
 
-test('décimas individuales: se suman a la próxima práctica (no al evento donde se ganaron) y el motivo lo explica', async () => {
+const cerca = (a, b) => assert.ok(Math.abs(a - b) < 1e-9, `${a} ≠ ${b}`);
+
+test('el premio da un bono al bimestre (0.625 por punto de premio) y no cambia la nota de la práctica', async () => {
   const k = await curso();
   const { eventos } = await k.cargar();
   const t1 = eventos.find((e) => e.codigo === 'T1');
   await otorgarDecimas(k.db, t1.id, ['a'], { valor: 0.3, motivo: 'pregunta de incertidumbre' }, AHORA);
-  const { ctx } = await k.cargar();
-  assert.equal(destinoDecimas(ctx, t1.id, 'a').codigo, 'P2', 'después del T1 la próxima práctica es P2');
-  assert.equal(decimasDelEvento(ctx, eventos.find((e) => e.codigo === 'P1'), 'a').total, 0, 'no cuentan hacia atrás');
   await k.practica('P2', { baja: 0 });
-  const n = await k.nota('P2', 'a');
-  const sin = await k.nota('P2', 'b');
-  assert.equal(n.estado, 'calculada');
-  assert.ok(Math.abs(n.valor - Math.min(1, sin.valor + 0.03)) < 1e-9, 'a recibe 0.3 décimas sobre 10 (0.03 en escala 0–1)');
-  assert.match(n.motivo, /incluye \+0\.3 de décimas/);
-  assert.equal(n.decimas.total, 0.3);
+  const { ctx } = await k.cargar();
+  assert.equal(BONO_POR_PREMIO, 0.625);
+  const a = bonoDecimas(ctx, 'a', t1.bimestre);
+  assert.equal(a.premio, 0.3);
+  cerca(a.puntos, 0.1875);
+  assert.equal(a.topado, false);
+  assert.equal(bonoDecimas(ctx, 'b', t1.bimestre).puntos, 0, 'quien no ganó no recibe');
+  assert.equal(bonoDecimas(ctx, 'a', t1.bimestre === 1 ? 2 : 1).puntos, 0, 'solo en el bimestre donde se ganó');
+  // La práctica queda con la nota de la rúbrica.
+  const na = await k.nota('P2', 'a');
+  const nb = await k.nota('P2', 'b');
+  assert.equal(na.valor, nb.valor);
+  assert.equal(na.decimas, undefined);
+  // Y el bono entra en la nota del bimestre.
+  const bim = notaBimestre(ctx, 'a', t1.bimestre);
+  const sin = notaBimestre(ctx, 'b', t1.bimestre);
+  cerca(bim.acumulada - sin.acumulada, 0.1875);
+  if (bim.proyectada !== null) cerca(bim.proyectada - sin.proyectada, 0.1875);
+  assert.equal(bim.bono.puntos, a.puntos);
 });
 
-test('tope de 10: con la nota en 10 no se pasa; con menos solo suma lo que cabe', async () => {
+test('tope de 0.5 por bimestre: varios premios se suman y después se topa; el 0.8 mayor vale justo 0.5', async () => {
   const k = await curso();
-  const { eventos } = await k.cargar();
-  await otorgarDecimas(k.db, eventos.find((e) => e.codigo === 'T1').id, ['a', 'b'], { valor: 0.5 }, AHORA);
+  const t1 = (await k.cargar()).eventos.find((e) => e.codigo === 'T1');
+  await otorgarDecimas(k.db, t1.id, ['a'], { valor: 0.8 }, AHORA);
+  await otorgarDecimas(k.db, t1.id, ['b'], { valor: 0.5 }, AHORA);
+  await otorgarDecimas(k.db, t1.id, ['b'], { valor: 0.5 }, AHORA);
+  const { ctx } = await k.cargar();
+  cerca(bonoDecimas(ctx, 'a', t1.bimestre).puntos, BONO_TOPE);
+  assert.equal(bonoDecimas(ctx, 'a', t1.bimestre).topado, false, '0.8 × 0.625 es justo 0.5');
+  const b = bonoDecimas(ctx, 'b', t1.bimestre);
+  assert.equal(b.premio, 1);
+  assert.equal(b.puntos, BONO_TOPE);
+  assert.equal(b.topado, true);
+});
+
+test('la nota del bimestre con bono no pasa de su total', async () => {
+  const k = await curso();
+  const { eventos, reg } = await k.cargar();
+  const t1 = eventos.find((e) => e.codigo === 'T1');
+  await otorgarDecimas(k.db, t1.id, ['a'], { valor: 0.8 }, AHORA);
   await k.practica('P2');
-  const a = await k.nota('P2', 'a');
-  assert.equal(a.valor, 1, 'no pasa de 10');
-  assert.equal(a.decimas.aplicadas, 0, 'ya tenía 10: no se aplicó nada');
-  assert.match(a.motivo, /ya tiene 10/);
-
-  // Con la nota por debajo de 10, un premio grande se corta en 10 y se aplica solo lo que cabía.
-  const k2 = await curso();
-  await otorgarDecimas(k2.db, (await k2.cargar()).eventos.find((e) => e.codigo === 'T1').id, ['a'], { valor: 3 }, AHORA);
-  await k2.practica('P2', { baja: 0 });
-  const n = await k2.nota('P2', 'a');
-  assert.ok(n.valor_sin_decimas < 1, 'la base no es 10');
-  assert.equal(n.valor, Math.min(1, n.valor_sin_decimas + 0.3));
-  assert.ok(Math.abs(n.decimas.aplicadas - (n.valor - n.valor_sin_decimas) * 10) < 1e-6);
-  const b = await k2.nota('P2', 'b');
-  assert.equal(b.valor_sin_decimas, undefined, 'quien no recibió décimas no cambia');
-});
-
-test('si falta a la práctica destino, las décimas pasan a la siguiente práctica a la que asista', async () => {
-  const k = await curso();
-  const { eventos } = await k.cargar();
-  await otorgarDecimas(k.db, eventos.find((e) => e.codigo === 'T1').id, ['a'], { valor: 0.2 }, AHORA);
-  await k.practica('P2', { faltan: ['a'] });
-  const enP2 = await k.nota('P2', 'a');
-  assert.equal(enP2.valor, 0, 'faltó: 0, sin décimas');
-  assert.equal(enP2.decimas, undefined);
-  let { ctx } = await k.cargar();
-  assert.equal(destinoDecimas(ctx, eventos.find((e) => e.codigo === 'T1').id, 'a').codigo, 'P3', 'pasan a P3');
-  await k.practica('P3', { baja: 0 });
-  const enP3 = await k.nota('P3', 'a');
-  assert.equal(enP3.decimas.total, 0.2);
-  assert.match(enP3.motivo, /incluye/);
+  const { ctx } = await k.cargar();
+  const chico = copia(cfg);
+  chico.esquemas.TRAD_B1 = { ...chico.esquemas.TRAD_B1, total: 0.2 };
+  const c2 = crearContexto(chico, ctx.curso, eventos, (await k.cargar()).reg);
+  assert.equal(notaBimestre(c2, 'a', t1.bimestre).acumulada, 0.2);
+  assert.ok(notaBimestre(ctx, 'a', t1.bimestre).acumulada > 0.5);
 });
 
 test('premio de grupo: una fila por integrante presente, mismo lote; se quita de una vez o de a uno', async () => {
@@ -126,49 +129,45 @@ test('premio de grupo: una fila por integrante presente, mismo lote; se quita de
 
 test('solo múltiplos de 0.1, y alguien a quien dárselas; varios premios se suman', async () => {
   const k = await curso();
-  const t1 = (await k.cargar()).eventos.find((e) => e.codigo === 'T1').id;
-  for (const mal of [0.15, 0, -0.1, 0.25, 11, NaN]) await assert.rejects(otorgarDecimas(k.db, t1, ['a'], { valor: mal }), /de 0\.1 en 0\.1/);
-  await assert.rejects(otorgarDecimas(k.db, t1, [], { valor: 0.1 }), /a quién/);
-  await otorgarDecimas(k.db, t1, ['a'], { valor: 0.1 }, AHORA);
-  await otorgarDecimas(k.db, t1, ['a'], { valor: 0.2 }, AHORA);
+  const t1 = (await k.cargar()).eventos.find((e) => e.codigo === 'T1');
+  for (const mal of [0.15, 0, -0.1, 0.25, 11, NaN]) await assert.rejects(otorgarDecimas(k.db, t1.id, ['a'], { valor: mal }), /de 0\.1 en 0\.1/);
+  await assert.rejects(otorgarDecimas(k.db, t1.id, [], { valor: 0.1 }), /a quién/);
+  await otorgarDecimas(k.db, t1.id, ['a'], { valor: 0.1 }, AHORA);
+  await otorgarDecimas(k.db, t1.id, ['a'], { valor: 0.2 }, AHORA);
   await otorgarDecimas(k.db, (await k.cargar()).eventos.find((e) => e.codigo === 'P2').id, ['a'], { valor: 0.3 }, AHORA);
-  const { ctx, eventos } = await k.cargar();
-  assert.equal(decimasDelEvento(ctx, eventos.find((e) => e.codigo === 'P2'), 'a').total, 0.3, 'las del T1 cuentan en P2');
-  assert.equal(decimasDelEvento(ctx, eventos.find((e) => e.codigo === 'P3'), 'a').total, 0.3, 'las del P2 cuentan en P3');
-  assert.equal(destinoDecimas(ctx, t1, 'a').codigo, 'P2');
+  const { ctx } = await k.cargar();
+  cerca(bonoDecimas(ctx, 'a', t1.bimestre).premio, 0.6);
+  cerca(bonoDecimas(ctx, 'a', t1.bimestre).puntos, 0.375);
 });
 
-test('el ajuste individual manda sobre las décimas; las décimas no aplican si hay penalización total ni a notas pendientes', async () => {
+test('el ajuste individual de la práctica no toca el bono; faltar a la práctica tampoco lo quita (el premio es del evento donde se ganó)', async () => {
   const k = await curso();
   const { eventos } = await k.cargar();
   const t1 = eventos.find((e) => e.codigo === 'T1');
   await otorgarDecimas(k.db, t1.id, ['a', 'b'], { valor: 0.5 }, AHORA);
   const p2 = eventos.find((e) => e.codigo === 'P2');
-  assert.equal((await k.nota('P2', 'a')).estado, 'pendiente', 'sin pase cerrado la nota sigue pendiente');
   await guardarAjuste(k.db, p2.id, 'a', 0.5, 'a mano', AHORA);
-  await k.practica('P2', { baja: 0 });
-  const a = await k.nota('P2', 'a');
-  assert.equal(a.valor, 0.5, 'el ajuste es la nota final');
-  const b = await k.nota('P2', 'b');
-  assert.ok(b.decimas.total === 0.5 && b.valor <= 1);
+  await k.practica('P2', { baja: 0, faltan: ['b'] });
+  assert.equal((await k.nota('P2', 'a')).valor, 0.5);
+  assert.equal((await k.nota('P2', 'b')).valor, 0, 'faltó a P2');
+  const { ctx } = await k.cargar();
+  cerca(bonoDecimas(ctx, 'a', t1.bimestre).puntos, 0.3125);
+  cerca(bonoDecimas(ctx, 'b', t1.bimestre).puntos, 0.3125);
 });
 
-test('premio de grupo: quien faltó a la clase donde se ganó no recibe las décimas (aunque su falta se marque después); el individual sí cuenta', async () => {
+test('premio de grupo: quien faltó a la clase donde se ganó no recibe el bono (aunque su falta se marque después); el individual sí cuenta', async () => {
   const k = await curso();
   const { eventos, ctx: c0 } = await k.cargar();
   const t1 = eventos.find((e) => e.codigo === 'T1');
-  // Se da al grupo 1 (a, b, c) antes de marcar quién faltó.
   await otorgarDecimas(k.db, t1.id, ['a', 'b', 'c'], { valor: 0.3, unidad: 'grupo', grupo: '1' }, AHORA);
-  // Después se marca que c no vino al T1; y a d (que no vino) se le dieron décimas individuales a propósito.
   await marcarAsistencia(k.db, t1.id, gruposDe(c0, t1), 'c', 'no_vino', null, AHORA);
   await marcarAsistencia(k.db, t1.id, gruposDe(c0, t1), 'd', 'no_vino', null, AHORA);
   await otorgarDecimas(k.db, t1.id, ['d'], { valor: 0.2 }, AHORA);
-  await k.practica('P2', { baja: 0 });
-  const [a, c, d] = [await k.nota('P2', 'a'), await k.nota('P2', 'c'), await k.nota('P2', 'd')];
-  assert.equal(a.decimas.total, 0.3);
-  assert.equal(c.decimas, undefined, 'c faltó al T1: el premio del grupo no le cuenta');
-  assert.equal(d.decimas.total, 0.2, 'el premio individual sí cuenta');
-  // Si se corrige y c sí vino, el premio vuelve a contar (se calcula cada vez).
+  const { ctx } = await k.cargar();
+  cerca(bonoDecimas(ctx, 'a', t1.bimestre).puntos, 0.1875);
+  assert.equal(bonoDecimas(ctx, 'c', t1.bimestre).puntos, 0, 'c faltó al T1: el premio del grupo no le cuenta');
+  cerca(bonoDecimas(ctx, 'd', t1.bimestre).puntos, 0.125);
+  // Si se corrige y c sí vino, el bono vuelve (se calcula cada vez).
   await marcarAsistencia(k.db, t1.id, null, 'c', 'presente', null, AHORA);
-  assert.equal((await k.nota('P2', 'c')).decimas.total, 0.3);
+  cerca(bonoDecimas((await k.cargar()).ctx, 'c', t1.bimestre).puntos, 0.1875);
 });

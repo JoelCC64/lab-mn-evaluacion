@@ -45,7 +45,7 @@ function DeMisCursos({ evento, grupo, grupos, alCerrar }) {
   };
   return html`
     <p class="tenue pequeno">Estudiante de otro de tus cursos de ${metodologia === 'SQI' ? 'SQI' : 'la metodología clásica'} (solo se recupera con la misma metodología).
-      ${evento.con_nota ? `Se califica con su grupo y su nota aparece sola en ${evento.codigo} de su curso.` : 'Sesión sin nota: queda su asistencia y las décimas que gane con su grupo, que se suman en su curso.'}</p>
+      ${evento.con_nota ? `Se califica con su grupo y su nota aparece sola en ${evento.codigo} de su curso.` : 'Sesión sin nota: queda su asistencia y las décimas que gane con su grupo, que cuentan en el bono del bimestre de su curso.'}</p>
     <div class="campo"><label>Buscar por nombre, código o curso</label>
       <input class="entrada" value=${buscar} onInput=${(e) => setBuscar(e.currentTarget.value)} autocomplete="off" /></div>
     <div class="lista">

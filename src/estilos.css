@@ -265,6 +265,7 @@ textarea.entrada { min-height: 84px; resize: vertical; }
 }
 .niveles button.elegido { background: var(--azul-2); border-color: var(--azul-2); color: #fff; }
 .niveles button:active { transform: scale(.96); }
+.niveles.bloqueados { opacity: .4; pointer-events: none; }
 .niveles.chicos button { min-height: 44px; font-size: 17px; }
 
 .criterio + .criterio { margin-top: 14px; }

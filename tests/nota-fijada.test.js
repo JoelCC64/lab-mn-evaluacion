@@ -13,7 +13,7 @@ import {
 } from '../src/datos/acciones.js';
 import { aplicarPropuestasDeObservaciones, leerPropuestasDeObservaciones } from '../src/datos/notas-observaciones.js';
 import { generarEventos } from '../src/nucleo/calendario.js';
-import { crearContexto, gruposDe, notaEvento, notaGrupo, rubrica } from '../src/nucleo/motor.js';
+import { bonoDecimas, crearContexto, gruposDe, notaEvento, notaGrupo, rubrica } from '../src/nucleo/motor.js';
 import { textoNotaGrupo } from '../src/nucleo/motor-vista.js';
 import { notaEnObservacion } from '../src/nucleo/notas-observaciones.js';
 import { configReal, copia } from './ayudas.js';
@@ -89,15 +89,15 @@ test('límites: no se acepta fuera de 0–tope; con decimales se redondea a cent
   assert.equal((await k.db.revisiones_grupo.get([ev.id, '1'])).nota_fijada, 9.26);
 });
 
-test('las décimas de premio se suman sobre la nota fijada; la penalización total manda sobre ambas', async () => {
+test('las décimas de premio no tocan la nota fijada (van al bono del bimestre); la penalización total manda sobre la fijada', async () => {
   const k = await curso();
   const t1 = await k.evento('T1');
   await otorgarDecimas(k.db, t1.id, ['a'], { valor: 0.5 }, AHORA);
   const { ev, grupos } = await k.sesion('P2', 3);
   await fijarNotaGrupo(k.db, ev.id, grupos, '1', 9, 10, AHORA);
-  const a = await k.nota('P2', 'a');
-  assert.ok(Math.abs(a.valor - 0.95) < 1e-9, '9 + 0.5');
+  assert.ok(Math.abs((await k.nota('P2', 'a')).valor - 0.9) < 1e-9, 'sin décimas encima');
   assert.ok(Math.abs((await k.nota('P2', 'b')).valor - 0.9) < 1e-9);
+  assert.ok(Math.abs(bonoDecimas((await k.cargar()).ctx, 'a', t1.bimestre).puntos - 0.3125) < 1e-9);
   await revisarGrupo(k.db, ev.id, grupos, '1', { penalizacion_total: true, motivo_penalizacion: 'x' }, AHORA);
   assert.equal((await k.nota('P2', 'b')).valor, 0);
 });
