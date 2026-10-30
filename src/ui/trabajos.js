@@ -3,8 +3,8 @@
 import { useEffect, useRef, useState } from '../vendor/preact-htm.js';
 import { html, useApp, Pantalla, Chip, Hoja, Aviso, Cargando, enlace, ir } from './base.js';
 import { useEvento } from './evento.js';
-import { NotaTexto } from './grupo.js';
-import { alternarEtiquetaTrabajo, borrarTrabajo, descontarTrabajo, marcarEntrega, puntuarTrabajo } from '../datos/acciones.js';
+import { NotaDirectaCampo, NotaTexto } from './grupo.js';
+import { alternarEtiquetaTrabajo, borrarTrabajo, descontarTrabajo, fijarNotaTrabajo, marcarEntrega, puntuarTrabajo } from '../datos/acciones.js';
 import { leerLocal } from '../datos/local.js';
 import { eventoBase } from '../nucleo/grupos.js';
 import { unidadTrabajo } from '../nucleo/motor.js';
@@ -135,6 +135,8 @@ function Calificacion({ ctx, evento, unidadId }) {
   const completo = Boolean(u?.nota.completo);
   const listos = unidades.filter((x) => x.porCalificar && x.nota.completo).length;
   const total = unidades.filter((x) => x.porCalificar).length;
+  // Nota directa: al abrirla (o si ya hay una fijada) las preguntas y el descuento se bloquean: una sola nota por unidad.
+  const [directa, setDirecta] = useState(false);
 
   // Avance automático: cuando un toque completa la calificación, pasa solo a la siguiente unidad por calificar.
   const [avanzando, setAvanzando] = useState(false);
@@ -174,10 +176,11 @@ function Calificacion({ ctx, evento, unidadId }) {
     <//>`;
   }
   const n = u.nota;
+  const bloqueada = directa || Boolean(n.fijada);
   const suma = u.porCalificar && html`
     <div class=${`suma-tc ${n.entregado === false ? 'no-entrego' : completo ? 'completa' : ''}`} aria-live="polite">
       <b>${textoPuntos(n.entregado === false ? 0 : n.puntos)}<span>/${config.escala_total}</span></b>
-      <small>${n.entregado === false ? 'no entregó' : completo ? '✓ completa' : `faltan ${n.faltan.length}`}</small>
+      <small>${n.entregado === false ? 'no entregó' : n.fijada ? '✓ nota directa' : completo ? '✓ completa' : `faltan ${n.faltan.length}`}</small>
     </div>`;
 
   return html`
@@ -187,15 +190,22 @@ function Calificacion({ ctx, evento, unidadId }) {
       ${u.porCalificar
         ? html`
           <${Entrega} n=${n} alElegir=${(v) => tocar(() => marcarEntrega(db, evento.id, unidad, unidadId, v))} />
-          <${Preguntas} n=${n} config=${config}
+          <${Preguntas} n=${n} config=${config} bloqueada=${bloqueada}
             alPuntuar=${(p, v) => tocar(() => { if (p.valor !== v || n.entregado === false) puntuarTrabajo(db, evento.id, unidad, unidadId, p.id, v); })}
             alEtiquetar=${(t) => tocar(() => alternarEtiquetaTrabajo(db, evento.id, unidad, unidadId, t))} />
+          ${n.entregado !== false && html`
+            <div class="tarjeta" onfocusin=${cancelar}>
+              <${NotaDirectaCampo} key=${`directa-${evento.id}-${unidadId}-${n.fijada ? n.nota_fijada : 'r'}`} tope=${config.escala_total}
+                fijada=${n.fijada ? n.nota_fijada : null} deRubrica=${n.fijada ? n.puntos_rubrica : n.completo ? n.puntos : null}
+                abierta=${bloqueada} setAbierta=${setDirecta} alFijar=${(v) => tocar(() => fijarNotaTrabajo(db, evento.id, unidad, unidadId, v, config.escala_total))}
+                bloqueo="Las preguntas y el descuento quedan bloqueados" volver="Volver a las preguntas" />
+            </div>`}
           <div onfocusin=${cancelar}>
             <${NotaTexto} key=${`nota-${evento.id}-${unidadId}`} evento=${evento} unidad=${unidad} unidadId=${unidadId}
               actual=${ctx.reg.notas.find((x) => x.evento === evento.id && x.unidad === unidad && x.unidad_id === String(unidadId))?.texto ?? ''} />
           </div>
-          <${Descuento} key=${`desc-${evento.id}-${unidadId}`} n=${n} config=${config}
-            alGuardar=${(v, motivo) => tocar(async () => { try { await descontarTrabajo(db, evento.id, unidad, unidadId, v, motivo); } catch (e) { avisar(e.message, 'mal'); } })} />
+          ${!bloqueada && html`<${Descuento} key=${`desc-${evento.id}-${unidadId}`} n=${n} config=${config}
+            alGuardar=${(v, motivo) => tocar(async () => { try { await descontarTrabajo(db, evento.id, unidad, unidadId, v, motivo); } catch (e) { avisar(e.message, 'mal'); } })} />`}
           ${n.registrado && html`<${Borrar} alBorrar=${() => tocar(async () => { await borrarTrabajo(db, evento.id, unidad, unidadId); avisar('Calificación borrada.'); })} />`}`
         : html`<${Aviso} tono="mal">${unidad === 'grupo' ? `Todos faltaron a ${practica.codigo}` : `Faltó a ${practica.codigo}`}: tiene 0 en el ${evento.codigo} y no hace falta calificarlo.<//>`}
       <div class="pie-fijo">
@@ -260,7 +270,7 @@ function Criterio({ p }) {
       </div>`}`;
 }
 
-function Preguntas({ n, config, alPuntuar, alEtiquetar }) {
+function Preguntas({ n, config, bloqueada, alPuntuar, alEtiquetar }) {
   const marcadas = new Set(n.etiquetas);
   return html`
     <div class=${`tarjeta tc-preguntas ${n.entregado === false ? 'atenuado' : ''}`}>
@@ -270,8 +280,8 @@ function Preguntas({ n, config, alPuntuar, alEtiquetar }) {
           <div class=${`tc-pregunta ${p.valor === null ? 'pendiente' : ''}`} key=${p.id}>
             <div class="tc-enunciado"><b>${p.id}</b><span>${p.texto}</span></div>
             ${p.criterios && html`<${Criterio} p=${p} />`}
-            <div class="niveles chicos">
-              ${p.puntajes.map((v) => html`<button class=${p.valor === v ? 'elegido' : ''} onClick=${() => alPuntuar(p, v)}>${v}</button>`)}
+            <div class=${`niveles chicos${bloqueada ? ' bloqueados' : ''}`}>
+              ${p.puntajes.map((v) => html`<button class=${p.valor === v ? 'elegido' : ''} disabled=${bloqueada} onClick=${() => alPuntuar(p, v)}>${v}</button>`)}
             </div>
             ${etiquetas.length > 0 && html`
               <div class="etiquetas">

@@ -108,8 +108,12 @@ export function notaGrupo(ctx, evento, grupo) {
   return { valor: valorRubrica, completo: true, partes };
 }
 
-/** Tope de la nota de un grupo en las unidades en que se escribe: 10 en una práctica; el máximo de la escala en un taller. */
+/**
+ * Tope de la nota de una unidad en las unidades en que se escribe: 10 en una práctica; el máximo de la escala en un taller;
+ * la escala total en un trabajo en casa.
+ */
 export function topeDeNota(config) {
+  if (config?.tipo === 'trabajo_casa') return config.escala_total;
   return config?.tipo === 'taller' ? Math.max(...config.evaluacion_integral.escala) : 10;
 }
 
@@ -124,6 +128,8 @@ export function unidadTrabajo(config) {
  * Nota = (Σ puntos − descuento) / escala total (10), sin penalización por atraso. «No entregó» vale 0.
  * `descuento` (puntos, ≥ 0) lo pone el profesor por lo que la rúbrica no cubre (redacción, ortografía) y lleva su motivo;
  * `puntos` ya lo trae restado (sin bajar de 0) y `suma` es la de las preguntas.
+ * Con `nota_fijada` (nota directa con decimales, en puntos sobre la escala total) esa nota manda: `puntos` es la fijada,
+ * `fijada` es true, `puntos_rubrica` guarda lo de las preguntas (o null si faltan) y el descuento no cuenta.
  */
 export function notaTrabajo(ctx, evento, unidadId) {
   const config = evento.config ? ctx.cfg.actividades[evento.config] : null;
@@ -143,6 +149,13 @@ export function notaTrabajo(ctx, evento, unidadId) {
   };
   if (!fila || !config?.preguntas) return r;
   if (fila.entregado === false) return { ...r, completo: true, valor: 0, puntos: 0 };
+  // Nota fijada por el profesor (decimales): manda sobre las preguntas y el descuento, que se conservan para el feedback.
+  if (typeof fila.nota_fijada === 'number') {
+    return {
+      ...r, completo: true, fijada: true, nota_fijada: fila.nota_fijada, puntos_rubrica: faltan.length ? null : puntos,
+      puntos: fila.nota_fijada, descuento: 0, descuento_motivo: null, valor: fila.nota_fijada / config.escala_total,
+    };
+  }
   if (faltan.length) return r;
   return { ...r, completo: true, valor: puntos / config.escala_total };
 }

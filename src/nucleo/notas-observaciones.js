@@ -1,6 +1,6 @@
 // Notas escritas en la observación de un grupo («9.5», «1.8»…): se leen como la nota del grupo y pasan a su propio campo
 // (nota fijada, con decimales). Funciones puras sobre el contexto del motor; lo que se aplica está en `src/datos/`.
-import { gruposDe, notaGrupo, topeDeNota } from './motor.js';
+import { gruposDe, notaGrupo, notaTrabajo, topeDeNota, unidadTrabajo } from './motor.js';
 
 const NUMERO = /^\d+(?:[.,]\d+)?$/;
 
@@ -20,31 +20,44 @@ export function notaEnObservacion(texto) {
 }
 
 /**
- * Propuestas de un curso: por cada grupo de una práctica o taller cuya observación trae una nota, con la nota que hoy
- * tiene (en las unidades de la actividad). `revisar` marca lo que conviene mirar antes de aplicar (cambia más del 30 % del
- * tope); `invalida`, un número fuera de 0–tope. Las que ya tienen nota fijada no se proponen.
+ * Propuestas de un curso: por cada grupo de una práctica o taller (o cada unidad de un trabajo en casa: grupo, o
+ * estudiante si el TC es individual) cuya observación trae una nota, con la nota que hoy tiene (en las unidades de la
+ * actividad). `revisar` marca lo que conviene mirar antes de aplicar (cambia más del 30 % del tope); `invalida`, un número
+ * fuera de 0–tope. Las que ya tienen nota fijada, y los TC que no entregaron, no se proponen.
+ * Cada una: { evento, unidad ('grupo' | 'estudiante'), grupo (el id de la unidad), nombre, … }.
  */
 export function propuestasDeObservaciones(ctx) {
   const lista = [];
   for (const n of ctx.reg.notas ?? []) {
-    if (n.unidad !== 'grupo') continue;
     const evento = ctx.eventoPorId.get(n.evento);
-    if (!evento || !['practica', 'taller'].includes(evento.tipo) || !evento.con_nota) continue;
+    if (!evento || !['practica', 'taller', 'trabajo_casa'].includes(evento.tipo) || !evento.con_nota) continue;
     const config = evento.config ? ctx.cfg.actividades[evento.config] : null;
     if (!config) continue;
+    const esTC = evento.tipo === 'trabajo_casa';
+    if (esTC ? !config.preguntas || n.unidad !== unidadTrabajo(config) : n.unidad !== 'grupo') continue;
     const hallada = notaEnObservacion(n.texto);
     if (!hallada) continue;
     const grupo = String(n.unidad_id);
-    if (ctx.revisiones.get(`${evento.id}|${grupo}`)?.nota_fijada !== undefined) continue;
     const tope = topeDeNota(config);
-    const g = notaGrupo(ctx, evento, grupo);
-    if (g.penalizacion) continue;
-    const actual = g.completo ? Math.round(g.valor * tope * 100) / 100 : null;
+    let actual, fijada;
+    if (esTC) {
+      const t = notaTrabajo(ctx, evento, grupo);
+      if (t.entregado === false) continue;
+      fijada = t.fijada;
+      actual = t.completo ? t.puntos : null;
+    } else {
+      const g = notaGrupo(ctx, evento, grupo);
+      if (g.penalizacion) continue;
+      fijada = ctx.revisiones.get(`${evento.id}|${grupo}`)?.nota_fijada !== undefined;
+      actual = g.completo ? Math.round(g.valor * tope * 100) / 100 : null;
+    }
+    if (fijada) continue;
     const invalida = hallada.valor > tope;
     lista.push({
-      evento, grupo, texto: n.texto, valor: hallada.valor, resto: hallada.resto, tope, actual, invalida,
+      evento, unidad: n.unidad, grupo, nombre: n.unidad === 'estudiante' ? ctx.estudiantePorId.get(grupo)?.nombre ?? grupo : null,
+      texto: n.texto, valor: hallada.valor, resto: hallada.resto, tope, actual, invalida,
       revisar: !invalida && actual !== null && Math.abs(hallada.valor - actual) > 0.3 * tope,
-      grupos: gruposDe(ctx, evento),
+      grupos: esTC ? null : gruposDe(ctx, evento),
     });
   }
   return lista.sort((a, b) => a.evento.curso.localeCompare(b.evento.curso) || a.evento.fecha.localeCompare(b.evento.fecha) || a.grupo.localeCompare(b.grupo, 'es', { numeric: true }));

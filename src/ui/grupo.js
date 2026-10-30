@@ -100,17 +100,27 @@ function Evaluacion({ ctx, evento, grupo, config, grupos }) {
 
 const PASOS_NOTA = [-0.25, -0.1, 0.1, 0.25];
 
-/**
- * Nota directa del grupo, con decimales (0.25, 1.8…), en las unidades de la actividad: sobre 10 en una práctica, sobre el
- * máximo de la escala en un taller. Es una opción desplegable: al abrirla, los botones de la rúbrica se bloquean (una sola
- * nota por grupo); «Volver a los botones» quita la nota directa y los desbloquea. La rúbrica ya marcada se conserva.
- */
+/** Nota directa de un grupo de práctica o taller: ver `NotaDirectaCampo`. */
 function NotaDirecta({ evento, grupo, grupos, nota, config, abierta, setAbierta }) {
   const { db } = useApp();
   const tope = topeDeNota(config);
   const deRubrica = nota.fijada ? nota.valor_rubrica : nota.valor;
-  const base = nota.fijada ? nota.nota_fijada : deRubrica === null || deRubrica === undefined ? null : Math.round(deRubrica * tope * 100) / 100;
-  const [texto, setTexto] = useState(nota.fijada ? String(nota.nota_fijada) : '');
+  return html`<${NotaDirectaCampo} tope=${tope} fijada=${nota.fijada ? nota.nota_fijada : null}
+    deRubrica=${deRubrica === null || deRubrica === undefined ? null : Math.round(deRubrica * tope * 100) / 100}
+    abierta=${abierta} setAbierta=${setAbierta} alFijar=${(v) => fijarNotaGrupo(db, evento.id, grupos, grupo, v, tope)}
+    bloqueo="Los botones de arriba quedan bloqueados" volver="Volver a los botones" />`;
+}
+
+/**
+ * Nota directa, con decimales (0.25, 1.8…), en las unidades de la actividad: sobre 10 en una práctica, sobre el máximo de la
+ * escala en un taller, sobre la escala total en un TC. Es una opción desplegable: al abrirla, lo que da la otra nota (los botones
+ * de la rúbrica, las preguntas del TC) se bloquea (una sola nota por unidad); «Volver…» quita la nota directa y lo desbloquea.
+ * Lo ya marcado se conserva. `fijada`: la nota directa actual o null; `deRubrica`: la que dan los botones, en esas unidades,
+ * o null si falta algo. `alFijar(valor | null)` guarda o quita la nota.
+ */
+export function NotaDirectaCampo({ tope, fijada, deRubrica, abierta, setAbierta, alFijar, bloqueo, volver: textoVolver }) {
+  const base = fijada !== null ? fijada : deRubrica;
+  const [texto, setTexto] = useState(fijada !== null ? String(fijada) : '');
   const [error, setError] = useState(null);
   if (!abierta) {
     return html`<button class="boton chico" style="align-self:flex-start" onClick=${() => setAbierta(true)}>Poner la nota directa (decimales) ▸</button>`;
@@ -119,19 +129,19 @@ function NotaDirecta({ evento, grupo, grupos, nota, config, abierta, setAbierta 
     const valor = Math.round(v * 100) / 100;
     if (!Number.isFinite(valor) || valor < 0 || valor > tope) { setError(`La nota va de 0 a ${tope}.`); return; }
     setError(null);
-    await fijarNotaGrupo(db, evento.id, grupos, grupo, valor, tope);
+    await alFijar(valor);
     setTexto(String(valor));
   };
   const escrita = Number(texto.trim().replace(',', '.'));
   const sumar = (paso) => guardar(Math.min(tope, Math.max(0, (base ?? 0) + paso)));
-  const volver = async () => { await fijarNotaGrupo(db, evento.id, grupos, grupo, null, tope); setTexto(''); setAbierta(false); };
+  const volver = async () => { await alFijar(null); setTexto(''); setAbierta(false); };
   return html`
     <div class="criterio">
       <div class="separado">
         <b>Nota directa</b>
-        <span class="tenue pequeno">0–${tope}${nota.fijada && deRubrica !== null && deRubrica !== undefined ? ` · botones: ${textoPuntos(deRubrica * tope)}` : ''}</span>
+        <span class="tenue pequeno">0–${tope}${fijada !== null && deRubrica !== null ? ` · ${textoVolver.replace('Volver a ', '')}: ${textoPuntos(deRubrica)}` : ''}</span>
       </div>
-      <p class="tenue pequeno">Los botones de arriba quedan bloqueados mientras uses la nota directa: el grupo tiene una sola nota.</p>
+      <p class="tenue pequeno">${bloqueo} mientras uses la nota directa: solo hay una nota.</p>
       <div class="fila-flex" style="gap:6px;flex-wrap:wrap">
         ${PASOS_NOTA.map((p) => html`<button class="boton chico" disabled=${base === null} onClick=${() => sumar(p)}>${p > 0 ? '+' : '−'}${Math.abs(p)}</button>`)}
       </div>
@@ -142,7 +152,7 @@ function NotaDirecta({ evento, grupo, grupos, nota, config, abierta, setAbierta 
         <button class="boton chico primario" disabled=${!texto.trim() || !Number.isFinite(escrita)} onClick=${() => guardar(escrita)}>Fijar</button>
       </div>
       ${error && html`<p class="tenue pequeno" style="color:var(--mal)">${error}</p>`}
-      <button class="boton chico" style="align-self:flex-start" onClick=${volver}>Volver a los botones${nota.fijada ? ' (quita la nota directa)' : ''}</button>
+      <button class="boton chico" style="align-self:flex-start" onClick=${volver}>${textoVolver}${fijada !== null ? ' (quita la nota directa)' : ''}</button>
     </div>`;
 }
 

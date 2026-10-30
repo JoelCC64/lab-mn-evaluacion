@@ -1,6 +1,6 @@
 // Pasa a nota fijada las notas escritas en las observaciones de los grupos (ver `src/nucleo/notas-observaciones.js`).
 import { registrosDelCurso } from './consultas.js';
-import { fijarNotaGrupo, guardarNotaProfesor } from './acciones.js';
+import { fijarNotaGrupo, fijarNotaTrabajo, guardarNotaProfesor } from './acciones.js';
 import { generarEventos } from '../nucleo/calendario.js';
 import { crearContexto } from '../nucleo/motor.js';
 import { propuestasDeObservaciones } from '../nucleo/notas-observaciones.js';
@@ -24,8 +24,9 @@ export async function aplicarPropuestasDeObservaciones(db, propuestas, ahora = u
   let n = 0;
   for (const p of propuestas) {
     if (p.invalida) continue;
-    await fijarNotaGrupo(db, p.evento.id, p.grupos, p.grupo, p.valor, p.tope, ahora);
-    await guardarNotaProfesor(db, p.evento.id, 'grupo', p.grupo, p.resto, ahora);
+    if (p.evento.tipo === 'trabajo_casa') await fijarNotaTrabajo(db, p.evento.id, p.unidad, p.grupo, p.valor, p.tope, ahora);
+    else await fijarNotaGrupo(db, p.evento.id, p.grupos, p.grupo, p.valor, p.tope, ahora);
+    await guardarNotaProfesor(db, p.evento.id, p.unidad, p.grupo, p.resto, ahora);
     n += 1;
   }
   return n;

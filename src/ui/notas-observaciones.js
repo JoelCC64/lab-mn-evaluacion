@@ -34,8 +34,8 @@ export function NotasDeObservaciones() {
     <div class="tarjeta">
       <h2>Notas escritas en las observaciones</h2>
       <p class="tenue pequeno">
-        Si escribiste la nota de un grupo en su observación («9.5», «1.8»), aquí la pasas al campo de nota con decimales: queda
-        fijada y reemplaza a la de la rúbrica; el número se quita de la observación. Las dudosas (cambian más del 30 % del tope) vienen sin marcar.
+        Si escribiste la nota de un grupo en su observación («9.5», «1.8»), en una práctica, un taller o un trabajo en casa, aquí la
+        pasas al campo de nota con decimales: queda fijada y reemplaza a la de la rúbrica (o a la de las preguntas del TC); el número se quita de la observación. Las dudosas (cambian más del 30 % del tope) vienen sin marcar.
       </p>
       ${lista === null ? html`<p class="tenue pequeno">Buscando…</p>`
         : !lista.length ? html`<p class="tenue pequeno">No hay observaciones con una nota por pasar.</p>`
@@ -45,7 +45,7 @@ export function NotasDeObservaciones() {
               <label class="fila">
                 <input type="checkbox" checked=${marcadas.has(clave(p))} disabled=${p.invalida} onChange=${() => alternar(p)} />
                 <div class="principal">
-                  <div class="linea1">${p.curso} · ${p.evento.codigo} · grupo ${p.grupo}</div>
+                  <div class="linea1">${p.curso} · ${p.evento.codigo} · ${p.unidad === 'grupo' ? `grupo ${p.grupo}` : p.nombre}</div>
                   <div class="linea2 fila-flex">
                     <span>${p.actual === null ? 'sin nota' : textoPuntos(p.actual)} → <b>${textoPuntos(p.valor)}</b> / ${p.tope}</span>
                     ${p.invalida && html`<${Chip} tono="mal">pasa del tope<//>`}

@@ -392,6 +392,27 @@ export async function descontarTrabajo(db, evento, unidad, unidadId, valor, moti
     : { descuento: 0, descuento_motivo: null }), ahora);
 }
 
+/**
+ * Nota directa del TC de una unidad, con decimales (múltiplo de 0.01), en puntos sobre la escala total (`tope`): manda sobre
+ * las preguntas y el descuento, que se conservan. Fijarla deja el trabajo como entregado. `valor` null la quita.
+ */
+export async function fijarNotaTrabajo(db, evento, unidad, unidadId, valor, tope, ahora = ahoraISO()) {
+  if (valor === null || valor === undefined) {
+    const id = String(unidadId);
+    await db.transaction('rw', db.trabajos_casa, async () => {
+      const actual = await db.trabajos_casa.get([evento, unidad, id]);
+      if (actual && actual.nota_fijada !== undefined) {
+        const { nota_fijada, ...resto } = actual;
+        await db.trabajos_casa.put({ ...resto, fecha: ahora });
+      }
+    });
+    return;
+  }
+  const v = Math.round(Number(valor) * 100) / 100;
+  if (!Number.isFinite(v) || v < 0 || v > tope) throw new Error(`La nota va de 0 a ${tope}.`);
+  await cambiarTrabajo(db, evento, unidad, unidadId, () => ({ entregado: true, nota_fijada: v }), ahora);
+}
+
 /** Borra lo registrado del TC de la unidad (la nota del profesor se conserva). */
 export async function borrarTrabajo(db, evento, unidad, unidadId) {
   await db.trabajos_casa.delete([evento, unidad, String(unidadId)]);
