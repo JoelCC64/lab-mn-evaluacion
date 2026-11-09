@@ -2,7 +2,7 @@
 // Guarda todos los archivos de la app para que funcione sin conexión.
 // En localhost usa primero la red (desarrollo); publicada, usa primero lo guardado (rápido y sin conexión).
 
-const VERSION = '0.12.31-285efdce77';
+const VERSION = '0.12.32-18245719d4';
 const CACHE = `lab-mn-${VERSION}`;
 const ARCHIVOS = [
   "./",
@@ -96,8 +96,11 @@ const ARCHIVOS = [
   "config/actividades/P1-TRAD.json",
   "config/actividades/P2-SQI.json",
   "config/actividades/P2-TRAD.json",
+  "config/actividades/P3-SQI.json",
+  "config/actividades/P3-TRAD.json",
   "config/actividades/T1.json",
   "config/actividades/T2.json",
+  "config/actividades/T3.json",
   "config/actividades/TC1-SQI.json",
   "config/actividades/TC2-SQI.json",
   "config/actividades/TC3-SQI.json",

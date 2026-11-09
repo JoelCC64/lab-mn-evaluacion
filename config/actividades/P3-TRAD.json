@@ -1,0 +1,331 @@
+{
+  "id": "P3-TRAD",
+  "codigo": "P3",
+  "fuente": "Guía P03 «Poleas y polipastos» (practica_3.pdf); preguntas del coloquio propuestas y aprobadas por Joel (8-nov-2026)",
+  "tipo": "practica",
+  "metodologia": "TRAD",
+  "bimestre": 1,
+  "componente": "diseno_datos_analisis",
+  "unidad_calificacion": "grupo",
+  "individual": [
+    "trabajo_preparatorio",
+    "control_oral"
+  ],
+  "asistencia": "pase_final_por_grupo",
+  "cierre": [
+    "trabajo_firmado"
+  ],
+  "penalizacion_total": "equipo_no_ordenado",
+  "criterios": [
+    {
+      "id": "diseno",
+      "corto": "diseño",
+      "nombre": "Diseño experimental",
+      "peso": 0.2,
+      "escala": [
+        0,
+        1,
+        2,
+        3,
+        4
+      ],
+      "indicadores": [
+        "Base y varillas armadas según el montaje: dos varillas de 30 cm en la base y la de 25 cm para colgar el dinamómetro",
+        "Primer experimento como en la figura 3.1: polea de 65 mm fija, polea de 40 mm móvil con el portapesas, hilo (≈ 60 cm) del soporte al dinamómetro",
+        "Dinamómetro encerado boca abajo, sin el portapesas",
+        "Segundo experimento: configuración propia con ventaja mecánica de 3 o 4, justificada antes de armarla (tramos de hilo que sostienen la carga)",
+        "Hilos verticales y paralelos; poleas que giran libremente, sin rozar el soporte"
+      ],
+      "niveles": {
+        "4": "Montaje correcto a la primera en los dos experimentos: dinamómetro encerado boca abajo, hilos paralelos y una configuración que da la ventaja mecánica pedida, justificada.",
+        "2": "Montaje funcional con correcciones tras la observación; dinamómetro sin encerar, hilos inclinados o configuración propia sin justificar.",
+        "0": "Montaje incorrecto o depende totalmente del profesor."
+      }
+    },
+    {
+      "id": "datos",
+      "corto": "datos",
+      "nombre": "Toma de datos",
+      "peso": 0.3,
+      "escala": [
+        0,
+        1,
+        2,
+        3,
+        4
+      ],
+      "indicadores": [
+        "Masas totales de 50 a 200 g en pasos de 50 g, contando los 10 g del portapesas",
+        "Fuerza F registrada para cada masa en los dos experimentos",
+        "Unidades y cifras coherentes con la escala del dinamómetro; incertidumbre instrumental identificada",
+        "Lectura con el sistema en reposo, sin que el hilo roce",
+        "Reparto de roles con participación de todos"
+      ],
+      "niveles": {
+        "4": "Tablas completas y ordenadas (masa, peso, F) en los dos experimentos, con unidades e incertidumbre; trabajo repartido.",
+        "2": "Tablas completas pero con desorden, unidades o incertidumbre faltantes, o sin contar el portapesas.",
+        "0": "Datos incompletos o no registrados."
+      }
+    },
+    {
+      "id": "analisis",
+      "corto": "análisis",
+      "nombre": "Análisis",
+      "peso": 0.5,
+      "escala": [
+        0,
+        1,
+        2,
+        3,
+        4
+      ],
+      "indicadores": [
+        "Peso de la carga W = mg para cada masa",
+        "Gráfica de F vs W para cada configuración, con su ajuste lineal",
+        "Pendiente interpretada como 1/VM y ordenada en el origen relacionada con el peso de la polea móvil, la fricción y el cero del dinamómetro, con diagramas de cuerpo libre",
+        "Ventaja mecánica de cada configuración y error relativo porcentual respecto a la ideal",
+        "Diferencias explicadas (fricción, masa de las poleas y del hilo, hilos no paralelos) y formas concretas de reducir los errores"
+      ],
+      "niveles": {
+        "4": "Cálculos, gráficas y ajustes correctos; interpreta pendiente y ordenada con diagramas de cuerpo libre; compara la ventaja mecánica medida con la ideal y explica la diferencia con el montaje.",
+        "2": "Gráficas o cálculos con fallas (sin ajuste, pendiente sin interpretar, sin error relativo) o explicaciones genéricas sin relación con sus datos.",
+        "0": "Sin gráficas ni interpretación de la ventaja mecánica."
+      }
+    }
+  ],
+  "etiquetas": [
+    {
+      "id": "montaje_ok",
+      "criterio": "diseno",
+      "signo": "+",
+      "texto": "Montaje correcto y dinamómetro encerado boca abajo"
+    },
+    {
+      "id": "sin_encerar",
+      "criterio": "diseno",
+      "signo": "-",
+      "texto": "Dinamómetro sin encerar boca abajo"
+    },
+    {
+      "id": "vm_mal_disenada",
+      "criterio": "diseno",
+      "signo": "-",
+      "texto": "La configuración propia no da la ventaja mecánica pedida"
+    },
+    {
+      "id": "hilos_no_paralelos",
+      "criterio": "diseno",
+      "signo": "-",
+      "texto": "Hilos inclinados o que rozan el soporte"
+    },
+    {
+      "id": "tabla_ok",
+      "criterio": "datos",
+      "signo": "+",
+      "texto": "Tablas ordenadas, con unidades e incertidumbre"
+    },
+    {
+      "id": "olvida_portapesas",
+      "criterio": "datos",
+      "signo": "-",
+      "texto": "No cuenta los 10 g del portapesas"
+    },
+    {
+      "id": "sin_incertidumbre",
+      "criterio": "datos",
+      "signo": "-",
+      "texto": "F sin unidades o sin incertidumbre del dinamómetro"
+    },
+    {
+      "id": "lectura_oscilando",
+      "criterio": "datos",
+      "signo": "-",
+      "texto": "Lee el dinamómetro con el sistema en movimiento"
+    },
+    {
+      "id": "un_solo_integrante",
+      "criterio": "datos",
+      "signo": "-",
+      "texto": "Solo un integrante trabaja"
+    },
+    {
+      "id": "ajuste_ok",
+      "criterio": "analisis",
+      "signo": "+",
+      "texto": "Ajuste lineal e interpretación de la pendiente correctos"
+    },
+    {
+      "id": "pendiente_mal",
+      "criterio": "analisis",
+      "signo": "-",
+      "texto": "No interpreta la pendiente como 1/VM"
+    },
+    {
+      "id": "sin_ordenada",
+      "criterio": "analisis",
+      "signo": "-",
+      "texto": "No explica la ordenada en el origen"
+    },
+    {
+      "id": "sin_dcl",
+      "criterio": "analisis",
+      "signo": "-",
+      "texto": "Sin diagramas de cuerpo libre de las poleas"
+    },
+    {
+      "id": "sin_error_relativo",
+      "criterio": "analisis",
+      "signo": "-",
+      "texto": "No compara la ventaja mecánica medida con la ideal"
+    },
+    {
+      "id": "fuentes_genericas",
+      "criterio": "analisis",
+      "signo": "-",
+      "texto": "Fuentes de error genéricas, sin relación con el montaje"
+    },
+    {
+      "id": "memorizado",
+      "criterio": "analisis",
+      "signo": "-",
+      "texto": "Respuesta memorizada, sin conexión con sus datos"
+    }
+  ],
+  "preguntas_discusion": [
+    "¿Qué representa físicamente la pendiente de la gráfica F vs W? ¿Y la ordenada en el origen?",
+    "Hagan el diagrama de cuerpo libre de la polea móvil: ¿cuántos tramos de hilo la sostienen y qué tensión tiene cada uno?",
+    "¿Cuál es la ventaja mecánica de cada configuración y cuánto difiere de la ideal?",
+    "¿Por qué la ventaja mecánica medida es menor que la ideal? ¿Qué parte de su montaje lo explica?",
+    "Para subir la carga 10 cm con su configuración, ¿cuánto hilo hay que recoger? ¿Se ahorra trabajo?",
+    "¿Qué cambiarían en el montaje para reducir las fuentes de error?"
+  ],
+  "preguntas_control": [
+    "¿Qué es una polea fija y qué ventaja ofrece? (cambia la dirección de la fuerza, pero no la reduce: ventaja mecánica ideal de 1)",
+    "¿Qué es una polea móvil? (se mueve con la carga y la sostienen dos tramos de cuerda: la fuerza ideal es la mitad del peso)",
+    "¿Qué es un polipasto? (combinación de poleas fijas y móviles para levantar cargas con menos fuerza)",
+    "¿Qué es la ventaja mecánica y cómo se calcula? (VM = peso de la carga / fuerza aplicada)",
+    "En un polipasto ideal, ¿cómo se sabe la ventaja mecánica sin medir? (es el número de tramos de cuerda que sostienen a la polea o al bloque móvil)",
+    "¿Por qué la ventaja mecánica medida suele ser menor que la ideal? (fricción en los ejes, peso de las poleas móviles y de la cuerda, cuerdas que no quedan paralelas)",
+    "Si con una ventaja mecánica de 4 se usa menos fuerza, ¿se ahorra trabajo? (no: se tira 4 veces más cuerda; idealmente el trabajo es el mismo)",
+    "¿Qué es una fuerza? ¿Es escalar o vectorial? (una interacción entre cuerpos que puede cambiar su movimiento; es un vector y se mide en newtons)",
+    "¿Cuál es la diferencia entre masa y peso? (la masa es la cantidad de materia, en kg; el peso es la fuerza gravitacional, W = mg, en N)",
+    "¿Qué condición cumple la polea móvil cuando el sistema está en reposo? (primera ley: ΣF = 0, es decir 2T − W = 0)",
+    "En una cuerda ideal que pasa por una polea ideal, ¿cómo es la tensión a ambos lados? (igual en toda la cuerda)",
+    "¿Qué es un diagrama de cuerpo libre? (el dibujo de un solo cuerpo con todas las fuerzas que actúan sobre él)",
+    "Al graficar la fuerza medida contra el peso aplicado, ¿qué representa la pendiente? (el inverso de la ventaja mecánica, 1/VM)",
+    "¿Y la ordenada en el origen? (sobre todo el peso de la polea móvil repartido entre los tramos, más la fricción y el cero del dinamómetro)",
+    "¿Por qué el dinamómetro se encera boca abajo? (porque se usa en esa posición: el peso de su propio gancho y resorte ya desplaza la lectura)",
+    "Si la guía pide una masa total de 50 g, ¿cuánto se coloca sobre el portapesas? (40 g, porque el portapesas pesa 10 g)",
+    "¿Cómo armarían una configuración con ventaja mecánica de 3 o de 4? (VM 4: dos poleas dobles con 4 tramos sosteniendo la carga; VM 3: atar el extremo de la cuerda a la polea móvil para que queden 3 tramos)"
+  ],
+  "conceptos_control": [
+    {
+      "id": "poleas",
+      "texto": "Polea fija, polea móvil y polipasto"
+    },
+    {
+      "id": "ventaja_mecanica",
+      "texto": "Ventaja mecánica ideal y real"
+    },
+    {
+      "id": "trabajo_vm",
+      "texto": "Ventaja mecánica y trabajo"
+    },
+    {
+      "id": "fuerza_peso",
+      "texto": "Fuerza, masa y peso"
+    },
+    {
+      "id": "equilibrio_dcl",
+      "texto": "Equilibrio y diagrama de cuerpo libre"
+    },
+    {
+      "id": "tension",
+      "texto": "Tensión en una cuerda ideal"
+    },
+    {
+      "id": "grafica_f_w",
+      "texto": "Pendiente y ordenada de la gráfica F vs W"
+    },
+    {
+      "id": "procedimiento",
+      "texto": "Procedimiento de la guía"
+    }
+  ],
+  "feedback": {
+    "etiquetas": {
+      "montaje_ok": {
+        "mejor": "Armaron el montaje correctamente y enceraron el dinamómetro boca abajo."
+      },
+      "sin_encerar": {
+        "mejorar": "No enceraron el dinamómetro boca abajo antes de medir.",
+        "sugerencia": "Enceren el dinamómetro en la misma posición en que lo usan (boca abajo) y sin el portapesas: así la lectura no incluye el peso de su propio gancho.",
+        "reforzar": "Encerar el dinamómetro en la posición de uso."
+      },
+      "vm_mal_disenada": {
+        "mejorar": "La configuración que armaron no da la ventaja mecánica de 3 o 4.",
+        "sugerencia": "Cuenten los tramos de hilo que sostienen la polea móvil: 4 tramos dan VM = 4; si atan el extremo del hilo a la polea móvil quedan 3 tramos y VM = 3.",
+        "reforzar": "Diseñar un polipasto contando los tramos que sostienen la carga."
+      },
+      "hilos_no_paralelos": {
+        "mejorar": "Los hilos quedaron inclinados o rozando el soporte.",
+        "sugerencia": "Dejen los tramos de hilo verticales y paralelos: si se inclinan, cada tramo sostiene menos peso y la ventaja mecánica cambia.",
+        "reforzar": "Hilos paralelos para que la ventaja mecánica sea la esperada."
+      },
+      "tabla_ok": {
+        "mejor": "Registraron tablas ordenadas, con unidades e incertidumbre."
+      },
+      "olvida_portapesas": {
+        "mejorar": "No contaron los 10 g del portapesas en la masa total.",
+        "sugerencia": "Sumen siempre los 10 g del portapesas: para 50 g en total se colocan 40 g sobre él.",
+        "reforzar": "Masa total = masas + portapesas."
+      },
+      "sin_incertidumbre": {
+        "sugerencia": "Anoten cada fuerza en newtons con la incertidumbre de la escala del dinamómetro.",
+        "reforzar": "Unidades e incertidumbre instrumental del dinamómetro."
+      },
+      "lectura_oscilando": {
+        "mejorar": "Leyeron el dinamómetro con el sistema en movimiento.",
+        "sugerencia": "Esperen a que la carga quede en reposo antes de leer: solo entonces la fuerza medida es la de equilibrio.",
+        "reforzar": "Medir la fuerza de equilibrio con el sistema en reposo."
+      },
+      "un_solo_integrante": {
+        "mejorar": "El trabajo recayó en un solo integrante.",
+        "sugerencia": "Repartan los roles (colocar masas, leer el dinamómetro, anotar) y túrnenlos entre las configuraciones.",
+        "reforzar": "Reparto de roles dentro del grupo."
+      },
+      "ajuste_ok": {
+        "mejor": "Ajustaron sus datos e interpretaron correctamente la pendiente."
+      },
+      "pendiente_mal": {
+        "mejorar": "No interpretaron la pendiente de F vs W.",
+        "sugerencia": "La pendiente dice qué fracción del peso hay que aplicar: es 1/VM. Con ella calculen la ventaja mecánica de cada configuración.",
+        "reforzar": "La pendiente de F vs W es el inverso de la ventaja mecánica."
+      },
+      "sin_ordenada": {
+        "mejorar": "No explicaron la ordenada en el origen del ajuste.",
+        "sugerencia": "Con el diagrama de cuerpo libre de la polea móvil vean qué fuerza aparece aunque W = 0: el peso de la polea móvil repartido entre los tramos, más la fricción.",
+        "reforzar": "Significado de la ordenada en el origen."
+      },
+      "sin_dcl": {
+        "mejorar": "No hicieron los diagramas de cuerpo libre de las poleas.",
+        "sugerencia": "Dibujen la polea móvil con el peso de la carga hacia abajo y una tensión por cada tramo de hilo hacia arriba; en equilibrio, la suma es cero.",
+        "reforzar": "Diagramas de cuerpo libre para analizar las poleas."
+      },
+      "sin_error_relativo": {
+        "mejorar": "No compararon la ventaja mecánica medida con la ideal.",
+        "sugerencia": "Calculen el error relativo porcentual entre la ventaja mecánica medida y la esperada, y expliquen la diferencia con su montaje.",
+        "reforzar": "Comparar la ventaja mecánica medida con la ideal."
+      },
+      "fuentes_genericas": {
+        "mejorar": "Las fuentes de error son genéricas.",
+        "sugerencia": "Nombren fuentes concretas de su montaje (fricción en los ejes, peso de las poleas y del hilo, hilos inclinados) y digan cómo reducir cada una.",
+        "reforzar": "Fuentes de error ligadas al montaje y cómo reducirlas."
+      },
+      "memorizado": {
+        "sugerencia": "Apoyen cada conclusión en un número de su tabla o en un punto de su gráfica.",
+        "reforzar": "Discutir los resultados con los datos propios."
+      }
+    }
+  }
+}

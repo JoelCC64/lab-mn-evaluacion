@@ -1,0 +1,223 @@
+{
+  "id": "T3",
+  "codigo": "T3",
+  "fuente": "Guía T3 «Tensión - Ejercicio» (taller_3.pdf), igual para Clásica y SQI; evaluación integral del T1 (Lineamientos profesores §19); preguntas del control propuestas y aprobadas por Joel (8-nov-2026)",
+  "tipo": "taller",
+  "metodologia": [
+    "TRAD",
+    "SQI"
+  ],
+  "bimestre": 1,
+  "pesos": {
+    "asistencia_permanencia": 0.5,
+    "evaluacion_integral": 0.5
+  },
+  "asistencia_permanencia": {
+    "unidad": "estudiante",
+    "fuente": "pase_final_por_grupo",
+    "se_retiro_antes": 0.5
+  },
+  "evaluacion_integral": {
+    "unidad": "grupo",
+    "escala": [
+      0,
+      1,
+      2
+    ],
+    "descripcion": "Preguntas u observaciones del docente, ejecución de las actividades y tareas. No exige que el grupo termine el taller.",
+    "incluye": [
+      "preguntas_y_observaciones_del_docente",
+      "ejecucion",
+      "tareas"
+    ],
+    "exige_terminar_taller": false
+  },
+  "individual": {
+    "TRAD": [
+      "trabajo_preparatorio",
+      "control_oral"
+    ],
+    "SQI": [
+      "control_oral_sin_nota"
+    ]
+  },
+  "retro_practica_anterior": true,
+  "cierre": [
+    "trabajo_firmado"
+  ],
+  "tareas": [
+    {
+      "id": "movimiento",
+      "texto": "3.1 (A): describir el movimiento de los bloques A y B y de la cuerda (aceleran juntos, con la misma aceleración constante)"
+    },
+    {
+      "id": "dcl",
+      "texto": "3.1 (B): diagramas de cuerpo libre de cada bloque y de la cuerda, por separado y con las fuerzas etiquetadas"
+    },
+    {
+      "id": "pares",
+      "texto": "3.1 (C): identificar y marcar los pares de acción y reacción (tercera ley)"
+    },
+    {
+      "id": "clasificacion",
+      "texto": "3.1 (D): clasificar de mayor a menor las componentes horizontales de las fuerzas y justificar"
+    },
+    {
+      "id": "cuerda_ligera",
+      "texto": "3.2 (A): comparar fuerzas netas y fuerzas sobre la cuerda al cambiarla por una de masa m < M con el mismo movimiento"
+    },
+    {
+      "id": "sin_masa",
+      "texto": "3.2 (B) y (C): qué pasa cuando la masa de la cuerda tiende a cero y por qué se habla de «la tensión de la cuerda»"
+    }
+  ],
+  "preguntas_discusion": [
+    "¿Los bloques y la cuerda tienen la misma aceleración? ¿Cómo lo saben?",
+    "¿Qué fuerzas forman pares de acción y reacción? ¿Por qué la fuerza neta sobre la cuerda no es cero?",
+    "¿Por qué la fuerza que la cuerda ejerce sobre B es mayor que la que ejerce sobre A?",
+    "Si la cuerda es más ligera y el movimiento es el mismo, ¿qué fuerzas cambian y cuáles no?",
+    "¿Qué pasa con la diferencia entre las fuerzas en los extremos de la cuerda cuando su masa tiende a cero? ¿Por qué entonces se habla de una sola «tensión»?"
+  ],
+  "preguntas_control": [
+    "Enuncie la primera ley de Newton. (si la fuerza neta es cero, el cuerpo sigue en reposo o con velocidad constante)",
+    "Si la fuerza neta sobre un objeto es cero, ¿está necesariamente en reposo? (no: puede moverse con velocidad constante)",
+    "¿Cuál es la segunda ley de Newton? (ΣF = ma: la aceleración es proporcional a la fuerza neta, tiene su misma dirección y es inversamente proporcional a la masa)",
+    "¿Qué es un newton en unidades básicas? (1 N = 1 kg·m/s²)",
+    "¿Qué dice la tercera ley? (las fuerzas de acción y reacción tienen la misma magnitud, sentido opuesto y actúan sobre cuerpos distintos)",
+    "Para un libro sobre una mesa, ¿el peso y la normal son un par de acción y reacción? (no: actúan sobre el mismo cuerpo; la reacción al peso es la fuerza que el libro hace sobre la Tierra)",
+    "¿La fuerza normal es siempre igual al peso? (no: depende de la situación, por ejemplo en un plano inclinado N = mg cos θ, o en un ascensor que acelera)",
+    "¿Qué diferencia hay entre fricción estática y cinética? (la estática actúa sin deslizamiento y llega hasta μs·N; la cinética actúa durante el deslizamiento; normalmente μs > μk)",
+    "En un plano inclinado sin fricción, ¿qué fuerza acelera al bloque y cuánto vale su aceleración? (la componente del peso a lo largo del plano, mg sen θ; a = g sen θ)",
+    "En un ascensor que sube acelerando, ¿la báscula marca más o menos que el peso? (más: N = m(g + a))",
+    "En una máquina de Atwood, ¿de qué depende la aceleración? (de la diferencia de masas sobre la masa total: a = (m₁ − m₂)g/(m₁ + m₂))",
+    "¿Cuáles son los pasos para resolver un problema con las leyes de Newton? (aislar cada cuerpo, hacer su diagrama de cuerpo libre, elegir ejes, plantear ΣF = ma por componentes y resolver)",
+    "¿Por qué la fuerza neta sobre una cuerda con masa que acelera no es cero? (porque tiene masa y acelera: ΣF = Ma)",
+    "En una cuerda con masa que acelera, ¿en qué extremo es mayor la fuerza que ejerce la cuerda? (en el extremo del bloque empujado; la diferencia entre los dos extremos es M·a)",
+    "¿Por qué en una cuerda sin masa se habla de una sola tensión? (si la masa tiende a cero, la fuerza neta sobre la cuerda tiende a cero y las fuerzas en sus dos extremos se igualan)"
+  ],
+  "conceptos_control": [
+    {
+      "id": "primera_ley",
+      "texto": "Primera ley e inercia"
+    },
+    {
+      "id": "segunda_ley",
+      "texto": "Segunda ley (ΣF = ma)"
+    },
+    {
+      "id": "tercera_ley",
+      "texto": "Tercera ley: pares de acción y reacción"
+    },
+    {
+      "id": "normal_peso",
+      "texto": "Fuerza normal y peso"
+    },
+    {
+      "id": "friccion",
+      "texto": "Fricción estática y cinética"
+    },
+    {
+      "id": "aplicaciones",
+      "texto": "Plano inclinado, ascensor y máquina de Atwood"
+    },
+    {
+      "id": "dcl_metodo",
+      "texto": "Diagramas de cuerpo libre y método de resolución"
+    },
+    {
+      "id": "tension_cuerda",
+      "texto": "Tensión en una cuerda con y sin masa"
+    }
+  ],
+  "etiquetas": [
+    {
+      "id": "dcl_completos",
+      "signo": "+",
+      "texto": "Diagramas de cuerpo libre completos y separados para cada cuerpo"
+    },
+    {
+      "id": "pares_correctos",
+      "signo": "+",
+      "texto": "Identifica bien los pares de acción y reacción"
+    },
+    {
+      "id": "justifica_clasificacion",
+      "signo": "+",
+      "texto": "Justifica la clasificación de fuerzas con la segunda ley"
+    },
+    {
+      "id": "sin_aceleracion",
+      "signo": "-",
+      "texto": "Dice que los bloques van a velocidad constante aunque hay una fuerza neta"
+    },
+    {
+      "id": "dcl_mezclados",
+      "signo": "-",
+      "texto": "Mezcla fuerzas de varios cuerpos en un mismo diagrama"
+    },
+    {
+      "id": "par_mismo_cuerpo",
+      "signo": "-",
+      "texto": "Toma como par de acción y reacción dos fuerzas sobre el mismo cuerpo"
+    },
+    {
+      "id": "cuerda_neta_cero",
+      "signo": "-",
+      "texto": "Supone que la fuerza neta sobre la cuerda con masa es cero"
+    }
+  ],
+  "feedback": {
+    "partes": {
+      "integral": {
+        "sugerencia": {
+          "TRAD": "Completen las tareas pendientes del taller y revisen la clasificación de fuerzas con la segunda ley.",
+          "SQI": "¿Cuál de las preguntas del taller les dejó más dudas? Tráiganla a la próxima sesión con una propuesta para resolverla."
+        },
+        "reforzar": "Tareas y preguntas del taller de leyes de Newton (tensión)."
+      }
+    },
+    "etiquetas": {
+      "dcl_completos": {
+        "mejor": "Hicieron diagramas de cuerpo libre completos y separados para cada cuerpo."
+      },
+      "pares_correctos": {
+        "mejor": "Identificaron correctamente los pares de acción y reacción."
+      },
+      "justifica_clasificacion": {
+        "mejor": "Justificaron la clasificación de las fuerzas con la segunda ley."
+      },
+      "sin_aceleracion": {
+        "mejorar": "Describieron el movimiento como de velocidad constante.",
+        "sugerencia": {
+          "TRAD": "Sin fricción y con una fuerza constante, la fuerza neta no es cero: los bloques y la cuerda aceleran juntos con a = F / (masa total).",
+          "SQI": "Si sobre el sistema actúa una fuerza horizontal y no hay fricción, ¿cuál es la fuerza neta? ¿Qué dice la segunda ley de su movimiento?"
+        },
+        "reforzar": "Fuerza neta distinta de cero implica aceleración."
+      },
+      "dcl_mezclados": {
+        "mejorar": "Mezclaron fuerzas de varios cuerpos en un mismo diagrama.",
+        "sugerencia": {
+          "TRAD": "Dibujen un diagrama por cuerpo (bloque A, cuerda, bloque B) con solo las fuerzas que actúan sobre ese cuerpo.",
+          "SQI": "En su diagrama del bloque A, ¿cada fuerza actúa sobre A? ¿Quién la ejerce?"
+        },
+        "reforzar": "Un diagrama de cuerpo libre por cuerpo."
+      },
+      "par_mismo_cuerpo": {
+        "mejorar": "Tomaron como par de acción y reacción dos fuerzas sobre el mismo cuerpo.",
+        "sugerencia": {
+          "TRAD": "Los pares de la tercera ley actúan sobre cuerpos distintos: la fuerza de la cuerda sobre A y la de A sobre la cuerda, por ejemplo.",
+          "SQI": "Si la fuerza X es «la cuerda tira de A», ¿cuál sería su pareja? ¿Sobre qué cuerpo actúa?"
+        },
+        "reforzar": "Los pares de acción y reacción actúan sobre cuerpos distintos."
+      },
+      "cuerda_neta_cero": {
+        "mejorar": "Supusieron que la fuerza neta sobre la cuerda con masa es cero.",
+        "sugerencia": {
+          "TRAD": "La cuerda tiene masa M y acelera con los bloques: su fuerza neta es M·a, por eso las fuerzas en sus dos extremos son distintas.",
+          "SQI": "Si la cuerda tiene masa y acelera junto con los bloques, ¿qué dice la segunda ley de la fuerza neta sobre ella?"
+        },
+        "reforzar": "Fuerza neta sobre una cuerda con masa."
+      }
+    }
+  }
+}

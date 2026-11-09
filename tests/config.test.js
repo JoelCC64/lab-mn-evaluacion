@@ -52,6 +52,20 @@ test('configuraciones reales de las primeras actividades (Anexos B, C, D y G)', 
     assert.deepEqual(t2.pesos, configActividad(cfg, 'T1', m).pesos);
     assert.equal(t2.tareas, undefined);
   }
+  // P3 y T3 (guías del 8-nov-2026): P3 Clásica con las tres secciones de siempre; P3 SQI con sus cinco aspectos (máximo
+  // 3 + 3 + 3 + 2 + 1 = 12); T3, el mismo taller para las dos metodologías, con la evaluación integral del T1.
+  assert.deepEqual(configActividad(cfg, 'P3', 'TRAD').criterios.map((c) => [c.id, c.peso]), [['diseno', 0.2], ['datos', 0.3], ['analisis', 0.5]]);
+  const p3s = configActividad(cfg, 'P3', 'SQI');
+  assert.deepEqual(p3s.aspectos_aplicables, cfg.sqi.porPractica.P3);
+  assert.equal(p3s.aspectos_aplicables.reduce((s, a) => s + Math.max(...cfg.sqi.aspectos[a].escala), 0), 12);
+  for (const m of ['TRAD', 'SQI']) {
+    const t3 = configActividad(cfg, 'T3', m);
+    assert.equal(t3.id, 'T3');
+    assert.deepEqual(t3.evaluacion_integral, configActividad(cfg, 'T1', m).evaluacion_integral);
+    assert.deepEqual(t3.pesos, configActividad(cfg, 'T1', m).pesos);
+    assert.equal(t3.tareas.length, 6);
+    assert.ok(t3.preguntas_control.length >= 12);
+  }
   // P1 Clásica: tres secciones 20/30/50 con escala 0–4; el análisis es una sola sección.
   const p1 = configActividad(cfg, 'P1', 'TRAD');
   assert.deepEqual(p1.criterios.map((c) => [c.id, c.peso]), [['diseno', 0.2], ['datos', 0.3], ['analisis', 0.5]]);

@@ -1,0 +1,297 @@
+{
+  "id": "P3-SQI",
+  "codigo": "P3",
+  "fuente": "Guía P3 SQI «Comprobación de modelos y ética» (practica_3_sqi.pdf); aspectos de sqi/aspectos-por-practica.json; preguntas del control propuestas (8-nov-2026)",
+  "tipo": "practica",
+  "metodologia": "SQI",
+  "bimestre": 1,
+  "unidad_calificacion": "grupo",
+  "individual": [
+    "control_oral_sin_nota"
+  ],
+  "asistencia": "pase_final_por_grupo",
+  "cierre": [
+    "trabajo_firmado"
+  ],
+  "penalizacion_total": "equipo_no_ordenado",
+  "aspectos_aplicables": [
+    "resp_pred_plan",
+    "ejec_registro",
+    "analisis",
+    "discusion",
+    "comunicacion"
+  ],
+  "indicadores": {
+    "resp_pred_plan": [
+      "Dibuja los diagramas de cuerpo libre de los modelos 1 y 2, subiendo y bajando (resistencia del aire menor que el peso)",
+      "Completa la Tabla 3.2 con la segunda ley de Newton: modelo 1, aceleración igual a g al subir y al bajar; modelo 2, mayor que g al subir y menor que g al bajar; siempre hacia abajo, en la misma dirección que g",
+      "Plan del experimento piloto: en qué parte de la trayectoria medir y por qué, cuántos ensayos y cómo cuantificar la concordancia con cada modelo",
+      "Escribe una estrategia concreta para manejar las expectativas y reducir el sesgo esta semana"
+    ],
+    "ejec_registro": [
+      "Realiza el experimento piloto con el celular protegido y registra el plan, los ensayos y las observaciones",
+      "Registra la aceleración medida con phyphox («aceleración sin g») en cada ensayo, con unidades y en la parte de la trayectoria elegida",
+      "Aplica en el laboratorio su estrategia contra el sesgo y anota cómo la usó",
+      "Documenta el experimento revisado (método mejorado u objeto extra) y por qué lo cambió"
+    ],
+    "analisis": [
+      "Compara la aceleración medida con g = 9.78 m/s² usando incertidumbres",
+      "Cuantifica la concordancia con cada modelo (diferencia frente a la incertidumbre, ajuste por mínimos cuadrados o residuos)",
+      "Decide qué modelo describe mejor sus datos, o reconoce que no puede distinguirlos y propone cómo lograrlo",
+      "Interpreta el experimento revisado y las limitaciones del modelo favorecido"
+    ],
+    "discusion": [
+      "Discute con el grupo sus respuestas a la pregunta 2 del TC anterior y genera estrategias contra el sesgo",
+      "Resume en el cuaderno la discusión dirigida por el instructor",
+      "Reflexiona sobre cómo el sesgo pudo afectar sus decisiones experimentales"
+    ],
+    "comunicacion": [
+      "Cuaderno con métodos y resultados que otro grupo podría seguir",
+      "Evidencia de participación de todos los integrantes"
+    ]
+  },
+  "etiquetas": [
+    {
+      "id": "dcl_correctos",
+      "aspecto": "resp_pred_plan",
+      "signo": "+",
+      "texto": "Diagramas de cuerpo libre correctos para los dos modelos"
+    },
+    {
+      "id": "arrastre_mal",
+      "aspecto": "resp_pred_plan",
+      "signo": "-",
+      "texto": "Resistencia del aire en la dirección equivocada (debe oponerse a la velocidad)"
+    },
+    {
+      "id": "prediccion_sin_newton",
+      "aspecto": "resp_pred_plan",
+      "signo": "-",
+      "texto": "Llena la Tabla 3.2 sin justificar con la segunda ley"
+    },
+    {
+      "id": "plan_piloto_vago",
+      "aspecto": "resp_pred_plan",
+      "signo": "-",
+      "texto": "Plan piloto sin decir dónde medir, cuántos ensayos o cómo comparar"
+    },
+    {
+      "id": "registro_completo",
+      "aspecto": "ejec_registro",
+      "signo": "+",
+      "texto": "Registra ensayos, unidades y observaciones"
+    },
+    {
+      "id": "pocos_ensayos",
+      "aspecto": "ejec_registro",
+      "signo": "-",
+      "texto": "Muy pocos ensayos para concluir"
+    },
+    {
+      "id": "sin_estrategia_sesgo",
+      "aspecto": "ejec_registro",
+      "signo": "-",
+      "texto": "No aplica ni registra su estrategia contra el sesgo"
+    },
+    {
+      "id": "sin_revision",
+      "aspecto": "ejec_registro",
+      "signo": "-",
+      "texto": "No realiza ni documenta el experimento revisado"
+    },
+    {
+      "id": "compara_con_incertidumbre",
+      "aspecto": "analisis",
+      "signo": "+",
+      "texto": "Compara la aceleración con g usando incertidumbres"
+    },
+    {
+      "id": "distingue_modelos",
+      "aspecto": "analisis",
+      "signo": "+",
+      "texto": "Decide entre los modelos con evidencia"
+    },
+    {
+      "id": "compara_sin_incertidumbre",
+      "aspecto": "analisis",
+      "signo": "-",
+      "texto": "Compara solo valores, sin incertidumbre"
+    },
+    {
+      "id": "concluye_sin_datos",
+      "aspecto": "analisis",
+      "signo": "-",
+      "texto": "Concluye sin apoyarse en sus datos"
+    },
+    {
+      "id": "ignora_limitaciones",
+      "aspecto": "analisis",
+      "signo": "-",
+      "texto": "No discute las limitaciones del modelo favorecido"
+    },
+    {
+      "id": "participa_discusion",
+      "aspecto": "discusion",
+      "signo": "+",
+      "texto": "Participa y anota las ideas de la discusión"
+    },
+    {
+      "id": "reflexiona_sesgo",
+      "aspecto": "discusion",
+      "signo": "+",
+      "texto": "Reflexiona sobre cómo el sesgo afectó sus decisiones"
+    },
+    {
+      "id": "no_registra_discusion",
+      "aspecto": "discusion",
+      "signo": "-",
+      "texto": "No registra la discusión ni la reflexión"
+    },
+    {
+      "id": "cuaderno_claro",
+      "aspecto": "comunicacion",
+      "signo": "+",
+      "texto": "Cuaderno claro: otro grupo podría repetir el experimento"
+    },
+    {
+      "id": "sin_participacion",
+      "aspecto": "comunicacion",
+      "signo": "-",
+      "texto": "No hay evidencia de participación de todos"
+    }
+  ],
+  "preguntas_discusion": [
+    "Según cada modelo, ¿la aceleración del teléfono al subir es igual, mayor o menor que g? ¿Y al bajar?",
+    "¿En qué parte de la trayectoria midieron y por qué allí?",
+    "¿Sus datos permiten distinguir los dos modelos? ¿Qué número lo muestra?",
+    "Si no pueden distinguirlos, ¿qué cambiarían para lograrlo? Si pueden, ¿qué prueba más exigente harían?",
+    "¿Qué estrategia usaron para que sus expectativas no influyeran en los datos? ¿Funcionó?"
+  ],
+  "preguntas_control": [
+    "¿Qué fuerzas actúan sobre el teléfono en vuelo según el modelo 1 y según el modelo 2? (modelo 1: solo el peso; modelo 2: el peso y la resistencia del aire)",
+    "¿Hacia dónde apunta la resistencia del aire cuando el objeto sube y cuando baja? (siempre opuesta a la velocidad: hacia abajo al subir, hacia arriba al bajar)",
+    "Según el modelo 2, ¿la aceleración al subir es mayor, menor o igual que g? ¿Y al bajar? (mayor al subir y menor al bajar; siempre hacia abajo)",
+    "¿Qué dice la segunda ley de Newton y cómo se usa con un diagrama de cuerpo libre? (ΣF = ma: la suma de las fuerzas del diagrama es igual a la masa por la aceleración)",
+    "En el punto más alto de la trayectoria, ¿cuánto valen la velocidad y la aceleración? (la velocidad es cero; la aceleración es g hacia abajo en los dos modelos, porque sin velocidad no hay resistencia del aire)",
+    "¿Qué mide la herramienta «aceleración sin g» de phyphox? (la aceleración del teléfono sin el efecto de la gravedad que detecta el sensor: en reposo marca cerca de cero)",
+    "¿Cómo decidirían cuál de los dos modelos describe mejor sus datos? (comparando la diferencia entre la aceleración medida y g con su incertidumbre, en varios ensayos)",
+    "¿Qué es un sesgo en un experimento y qué estrategia usarían para reducirlo? (la tendencia a obtener o interpretar resultados según lo que se espera; por ejemplo, fijar el análisis y el criterio para descartar datos antes de medir)",
+    "¿Qué significa que un resultado sea reproducible? (que se vuelve a obtener al repetir el experimento en condiciones similares)",
+    "¿Qué hace el ajuste por mínimos cuadrados y qué deberían mostrar los residuos si el modelo es bueno? (encuentra la recta que minimiza la suma de los cuadrados de los residuos; residuos pequeños y sin patrón)",
+    "Si sus datos no coinciden con lo esperado, ¿qué deben hacer? (proponer y poner a prueba explicaciones, y comprobar si el resultado se repite con mayor precisión)"
+  ],
+  "conceptos_control": [
+    {
+      "id": "modelos_fuerzas",
+      "texto": "Fuerzas en los modelos 1 y 2"
+    },
+    {
+      "id": "resistencia_aire",
+      "texto": "Dirección de la resistencia del aire"
+    },
+    {
+      "id": "segunda_ley",
+      "texto": "Segunda ley de Newton y diagramas de cuerpo libre"
+    },
+    {
+      "id": "distinguir_modelos",
+      "texto": "Distinguir modelos con incertidumbre"
+    },
+    {
+      "id": "sesgo_etica",
+      "texto": "Sesgo y ética científica"
+    },
+    {
+      "id": "reproducibilidad",
+      "texto": "Reproducibilidad"
+    },
+    {
+      "id": "minimos_cuadrados",
+      "texto": "Ajuste por mínimos cuadrados y residuos"
+    },
+    {
+      "id": "procedimiento",
+      "texto": "Procedimiento de la guía (phyphox)"
+    }
+  ],
+  "feedback": {
+    "etiquetas": {
+      "dcl_correctos": {
+        "mejor": "Dibujaron correctamente los diagramas de cuerpo libre de los dos modelos."
+      },
+      "arrastre_mal": {
+        "mejorar": "La resistencia del aire quedó en la dirección equivocada en algún diagrama.",
+        "sugerencia": "¿Hacia dónde se mueve el teléfono en cada tramo? ¿Hacia dónde debería apuntar una fuerza que se opone a ese movimiento?",
+        "reforzar": "La resistencia del aire se opone a la velocidad."
+      },
+      "prediccion_sin_newton": {
+        "mejorar": "Llenaron la Tabla 3.2 sin justificar con la segunda ley.",
+        "sugerencia": "Si suman las fuerzas de cada diagrama, ¿la fuerza neta es mayor, menor o igual que el peso? ¿Qué dice eso de la aceleración comparada con g?",
+        "reforzar": "Predecir la aceleración con la segunda ley y el diagrama de cuerpo libre."
+      },
+      "plan_piloto_vago": {
+        "mejorar": "El plan piloto no dice dónde medir, cuántos ensayos hacer o cómo comparar con los modelos.",
+        "sugerencia": "¿Qué parte de la trayectoria les da la información más clara y cuántos ensayos necesitarían para confiar en su conclusión?",
+        "reforzar": "Planificar dónde medir, cuántas veces y cómo comparar."
+      },
+      "registro_completo": {
+        "mejor": "Registraron los ensayos con unidades y observaciones."
+      },
+      "pocos_ensayos": {
+        "mejorar": "Hicieron muy pocos ensayos para concluir.",
+        "sugerencia": "Con sus ensayos, ¿qué tan grande es la incertidumbre de la aceleración? ¿Cuántos más necesitarían para distinguir los modelos?",
+        "reforzar": "Repetir ensayos para reducir la incertidumbre."
+      },
+      "sin_estrategia_sesgo": {
+        "mejorar": "No aplicaron ni registraron su estrategia contra el sesgo.",
+        "sugerencia": "¿Qué decisión del experimento tomaron antes de ver los datos para que sus expectativas no la influyeran? Anótenla.",
+        "reforzar": "Aplicar y registrar una estrategia contra el sesgo."
+      },
+      "sin_revision": {
+        "mejorar": "No realizaron o no documentaron el experimento revisado.",
+        "sugerencia": "Con lo que aprendieron del piloto, ¿qué cambio haría su experimento más concluyente? Documenten el cambio y su resultado.",
+        "reforzar": "Diseñar y documentar un experimento revisado."
+      },
+      "compara_con_incertidumbre": {
+        "mejor": "Compararon la aceleración medida con g usando incertidumbres."
+      },
+      "distingue_modelos": {
+        "mejor": "Decidieron entre los modelos con evidencia de sus datos."
+      },
+      "compara_sin_incertidumbre": {
+        "mejorar": "Compararon solo valores, sin incertidumbre.",
+        "sugerencia": "¿La diferencia entre su aceleración y g es mayor o menor que la incertidumbre? ¿Qué les dice eso sobre los modelos?",
+        "reforzar": "Comparar con un modelo usando la incertidumbre."
+      },
+      "concluye_sin_datos": {
+        "mejorar": "La conclusión no se apoya en sus datos.",
+        "sugerencia": "¿Qué número de su tabla respalda su conclusión? ¿Qué dirían si ese número fuera distinto?",
+        "reforzar": "Concluir con base en los datos."
+      },
+      "ignora_limitaciones": {
+        "mejorar": "No discutieron las limitaciones del modelo que favorecieron.",
+        "sugerencia": "¿En qué condiciones creen que su modelo dejaría de funcionar? ¿Cómo lo pondrían a prueba?",
+        "reforzar": "Reconocer los límites de un modelo."
+      },
+      "participa_discusion": {
+        "mejor": "Participaron en la discusión y anotaron las ideas."
+      },
+      "reflexiona_sesgo": {
+        "mejor": "Reflexionaron sobre cómo el sesgo pudo afectar sus decisiones."
+      },
+      "no_registra_discusion": {
+        "mejorar": "No registraron la discusión ni la reflexión.",
+        "sugerencia": "¿Qué idea de la discusión sobre el sesgo les pareció más útil? Anótenla y digan cómo la usaron en el laboratorio.",
+        "reforzar": "Registrar la discusión y la reflexión en el cuaderno."
+      },
+      "cuaderno_claro": {
+        "mejor": "Su cuaderno es claro: otro grupo podría repetir el experimento."
+      },
+      "sin_participacion": {
+        "mejorar": "No hay evidencia de participación de todos los integrantes.",
+        "sugerencia": "¿Qué parte del experimento hizo cada integrante? Repartan los roles y túrnenlos en la próxima práctica.",
+        "reforzar": "Participación de todo el grupo."
+      }
+    }
+  }
+}
