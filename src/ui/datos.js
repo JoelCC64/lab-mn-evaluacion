@@ -74,7 +74,7 @@ export function Datos() {
 
   const exportar = () => conOcupado('Preparando el respaldo…', async () => {
     const { resultado, nombre } = await exportarRespaldoDelDia({ cfg, db, demo });
-    if (resultado !== 'cancelado') avisar(resultado === 'compartido' ? 'Respaldo compartido.' : `Respaldo guardado: ${nombre}`, 'ok');
+    if (resultado !== 'cancelado') avisar(resultado === 'compartido' ? 'Respaldo compartido.' : `Respaldo guardado en Descargas: ${nombre}`, 'ok');
   });
 
   const exportarCompleto = () => conOcupado('Preparando el respaldo completo…', async () => {
@@ -113,7 +113,7 @@ export function Datos() {
 
       <a class="tarjeta" href=${enlace('excel')}>
         <div class="separado"><h2>Escribir las notas en el Excel</h2><span class="flecha">›</span></div>
-        <p class="tenue pequeno">En la Mac, con Chrome: importa el respaldo del iPhone y escribe la asistencia y las notas en el Excel, solo en las columnas y hojas de la app.</p>
+        <p class="tenue pequeno">En la Mac, con Chrome: importa el respaldo del celular y escribe la asistencia y las notas en el Excel, solo en las columnas y hojas de la app.</p>
       </a>
 
       <div class="tarjeta">
@@ -127,7 +127,7 @@ export function Datos() {
         <h2>Respaldo del día</h2>
         <p class="tenue pequeno">
           Un solo archivo Excel con todo lo registrado: notas por curso, asistencia y el detalle de cada evento, más los datos
-          para restaurar. Súbelo a Drive al final de cada día (en el iPhone se abre la hoja de compartir: Drive, Archivos o AirDrop a la Mac).
+          para restaurar. Súbelo a Drive al final de cada día (en el celular se abre el menú de compartir o, si no se puede, el archivo queda en Descargas).
           Tiene datos de estudiantes: guárdalo en un lugar seguro.
         </p>
         <p class="pequeno">Último respaldo en este dispositivo: <b>${ultimo ? new Date(ultimo).toLocaleString('es-EC', { dateStyle: 'medium', timeStyle: 'short' }) : 'nunca'}</b>
@@ -144,7 +144,7 @@ export function Datos() {
       <div class="tarjeta">
         <h2>Pasar eventos a otro dispositivo</h2>
         <p class="tenue pequeno">
-          Lleva lo registrado en uno o varios eventos, por ejemplo los TC calificados en la Mac, al iPhone. El otro dispositivo
+          Lleva lo registrado en uno o varios eventos, por ejemplo los TC calificados en la Mac, al celular. El otro dispositivo
           muestra qué cambia y, al confirmar, reemplaza solo esos eventos. Los dos deben tener la nómina (el Excel del semestre leído).
         </p>
         <button class="boton ancho" disabled=${!!ocupado} onClick=${() => setVista({ tipo: 'enviar' })}>Enviar eventos…</button>
@@ -173,7 +173,7 @@ export function Datos() {
         <p class="tenue pequeno">
           Tu nombre va en la columna PROFESOR de «${cfg.excel.escritura.hojas_coordinacion[1]}» y «${cfg.excel.escritura.hojas_coordinacion[2]}»
           y firma el texto para el profesor de un estudiante que recupera contigo. Se guarda solo en este dispositivo
-          (no está en la app publicada ni en el respaldo): escríbelo en el iPhone y en la Mac.
+          (no está en la app publicada ni en el respaldo): escríbelo en el celular y en la Mac.
         </p>
         <${AjusteProfesor} />
       </div>

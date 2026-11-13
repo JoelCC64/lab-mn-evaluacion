@@ -16,7 +16,7 @@ export const TIPO_XLSX = 'application/vnd.openxmlformats-officedocument.spreadsh
 export const ACEPTA_RESPALDO = `.xlsx,.zip,.json,application/json,application/zip,${TIPO_XLSX}`;
 
 /**
- * Crea el respaldo del día y abre la hoja de compartir (iPhone: Drive, Archivos, AirDrop) o lo descarga (Mac).
+ * Crea el respaldo del día y abre la hoja de compartir (celular) o lo descarga (Mac, o si el celular no puede compartirlo).
  * Devuelve { resultado: 'compartido' | 'descargado' | 'cancelado', nombre, creado }.
  */
 export async function exportarRespaldoDelDia({ cfg, db, demo }) {

@@ -1,4 +1,4 @@
-// Excel del semestre (Mac, Chrome): trae el respaldo del iPhone y escribe la asistencia y las notas en el Excel,
+// Excel del semestre (Mac, Chrome): trae el respaldo del celular y escribe la asistencia y las notas en el Excel,
 // solo en las zonas de la app. Antes de guardar: revisa el archivo, muestra lo que cambia, pregunta por las
 // celdas editadas a mano, comprueba que fuera de las zonas todo quede igual, exige que el Excel esté cerrado
 // y descarga una copia del archivo tal como estaba. Después guarda sobre el mismo archivo.
@@ -184,7 +184,7 @@ export function Excel() {
       ${ocupado && html`<${Aviso}>${ocupado}<//>`}
       ${!demo && !conCarpeta && html`
         <${Aviso} tono="aviso" titulo="Esto se hace en la Mac, con Chrome">
-          Este navegador no puede guardar sobre el Excel. En el iPhone, exporta el respaldo en «Datos» y envíalo a la Mac por AirDrop;
+          Este navegador no puede guardar sobre el Excel. En el celular, exporta el respaldo en «Datos» y pásalo a la Mac (por Drive, correo o cable);
           en la Mac, abre la app en Chrome y entra aquí.
         <//>`}
 
@@ -203,9 +203,9 @@ export function Excel() {
         <p class="tenue pequeno">${respaldo
           ? html`Último respaldo importado: <b>${fechaHora(respaldo.creado)}</b> (creado en el otro dispositivo; importado el ${fechaHora(respaldo.importado)}).`
           : 'Aún no se importó un respaldo aquí: se escriben los datos registrados en este dispositivo.'}</p>
-        <button class="boton ancho" disabled=${!!ocupado} onClick=${importarRespaldo}>Importar el respaldo del iPhone…</button>
+        <button class="boton ancho" disabled=${!!ocupado} onClick=${importarRespaldo}>Importar el respaldo del celular…</button>
         <p class="tenue pequeno">
-          Si calificaste algo aquí (por ejemplo, los TC), envíalo antes al iPhone con Datos › «Enviar eventos…»: importar un
+          Si calificaste algo aquí (por ejemplo, los TC), envíalo antes al celular con Datos › «Enviar eventos…»: importar un
           respaldo reemplaza todo lo de este dispositivo. La app avisa si se perdería algo.
         </p>
       </div>
@@ -266,7 +266,7 @@ function Revision({ revision, decidir, escribir, ocupado }) {
     ${plan.errores.length > 0 && html`<${Aviso} tono="mal" titulo="Hojas que no se escriben" lista=${plan.errores} />`}
     ${plan.avisos.length > 0 && html`<${Aviso} tono="aviso" titulo="Avisos" lista=${plan.avisos} />`}
     ${plan.sinApp.length > 0 && html`<${Aviso} tono="aviso" titulo=${`${plan.sinApp.length} fila(s) del Excel con un código que la app no tiene: no se escriben`}
-      lista=${plan.sinApp.map((x) => `${x.hoja}, fila ${x.fila}: ${x.codigo}`)}>Si es un estudiante nuevo, lee el Excel en el iPhone («Datos») y vuelve a pasar el respaldo.<//>`}
+      lista=${plan.sinApp.map((x) => `${x.hoja}, fila ${x.fila}: ${x.codigo}`)}>Si es un estudiante nuevo, lee el Excel en el celular («Datos») y vuelve a pasar el respaldo.<//>`}
     ${plan.sinFila.length > 0 && html`<${Aviso} tono="aviso" titulo=${`${plan.sinFila.length} estudiante(s) de la app que no están en el Excel: no se escriben`}
       lista=${plan.sinFila.map((x) => `${x.hoja}: ${x.nombre} (${x.codigo})`)} />`}
     ${plan.repetidos.length > 0 && html`<${Aviso} tono="mal" titulo="Códigos repetidos en el Excel: esas filas no se escriben" lista=${plan.repetidos.map((x) => `${x.hoja}: ${x.codigo}`)} />`}

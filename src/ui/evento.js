@@ -81,7 +81,7 @@ export function Evento({ id, pestana }) {
   // La pestaña por defecto se elige una sola vez al abrir el evento (no salta mientras se registra).
   const listo = Boolean(ctx && evento);
   const porDefecto = useMemo(() => (listo ? pestanaPorDefecto(ctx, evento, pestanasDe(cfg, evento)) : null), [id, listo]);
-  // En el iPhone las pestañas pueden no caber: la elegida se desliza a la vista.
+  // En el celular las pestañas pueden no caber: la elegida se desliza a la vista.
   useEffect(() => { document.querySelector('.pestanas a.activa')?.scrollIntoView({ block: 'nearest', inline: 'nearest' }); }, [id, pestana, listo]);
   if (!curso || (!cargando && eventos && !evento)) {
     return html`<${Pantalla} titulo="Evento desconocido" atras="#/"><${Aviso} tono="mal">No existe el evento ${id}.<//><//>`;
@@ -166,7 +166,7 @@ function MenuEvento({ ctx, evento }) {
     ${abierto && html`
       <${Hoja} titulo=${evento.sesion ? 'Opciones de la sesión' : 'Opciones del evento'} alCerrar=${() => setAbierto(false)}>
         <p class="tenue pequeno">${registros
-          ? 'Para seguir en otro dispositivo (por ejemplo, calificar en la Mac y pasarlo al iPhone):'
+          ? 'Para seguir en otro dispositivo (por ejemplo, calificar en la Mac y pasarlo al celular):'
           : 'Aún no hay nada registrado aquí en este evento.'}</p>
         <button class="boton ancho" disabled=${!registros} onClick=${enviar}>Enviar este evento a otro dispositivo</button>
         ${evento.sesion && html`<hr class="separador" />`}

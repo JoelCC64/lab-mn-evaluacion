@@ -25,18 +25,18 @@ function rutaUnidad(evento, u) {
   return enlace('evento', evento.id, u.unidad === 'grupo' ? 'grupo' : 'estudiante', u.id);
 }
 
-/** ¿La app corre en un iPhone o iPad? (el iPad se presenta como «Macintosh», pero con pantalla táctil) */
-const esIOS = () => /iPhone|iPad|iPod/.test(navigator.userAgent) || (/Macintosh/.test(navigator.userAgent) && navigator.maxTouchPoints > 1);
+/** ¿La app corre en un celular o tableta (iPhone, iPad o Android)? Pantalla táctil como puntero principal. */
+const esCelular = () => Boolean(window.matchMedia?.('(pointer: coarse)').matches);
 
 /**
- * ¿Este dispositivo trabaja con una copia importada del iPhone (la Mac)? Lo que se registre aquí se pierde con el
- * próximo respaldo que se importe. En el iPhone no se avisa: allí una restauración es una recuperación.
+ * ¿Este dispositivo trabaja con una copia importada del celular (la Mac)? Lo que se registre aquí se pierde con el
+ * próximo respaldo que se importe. En el celular no se avisa: allí una restauración es una recuperación.
  */
 function useCopiaImportada() {
   const { db } = useApp();
   const [copia, setCopia] = useState(null);
   useEffect(() => {
-    if (esIOS()) return;
+    if (esCelular()) return;
     leerLocal(db, 'respaldo_importado').then(setCopia).catch(() => setCopia(null));
   }, [db]);
   return copia;
@@ -69,8 +69,8 @@ export function Trabajos({ ctx, evento }) {
   }
   return html`
     ${copia && html`
-      <${Aviso} tono="aviso" titulo="Este dispositivo tiene una copia del iPhone">
-        Lo que califiques aquí no pasa al iPhone y se reemplaza con el próximo respaldo que importes. Califica los TC en el iPhone.
+      <${Aviso} tono="aviso" titulo="Este dispositivo tiene una copia del celular">
+        Lo que califiques aquí no pasa al celular y se reemplaza con el próximo respaldo que importes. Califica los TC en el celular.
       <//>`}
     ${!paseCerrado && html`
       <${Aviso} tono="aviso">

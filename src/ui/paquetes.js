@@ -1,5 +1,5 @@
 // Pasar eventos entre dispositivos (Fase 9): elegir y enviar un paquete, abrirlo en el otro dispositivo con la
-// comparación de lo que cambia, y entregar archivos (compartir en el iPhone, descargar en la Mac).
+// comparación de lo que cambia, y entregar archivos (compartir en el celular, descargar en la Mac).
 import { useEffect, useMemo, useState } from '../vendor/preact-htm.js';
 import { html, useApp, Aviso, Cargando, Hoja } from './base.js';
 import { nombreEvento } from './evento.js';
@@ -38,7 +38,7 @@ const textoEvento = (porId, id) => {
 
 /**
  * Entrega de un archivo ya preparado ({ nombre, blob, tipo, alEntregar? }). En la Mac se descarga enseguida. En el
- * iPhone, la hoja de compartir pide un toque reciente: se muestra «Archivo listo» y se comparte con un segundo toque.
+ * celular, el menú de compartir pide un toque reciente: se muestra «Archivo listo» y se comparte con un segundo toque.
  * Devuelve { entregar, hoja }: `hoja` se pinta en el componente que usa el gancho.
  */
 export function useEntrega() {
@@ -49,7 +49,7 @@ export function useEntrega() {
     const r = await compartirODescargar(archivo.nombre, archivo.blob, archivo.tipo);
     if (r === 'cancelado') return false;
     archivo.alEntregar?.(r);
-    avisar(r === 'compartido' ? `Listo: ${archivo.nombre}` : `Guardado: ${archivo.nombre}`, 'ok');
+    avisar(r === 'compartido' ? `Listo: ${archivo.nombre}` : `Guardado en Descargas: ${archivo.nombre}`, 'ok');
     return true;
   };
   const entregar = async (archivo) => { if (tactil) setListo(archivo); else await enviar(archivo); };

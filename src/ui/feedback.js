@@ -70,7 +70,7 @@ function TarjetaFeedback({ u, evento }) {
   const espera = useRef(null);
   const ultimo = useRef(u.texto);
   const caja = useRef(null);
-  // El cuadro crece con el texto: en el iPhone se desplaza la página, no el cuadro.
+  // El cuadro crece con el texto: en el celular se desplaza la página, no el cuadro.
   useLayoutEffect(() => {
     const c = caja.current;
     if (c) { c.style.height = 'auto'; c.style.height = `${c.scrollHeight + 2}px`; }

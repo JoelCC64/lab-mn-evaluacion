@@ -1,4 +1,4 @@
-// Archivos en el navegador: elegir, leer, compartir (iPhone) o descargar (Mac), y cargar ExcelJS a pedido.
+// Archivos en el navegador: elegir, leer, compartir (celular) o descargar (Mac), y cargar ExcelJS a pedido.
 
 let promesaExcelJS;
 
@@ -39,7 +39,7 @@ export function elegirArchivo(accept) {
 export const ACEPTA_EXCEL = '.xlsx,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
 export const ACEPTA_JSON = '.json,application/json';
 
-/** En el celular abre la hoja de compartir (AirDrop); en la Mac descarga el archivo. */
+/** En el celular abre el menú de compartir (si el navegador acepta ese tipo de archivo); si no, o en la Mac, lo descarga. */
 export async function compartirODescargar(nombre, contenido, tipo = 'application/json') {
   const archivo = new File([contenido], nombre, { type: tipo });
   const tactil = window.matchMedia?.('(pointer: coarse)').matches;
@@ -69,7 +69,7 @@ export function descargar(nombre, contenido, tipo = 'application/octet-stream') 
 
 // ---------- Carpeta del Excel (Chrome en la Mac: API de acceso a archivos) ----------
 
-/** ¿El navegador puede guardar sobre un archivo existente? (Chrome en la Mac sí; Safari del iPhone no). */
+/** ¿El navegador puede guardar sobre un archivo existente? (Chrome en la Mac sí; los celulares no). */
 export const puedeGuardarSobreArchivos = () => typeof window.showDirectoryPicker === 'function';
 
 export function elegirCarpeta() {

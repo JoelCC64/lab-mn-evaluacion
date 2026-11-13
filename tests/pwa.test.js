@@ -42,7 +42,7 @@ test('nada de lo que la app publica ni de la configuración está ignorado por g
   assert.equal(r.stdout.trim(), '', `ignorados por el .gitignore: ${r.stdout.trim()}`);
 });
 
-test('manifiesto e índice listos para instalar en el iPhone', () => {
+test('manifiesto e índice listos para instalar en el celular (iPhone y Android)', () => {
   const m = JSON.parse(leer('manifest.webmanifest'));
   assert.equal(m.display, 'standalone');
   assert.equal(m.start_url, './');

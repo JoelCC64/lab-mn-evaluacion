@@ -166,7 +166,7 @@ function Riesgo({ m }) {
 function Exportar({ secciones, cabecera, nombre }) {
   const { avisar } = useApp();
   const [ocupado, setOcupado] = useState(null);
-  const [listo, setListo] = useState(null);   // en el iPhone: archivo preparado, para compartirlo con un toque
+  const [listo, setListo] = useState(null);   // en el celular: archivo preparado, para compartirlo con un toque
   useEffect(() => setListo(null), [nombre]);
   const tactil = typeof window !== 'undefined' && window.matchMedia?.('(pointer: coarse)').matches;
 

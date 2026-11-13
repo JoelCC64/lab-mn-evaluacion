@@ -1,5 +1,5 @@
 // Paquete de eventos (Fase 9): pasa lo registrado en uno o varios eventos de un dispositivo a otro (por ejemplo, los TC
-// calificados en la Mac, al iPhone). En el destino reemplaza esos eventos, previa confirmación; lo demás no se toca.
+// calificados en la Mac, al celular). En el destino reemplaza esos eventos, previa confirmación; lo demás no se toca.
 import { ahoraISO, TABLAS_DE_EVENTO } from '../db.js';
 import { generarEventos } from '../nucleo/calendario.js';
 import { cambiosQueSePerderian, compararEvento, eventoDelVisitante, registrosPorEvento, ultimoCambio } from '../nucleo/sincronia.js';
@@ -125,7 +125,7 @@ export async function aplicarPaquete(db, obj) {
 
 /**
  * Antes de restaurar un respaldo completo: eventos en los que este dispositivo tiene cambios que el respaldo no trae
- * (por ejemplo, TC calificados en la Mac que aún no pasaron al iPhone). [{ evento, perdidos, ultimoPerdido, … }].
+ * (por ejemplo, TC calificados en la Mac que aún no pasaron al celular). [{ evento, perdidos, ultimoPerdido, … }].
  */
 export async function cambiosQueSePierdenAlRestaurar(db, respaldo, { desde = null } = {}) {
   return cambiosQueSePerderian(await tablasDeEventos(db), respaldo.tablas ?? {}, { desde });
