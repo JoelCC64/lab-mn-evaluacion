@@ -100,6 +100,7 @@ export function Datos() {
   return html`
     <${Pantalla} titulo="Datos" subtitulo=${demo ? 'Demostración con datos ficticios' : 'Excel, respaldo y restauración'} atras="#/">
       ${ocupado && html`<${Aviso}>${ocupado}<//>`}
+      ${ocupado && html`<div class="flotante" role="status">${ocupado}</div>`}
 
       <div class="tarjeta">
         <h2>Excel del semestre</h2>
@@ -301,12 +302,21 @@ function VistaRespaldo({ vista, cerrar }) {
       setPerdidas(await cambiosQueSePierdenAlRestaurar(db, obj, { desde }));
     })().catch((e) => { console.error(e); setPerdidas([]); });
   }, []);
+  const [restaurando, setRestaurando] = useState(false);
   const restaurar = async () => {
-    await restaurarRespaldo(db, obj);
-    await guardarLocal(db, 'respaldo_importado', { creado: obj.creado, app: obj.app, archivo: nombre, importado: new Date().toISOString() });
-    marcarRespaldo(db.name);   // los datos quedaron iguales a un archivo de respaldo
-    cerrar();
-    avisar('Respaldo restaurado.', 'ok');
+    if (restaurando) return;
+    setRestaurando(true);
+    try {
+      await restaurarRespaldo(db, obj);
+      await guardarLocal(db, 'respaldo_importado', { creado: obj.creado, app: obj.app, archivo: nombre, importado: new Date().toISOString() });
+      marcarRespaldo(db.name);   // los datos quedaron iguales a un archivo de respaldo
+      cerrar();
+      avisar('Respaldo restaurado.', 'ok');
+    } catch (e) {
+      console.error(e);
+      setRestaurando(false);
+      avisar(`No se pudo restaurar: ${e.message || e}`, 'mal');
+    }
   };
   return html`
     <${Hoja} titulo="Restaurar respaldo" alCerrar=${cerrar}>
@@ -316,8 +326,8 @@ function VistaRespaldo({ vista, cerrar }) {
         <${AvisoPerdidas} perdidas=${perdidas} />
         <${Aviso} tono="mal" titulo="Reemplaza todo lo de este dispositivo">Lo que hay ahora en la app se pierde. Si dudas, exporta antes un respaldo de lo actual.<//>`}
       <div class="botones">
-        <button class="boton" onClick=${cerrar}>Cancelar</button>
-        ${!errores.length && html`<button class="boton peligro-fuerte" onClick=${restaurar}>Reemplazar todo</button>`}
+        <button class="boton" disabled=${restaurando} onClick=${cerrar}>Cancelar</button>
+        ${!errores.length && html`<button class="boton peligro-fuerte" disabled=${restaurando} onClick=${restaurar}>${restaurando ? 'Restaurando…' : 'Reemplazar todo'}</button>`}
       </div>
     <//>`;
 }

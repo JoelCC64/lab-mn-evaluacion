@@ -2,7 +2,7 @@
 // Guarda todos los archivos de la app para que funcione sin conexión.
 // En localhost usa primero la red (desarrollo); publicada, usa primero lo guardado (rápido y sin conexión).
 
-const VERSION = '0.12.33-98ac6830a9';
+const VERSION = '0.12.34-27b3e1319e';
 const CACHE = `lab-mn-${VERSION}`;
 const ARCHIVOS = [
   "./",

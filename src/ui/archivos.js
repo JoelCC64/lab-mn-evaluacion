@@ -22,17 +22,45 @@ export async function abrirLibro(buffer) {
   return wb;
 }
 
-/** Abre el selector de archivos y devuelve el archivo elegido (o null si se cancela). */
-export function elegirArchivo(accept) {
+/** Espera tras volver a la app sin que el navegador avise ni archivo ni cancelación. */
+export const ESPERA_SELECTOR_MS = 4000;
+
+/**
+ * Abre el selector de archivos y devuelve el archivo elegido (o null si se cancela). Si el navegador no avisa la
+ * cancelación (pasa en algunos Android al salir del selector con «Atrás»), se da por cancelado poco después de volver
+ * a la app: así la pantalla nunca queda esperando un archivo que no va a llegar.
+ */
+export function elegirArchivo(accept, { espera = ESPERA_SELECTOR_MS } = {}) {
   return new Promise((resolver) => {
     const input = document.createElement('input');
     input.type = 'file';
     input.accept = accept;
     input.style.display = 'none';
-    input.addEventListener('change', () => { resolver(input.files?.[0] ?? null); input.remove(); }, { once: true });
-    input.addEventListener('cancel', () => { resolver(null); input.remove(); }, { once: true });
+    let temporizador = null;
+    let terminado = false;
+    const terminar = (archivo) => {
+      if (terminado) return;
+      terminado = true;
+      clearTimeout(temporizador);
+      removeEventListener('focus', alVolver);
+      document.removeEventListener('visibilitychange', alVolver);
+      input.remove();
+      resolver(archivo);
+    };
+    function alVolver() {
+      if (document.visibilityState !== 'visible') return;
+      clearTimeout(temporizador);
+      temporizador = setTimeout(() => terminar(input.files?.[0] ?? null), espera);
+    }
+    input.addEventListener('change', () => terminar(input.files?.[0] ?? null));
+    input.addEventListener('cancel', () => terminar(null));
     document.body.append(input);
     input.click();
+    // El selector se abre después del toque: recién entonces se empieza a esperar la vuelta.
+    setTimeout(() => {
+      addEventListener('focus', alVolver);
+      document.addEventListener('visibilitychange', alVolver);
+    }, 300);
   });
 }
 
