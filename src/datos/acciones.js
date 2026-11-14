@@ -149,7 +149,8 @@ export async function marcarAsistencia(db, evento, grupos, estudiante, estado, m
 export async function marcarSinColoquio(db, evento, grupos, estudiante, sin = true, ahora = ahoraISO()) {
   if (grupos) await asegurarInstantanea(db, evento, grupos, ahora);
   await db.transaction('rw', db.asistencia, async () => {
-    const actual = (await db.asistencia.get([evento, estudiante])) ?? { evento, estudiante, estado: null, motivo: null, observacion: null };
+    // Quien no tenía fila en el pase y se marca «sin coloquio» estuvo en clase: queda presente.
+    const actual = (await db.asistencia.get([evento, estudiante])) ?? { evento, estudiante, estado: sin ? 'presente' : null, motivo: null, observacion: null };
     const { sin_coloquio: _anterior, ...resto } = actual;
     await db.asistencia.put({ ...resto, ...(sin ? { sin_coloquio: true } : {}), fecha: ahora });
   });

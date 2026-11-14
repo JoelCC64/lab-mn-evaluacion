@@ -46,17 +46,41 @@ export function gruposDe(ctx, evento) {
 export function asistenciaDe(ctx, evento, estudiante) {
   const base = eventoBase(evento, ctx.eventos);
   const fila = ctx.asistencia.get(`${base.id}|${estudiante}`);
+  const pase = ctx.pases.get(base.id);
+  const paseCerrado = Boolean(pase?.cerrado);
+  // Agregado al curso (matrícula extraordinaria) después de cerrar el pase de esta sesión: no estaba, así que la
+  // perdió (0, recuperable). Antes quedaba «no consta en el pase» y el evento seguía «por evaluar» para siempre.
+  if (!fila && paseCerrado && ingresoDespues(ctx.estudiantePorId?.get(estudiante), base, pase)) {
+    return {
+      estado: 'no_vino', motivo: null, observacion: null, paseCerrado, falta: true, sinColoquio: false,
+      ingresoDespues: true,
+    };
+  }
   return {
-    estado: fila?.estado ?? null,
+    // «Sin coloquio» marcado a quien no tenía fila en el pase: sí estuvo en clase (presente, sin nota del taller).
+    estado: fila?.estado ?? (fila?.sin_coloquio ? 'presente' : null),
     motivo: fila?.motivo ?? null,
     observacion: fila?.observacion ?? null,
-    paseCerrado: Boolean(ctx.pases.get(base.id)?.cerrado),
+    paseCerrado,
     falta: FALTAS.includes(fila?.estado),
     sinColoquio: Boolean(fila?.sin_coloquio),   // taller: estuvo en clase pero no hizo el coloquio (sin nota)
   };
 }
 
+/** ¿El estudiante se agregó en la app después de esa sesión? (por el cierre del pase o, sin él, por la fecha). */
+function ingresoDespues(est, base, pase) {
+  if (!est?.agregado) return false;
+  if (pase?.cerrado_en) return est.agregado > pase.cerrado_en;
+  return fechaLocal(est.agregado) > base.fecha;
+}
+
+/** Fecha local (Ecuador, UTC−5) de un instante ISO, como «AAAA-MM-DD». */
+function fechaLocal(iso) {
+  return new Date(Date.parse(iso) - 5 * 3600 * 1000).toISOString().slice(0, 10);
+}
+
 function textoFalta(asis) {
+  if (asis.ingresoDespues) return 'aún no estaba en el curso (se agregó después de esta sesión)';
   const base = asis.estado === 'salio' ? 'salió' : 'no vino';
   return asis.motivo ? `${base} (${asis.motivo})` : base;
 }

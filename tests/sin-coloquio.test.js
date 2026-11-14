@@ -63,3 +63,37 @@ test('la marca se conserva al cambiar la asistencia; el ajuste individual manda'
   await guardarAjuste(k.db, k.t1.id, 'b', 0.3, 'revisión', AHORA);
   assert.equal((await k.nota('b')).valor, 0.3);
 });
+
+// Casos del respaldo real (13-nov-2026): eventos que quedaban «por evaluar» para siempre en el aviso de Inicio.
+test('«sin coloquio» a quien no tenía fila en el pase cerrado: presente y taller en 0 (no «no consta en el pase»)', async () => {
+  const k = await escenario();
+  await cerrarPase(k.db, k.t1.id, k.grupos, 'sin grupo', AHORA);
+  // Fila vieja sin estado (como la dejaba la app antes) con la marca puesta después del cierre.
+  await k.db.asistencia.put({ evento: k.t1.id, estudiante: 'c', estado: null, motivo: null, observacion: 'Sí vino', sin_coloquio: true, fecha: AHORA });
+  await k.db.estudiantes.put({ id: 'c', codigo: 'c', nombre: 'APELLIDOC NOMBRE', curso: 'GR2QB', estado: 'pendiente', agregado: '2026-10-05T21:45:15.487Z' });
+  const c = await k.nota('c');
+  assert.equal(c.estado, 'calculada');
+  assert.equal(c.valor, 0);
+  assert.match(c.motivo, /no hizo el coloquio/);
+  assert.equal(c.asistencia, 'presente');
+  // Y la acción ya deja la fila como presente.
+  await marcarSinColoquio(k.db, k.t1.id, k.grupos, 'd', true, AHORA);
+  assert.equal((await k.db.asistencia.get([k.t1.id, 'd'])).estado, 'presente');
+});
+
+test('agregado al curso después de cerrar el pase: perdió la sesión (0, recuperable) y deja de estar «por evaluar»', async () => {
+  const k = await escenario();
+  await cerrarPase(k.db, k.t1.id, k.grupos, 'sin grupo', AHORA);
+  await k.db.estudiantes.put({ id: 'n', codigo: 'n', nombre: 'NUEVO NUEVA ESTUDIANTE', curso: 'GR2QB', estado: 'pendiente', agregado: '2026-10-27T19:23:22.871Z' });
+  let n = await k.nota('n');
+  assert.equal(n.estado, 'calculada');
+  assert.equal(n.valor, 0);
+  assert.match(n.motivo, /aún no estaba en el curso/);
+  // Agregado ANTES del cierre y sin fila: sigue pendiente (es un descuido del pase, no una ausencia).
+  await k.db.estudiantes.put({ id: 'm', codigo: 'm', nombre: 'ANTES ANTES ESTUDIANTE', curso: 'GR2QB', estado: 'pendiente', agregado: '2026-10-05T21:45:15.487Z' });
+  assert.equal((await k.nota('m')).estado, 'pendiente');
+  // La recuperación manda sobre la ausencia.
+  await k.db.recuperaciones.put({ evento: k.t1.id, estudiante: 'n', estado: 'realizada', nota: 0.7, motivo: 'justificada', detalle: 'otro curso', fecha: AHORA });
+  n = await k.nota('n');
+  assert.equal(n.valor, 0.7);
+});
