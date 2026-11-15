@@ -66,6 +66,23 @@ test('configuraciones reales de las primeras actividades (Anexos B, C, D y G)', 
     assert.equal(t3.tareas.length, 6);
     assert.ok(t3.preguntas_control.length >= 12);
   }
+  // P4 y T4 (guías del aula virtual, 15-nov-2026): P4 Clásica con las tres secciones de siempre (la P4 de SQI aún no
+  // está publicada); T4 «Fuerzas de fricción», el mismo taller para las dos metodologías, con la evaluación integral del T1.
+  const p4 = configActividad(cfg, 'P4', 'TRAD');
+  assert.deepEqual(p4.criterios.map((c) => [c.id, c.peso]), [['diseno', 0.2], ['datos', 0.3], ['analisis', 0.5]]);
+  assert.equal(p4.bimestre, 2);
+  assert.equal(bimestreDeActividad(cfg, 'P4', 'TRAD'), 2);
+  assert.equal(configActividad(cfg, 'P4', 'SQI'), null);
+  assert.equal(cfg.catalogo.T4.titulo, 'Fuerzas de fricción');
+  for (const m of ['TRAD', 'SQI']) {
+    const t4 = configActividad(cfg, 'T4', m);
+    assert.equal(t4.id, 'T4');
+    assert.equal(t4.bimestre, 2);
+    assert.deepEqual(t4.evaluacion_integral, configActividad(cfg, 'T1', m).evaluacion_integral);
+    assert.deepEqual(t4.pesos, configActividad(cfg, 'T1', m).pesos);
+    assert.equal(t4.tareas.length, 6);
+    assert.ok(t4.preguntas_control.length >= 12);
+  }
   // P1 Clásica: tres secciones 20/30/50 con escala 0–4; el análisis es una sola sección.
   const p1 = configActividad(cfg, 'P1', 'TRAD');
   assert.deepEqual(p1.criterios.map((c) => [c.id, c.peso]), [['diseno', 0.2], ['datos', 0.3], ['analisis', 0.5]]);

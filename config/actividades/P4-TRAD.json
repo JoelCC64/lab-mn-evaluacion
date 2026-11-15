@@ -1,0 +1,330 @@
+{
+  "id": "P4-TRAD",
+  "codigo": "P4",
+  "fuente": "Guía P04 «Segunda ley de Newton» (aula virtual, curso general, Tema 4); preguntas del coloquio propuestas el 15-nov-2026, pendientes de revisión de Joel",
+  "tipo": "practica",
+  "metodologia": "TRAD",
+  "bimestre": 2,
+  "componente": "diseno_datos_analisis",
+  "unidad_calificacion": "grupo",
+  "individual": [
+    "trabajo_preparatorio",
+    "control_oral"
+  ],
+  "asistencia": "pase_final_por_grupo",
+  "cierre": [
+    "trabajo_firmado"
+  ],
+  "penalizacion_total": "equipo_no_ordenado",
+  "criterios": [
+    {
+      "id": "diseno",
+      "corto": "diseño",
+      "nombre": "Diseño experimental",
+      "peso": 0.2,
+      "escala": [
+        0,
+        1,
+        2,
+        3,
+        4
+      ],
+      "indicadores": [
+        "Pista armada con los soportes y nivelada con el nivelador (completamente horizontal)",
+        "Posiciones de 0 cm y 80 cm marcadas sobre la pista",
+        "Tornillo de latón enroscado al sensor de fuerza del DigiCart y unido al contenedor de película con el hilo",
+        "Hilo sobre la polea, con una longitud que deja recorrer 80 cm sin que el contenedor golpee el suelo",
+        "DigiCart siempre sobre la pista; se suelta desde el reposo en la marca de 0 cm"
+      ],
+      "niveles": {
+        "4": "Montaje correcto a la primera: pista nivelada, 80 cm marcados, hilo sobre la polea con la longitud adecuada y DigiCart soltado desde el reposo.",
+        "2": "Montaje funcional con correcciones tras la observación: pista sin nivelar, hilo fuera de la polea o demasiado largo, o salida no desde el reposo.",
+        "0": "Montaje incorrecto o depende totalmente del profesor."
+      }
+    },
+    {
+      "id": "datos",
+      "corto": "datos",
+      "nombre": "Toma de datos",
+      "peso": 0.3,
+      "escala": [
+        0,
+        1,
+        2,
+        3,
+        4
+      ],
+      "indicadores": [
+        "Masa total Mt medida con la balanza: DigiCart con tornillo de latón, contenedor con tapa, las cuatro masas de 10 g y los tornillos de plástico",
+        "Fuerza F (peso del contenedor con sus masas) medida con el dinamómetro para cada configuración",
+        "10 tiempos de recorrido de 80 cm para cada configuración, pasando una masa del contenedor al DigiCart cada vez (masa del sistema constante)",
+        "Unidades y cifras coherentes con la precisión de la balanza, el dinamómetro y el cronómetro; incertidumbres identificadas",
+        "Reparto de roles con participación de todos"
+      ],
+      "niveles": {
+        "4": "Tabla 4.1 completa y ordenada (F y 10 tiempos por configuración), Mt medida, unidades e incertidumbres; masas pasadas al DigiCart; trabajo repartido.",
+        "2": "Tabla completa pero con desorden, unidades o incertidumbres faltantes, menos de 10 tiempos o masas retiradas del sistema en lugar de pasarlas al DigiCart.",
+        "0": "Datos incompletos o no registrados."
+      }
+    },
+    {
+      "id": "analisis",
+      "corto": "análisis",
+      "nombre": "Análisis",
+      "peso": 0.5,
+      "escala": [
+        0,
+        1,
+        2,
+        3,
+        4
+      ],
+      "indicadores": [
+        "Respuestas justificadas: el DigiCart hace un MRUV y el experimento permite comprobar la segunda ley",
+        "Tiempo promedio con su incertidumbre para cada configuración",
+        "Aceleración de cada configuración con a = 2d/t² (sale del reposo) y su incertidumbre",
+        "Gráfica de F vs a con ajuste lineal; la pendiente interpretada como la masa del sistema",
+        "Error relativo porcentual entre la pendiente y la Mt medida, con causas relacionadas con el montaje (fricción, polea, masa del hilo, tiempo de reacción)"
+      ],
+      "niveles": {
+        "4": "Cálculos, incertidumbres, gráfica y ajuste correctos; interpreta la pendiente como la masa del sistema, la compara con Mt y explica la diferencia con su montaje.",
+        "2": "Gráfica o cálculos con fallas (aceleración con fórmula de MRU, sin ajuste, pendiente sin interpretar, sin error relativo) o explicaciones genéricas.",
+        "0": "Sin gráfica ni interpretación de la pendiente."
+      }
+    }
+  ],
+  "etiquetas": [
+    {
+      "id": "montaje_ok",
+      "criterio": "diseno",
+      "signo": "+",
+      "texto": "Pista nivelada y montaje correcto a la primera"
+    },
+    {
+      "id": "pista_sin_nivelar",
+      "criterio": "diseno",
+      "signo": "-",
+      "texto": "Pista sin nivelar"
+    },
+    {
+      "id": "hilo_mal",
+      "criterio": "diseno",
+      "signo": "-",
+      "texto": "Hilo fuera de la polea o tan largo que el contenedor golpea el suelo"
+    },
+    {
+      "id": "no_desde_reposo",
+      "criterio": "diseno",
+      "signo": "-",
+      "texto": "No suelta el DigiCart desde el reposo en la marca de 0 cm"
+    },
+    {
+      "id": "tabla_ok",
+      "criterio": "datos",
+      "signo": "+",
+      "texto": "Tabla completa, con unidades e incertidumbres"
+    },
+    {
+      "id": "masa_no_constante",
+      "criterio": "datos",
+      "signo": "-",
+      "texto": "Retira las masas del sistema en lugar de pasarlas al DigiCart"
+    },
+    {
+      "id": "sin_masa_total",
+      "criterio": "datos",
+      "signo": "-",
+      "texto": "No mide la masa total Mt o le falta algún componente"
+    },
+    {
+      "id": "pocos_tiempos",
+      "criterio": "datos",
+      "signo": "-",
+      "texto": "Menos de 10 tiempos por configuración"
+    },
+    {
+      "id": "un_solo_integrante",
+      "criterio": "datos",
+      "signo": "-",
+      "texto": "Solo un integrante trabaja"
+    },
+    {
+      "id": "ajuste_ok",
+      "criterio": "analisis",
+      "signo": "+",
+      "texto": "Gráfica F vs a con ajuste y pendiente bien interpretada"
+    },
+    {
+      "id": "aceleracion_mru",
+      "criterio": "analisis",
+      "signo": "-",
+      "texto": "Calcula la aceleración con fórmulas de MRU (d/t)"
+    },
+    {
+      "id": "pendiente_mal",
+      "criterio": "analisis",
+      "signo": "-",
+      "texto": "No interpreta la pendiente como la masa del sistema"
+    },
+    {
+      "id": "sin_error_relativo",
+      "criterio": "analisis",
+      "signo": "-",
+      "texto": "No compara la pendiente con la masa total medida"
+    },
+    {
+      "id": "sin_incertidumbre",
+      "criterio": "analisis",
+      "signo": "-",
+      "texto": "Tiempos o aceleraciones sin incertidumbre"
+    },
+    {
+      "id": "fuentes_genericas",
+      "criterio": "analisis",
+      "signo": "-",
+      "texto": "Fuentes de error genéricas, sin relación con el montaje"
+    },
+    {
+      "id": "memorizado",
+      "criterio": "analisis",
+      "signo": "-",
+      "texto": "Respuesta memorizada, sin conexión con sus datos"
+    }
+  ],
+  "preguntas_discusion": [
+    "¿El DigiCart se mueve con velocidad constante o acelera? ¿Cómo lo muestran sus tiempos?",
+    "¿Por qué se pasan las masas del contenedor al DigiCart en lugar de retirarlas?",
+    "¿Qué representa la pendiente de la gráfica F vs a? ¿Y la ordenada en el origen?",
+    "¿Cuánto difiere la pendiente de la masa total medida? ¿Qué parte del montaje lo explica?",
+    "Si la pista no estuviera nivelada, ¿cómo cambiarían sus aceleraciones?",
+    "¿Qué fuerza hace el hilo sobre el DigiCart: el peso del contenedor o menos? ¿Por qué?"
+  ],
+  "preguntas_control": [
+    "Enuncie la segunda ley de Newton. (ΣF = ma: la aceleración es proporcional a la fuerza neta, tiene su dirección y es inversamente proporcional a la masa)",
+    "¿Qué es la masa inercial? (la medida de la oposición de un cuerpo a cambiar su estado de movimiento)",
+    "¿Qué diferencia hay entre masa y peso? (la masa es propia del cuerpo, en kg; el peso es la fuerza de gravedad sobre él, W = mg, en N)",
+    "¿Qué es un newton en unidades básicas? (1 N = 1 kg·m/s²)",
+    "¿Qué tipo de movimiento hace el DigiCart en esta práctica? (MRUV: la fuerza neta es constante y distinta de cero)",
+    "¿Cómo se calcula la aceleración si el carro parte del reposo y recorre d en un tiempo t? (a = 2d/t²)",
+    "¿Por qué se mide 10 veces el tiempo de recorrido? (para promediar y estimar la incertidumbre por los errores aleatorios)",
+    "¿Por qué las masas se pasan al DigiCart en lugar de retirarlas? (para mantener constante la masa total del sistema y variar solo la fuerza)",
+    "¿Qué fuerza acelera al sistema? (el peso del contenedor con sus masas que cuelga)",
+    "¿Qué representa la pendiente de la gráfica F vs a? (la masa del sistema que se acelera)",
+    "¿La tensión del hilo es igual al peso del contenedor mientras el sistema acelera? (no: es menor, T = m(g − a))",
+    "Si se duplica la fuerza con la misma masa total, ¿qué pasa con la aceleración? (se duplica)",
+    "¿Para qué se nivela la pista? (para que la gravedad no tenga componente a lo largo de la pista y la única fuerza horizontal sea la del hilo)",
+    "Nombre dos fuentes de error de esta práctica. (fricción en las ruedas y en la polea, tiempo de reacción con el cronómetro, pista sin nivelar, masa del hilo)",
+    "¿Qué es un sistema de referencia inercial? (uno que no acelera, donde se cumple la primera ley)"
+  ],
+  "conceptos_control": [
+    {
+      "id": "segunda_ley",
+      "texto": "Segunda ley (ΣF = ma)"
+    },
+    {
+      "id": "masa_inercial",
+      "texto": "Masa inercial, masa y peso"
+    },
+    {
+      "id": "unidades",
+      "texto": "Unidades de fuerza"
+    },
+    {
+      "id": "mruv",
+      "texto": "MRUV y cálculo de la aceleración"
+    },
+    {
+      "id": "masa_constante",
+      "texto": "Masa del sistema constante"
+    },
+    {
+      "id": "pendiente",
+      "texto": "Pendiente de F vs a"
+    },
+    {
+      "id": "tension",
+      "texto": "Tensión del hilo y fuerza neta"
+    },
+    {
+      "id": "errores",
+      "texto": "Fuentes de error e incertidumbre"
+    }
+  ],
+  "feedback": {
+    "etiquetas": {
+      "montaje_ok": {
+        "mejor": "Nivelaron la pista y armaron el montaje correctamente a la primera."
+      },
+      "pista_sin_nivelar": {
+        "mejorar": "La pista no quedó nivelada.",
+        "sugerencia": "Usen el nivelador antes de medir: si la pista se inclina, el peso del DigiCart aporta una fuerza que no está en su tabla.",
+        "reforzar": "Nivelar la pista para que la única fuerza horizontal sea la del hilo."
+      },
+      "hilo_mal": {
+        "mejorar": "El hilo no pasaba por la polea o el contenedor golpeaba el suelo.",
+        "sugerencia": "Comprueben en cada ensayo que el hilo pase por la polea y ajusten su largo para que el contenedor no toque el suelo antes de los 80 cm.",
+        "reforzar": "Longitud del hilo y paso por la polea en cada ensayo."
+      },
+      "no_desde_reposo": {
+        "mejorar": "No soltaron el DigiCart desde el reposo en la marca de 0 cm.",
+        "sugerencia": "Suelten el carro sin empujarlo y desde 0 cm: la fórmula a = 2d/t² supone velocidad inicial cero.",
+        "reforzar": "Salida desde el reposo para usar a = 2d/t²."
+      },
+      "tabla_ok": {
+        "mejor": "Registraron una tabla completa, con unidades e incertidumbres."
+      },
+      "masa_no_constante": {
+        "mejorar": "Retiraron las masas del sistema en lugar de pasarlas al DigiCart.",
+        "sugerencia": "Cada masa que sale del contenedor va al DigiCart: así la masa total no cambia y solo varía la fuerza.",
+        "reforzar": "Mantener constante la masa del sistema."
+      },
+      "sin_masa_total": {
+        "mejorar": "No midieron la masa total del sistema completa.",
+        "sugerencia": "Pesen juntos el DigiCart con el tornillo de latón, el contenedor con tapa, las cuatro masas y los tornillos de plástico: esa Mt es la que comparan con la pendiente.",
+        "reforzar": "Masa total del sistema."
+      },
+      "pocos_tiempos": {
+        "mejorar": "Tomaron menos de 10 tiempos por configuración.",
+        "sugerencia": "Midan 10 veces cada recorrido: con más datos el promedio es más confiable y pueden estimar la incertidumbre.",
+        "reforzar": "Repetir las mediciones para reducir el error aleatorio."
+      },
+      "un_solo_integrante": {
+        "mejorar": "El trabajo recayó en un solo integrante.",
+        "sugerencia": "Repartan los roles (soltar el carro, cronometrar, anotar, cambiar las masas) y túrnenlos entre configuraciones.",
+        "reforzar": "Reparto de roles dentro del grupo."
+      },
+      "ajuste_ok": {
+        "mejor": "Graficaron F vs a, ajustaron una recta e interpretaron bien la pendiente."
+      },
+      "aceleracion_mru": {
+        "mejorar": "Calcularon la aceleración con fórmulas de velocidad constante.",
+        "sugerencia": "El carro parte del reposo y acelera: usen d = ½at², es decir a = 2d/t², con el tiempo promedio.",
+        "reforzar": "Aceleración en un MRUV que parte del reposo."
+      },
+      "pendiente_mal": {
+        "mejorar": "No interpretaron la pendiente de F vs a.",
+        "sugerencia": "Si F = ma, la pendiente de la recta F vs a es la masa que se acelera: compárenla con la Mt que midieron.",
+        "reforzar": "La pendiente de F vs a es la masa del sistema."
+      },
+      "sin_error_relativo": {
+        "mejorar": "No compararon la pendiente con la masa total medida.",
+        "sugerencia": "Calculen el error relativo porcentual entre la pendiente y Mt y expliquen la diferencia con su montaje.",
+        "reforzar": "Error relativo entre la masa del ajuste y la medida."
+      },
+      "sin_incertidumbre": {
+        "sugerencia": "Acompañen el tiempo promedio y la aceleración con su incertidumbre: la de la aceleración sale de la del tiempo.",
+        "reforzar": "Incertidumbre del tiempo promedio y de la aceleración."
+      },
+      "fuentes_genericas": {
+        "mejorar": "Las fuentes de error fueron genéricas.",
+        "sugerencia": "Relacionen cada fuente con su montaje: fricción en las ruedas y la polea, tiempo de reacción al cronometrar, nivelación de la pista.",
+        "reforzar": "Fuentes de error propias del experimento."
+      },
+      "memorizado": {
+        "mejorar": "La respuesta parece memorizada y no se apoya en sus datos.",
+        "sugerencia": "Usen sus propios valores de F, a y Mt para justificar cada conclusión.",
+        "reforzar": "Conclusiones apoyadas en los datos."
+      }
+    }
+  }
+}

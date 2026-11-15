@@ -1,0 +1,237 @@
+{
+  "id": "T4",
+  "codigo": "T4",
+  "fuente": "Guía T4 «Fuerzas de fricción» (aula virtual, curso general, Tema 4), igual para Clásica y SQI; evaluación integral del T1 (Lineamientos profesores §19); preguntas del control propuestas el 15-nov-2026, pendientes de revisión de Joel",
+  "tipo": "taller",
+  "metodologia": [
+    "TRAD",
+    "SQI"
+  ],
+  "bimestre": 2,
+  "pesos": {
+    "asistencia_permanencia": 0.5,
+    "evaluacion_integral": 0.5
+  },
+  "asistencia_permanencia": {
+    "unidad": "estudiante",
+    "fuente": "pase_final_por_grupo",
+    "se_retiro_antes": 0.5
+  },
+  "evaluacion_integral": {
+    "unidad": "grupo",
+    "escala": [
+      0,
+      1,
+      2
+    ],
+    "descripcion": "Preguntas u observaciones del docente, ejecución de las actividades y tareas. No exige que el grupo termine el taller.",
+    "incluye": [
+      "preguntas_y_observaciones_del_docente",
+      "ejecucion",
+      "tareas"
+    ],
+    "exige_terminar_taller": false
+  },
+  "individual": {
+    "TRAD": [
+      "trabajo_preparatorio",
+      "control_oral"
+    ],
+    "SQI": [
+      "control_oral_sin_nota"
+    ]
+  },
+  "retro_practica_anterior": true,
+  "cierre": [
+    "trabajo_firmado"
+  ],
+  "tareas": [
+    {
+      "id": "materiales",
+      "texto": "Cada grupo trae el plano (≈ 0.5 m), un celular con Phyphox y 3 materiales rugosos con cinta"
+    },
+    {
+      "id": "angulo_critico",
+      "texto": "Experimento 1: ángulo crítico θc (5 veces por material) con Phyphox › Inclinación › Plano inclinado; promedio con incertidumbre"
+    },
+    {
+      "id": "mu_estatico",
+      "texto": "Expresión μs = tan θc y su valor para cada material; variación entre ensayos"
+    },
+    {
+      "id": "aceleracion",
+      "texto": "Experimento 2: con θ > θc, 10 diferencias de aceleración (región en reposo y región de aceleración constante) con «Aceleración (sin g)»"
+    },
+    {
+      "id": "mu_cinetico",
+      "texto": "Expresión μk = tan θ − a/(g cos θ) por análisis de fuerzas y su valor para cada material"
+    },
+    {
+      "id": "comparacion",
+      "texto": "Comparar μk entre materiales y verificar μs > μk"
+    }
+  ],
+  "preguntas_discusion": [
+    "¿Por qué en el ángulo crítico μs = tan θc? Hagan el diagrama de cuerpo libre del celular.",
+    "¿Qué fuerzas actúan sobre el celular mientras desliza? ¿Por qué su aceleración es menor que g sen θ?",
+    "¿Qué material dio la mayor fricción? ¿Coincide con lo que esperaban al tocarlo?",
+    "¿Se cumple μs > μk en sus datos? ¿Por qué debería cumplirse?",
+    "¿Varió mucho θc entre ensayos? ¿A qué se debe?",
+    "¿Se mantiene μk constante si cambian el ángulo del plano?"
+  ],
+  "preguntas_control": [
+    "¿Qué es la fuerza de fricción? (una fuerza de contacto que se opone al movimiento relativo, o a su inicio, entre dos superficies)",
+    "¿Qué diferencia hay entre fricción estática y cinética? (la estática actúa sin deslizamiento y llega hasta μs·N; la cinética actúa durante el deslizamiento y vale μk·N)",
+    "¿Cuál suele ser mayor, μs o μk? (μs: cuesta más iniciar el movimiento que mantenerlo)",
+    "¿De qué depende la fuerza de fricción cinética? (del coeficiente μk y de la normal; casi no depende del área de contacto ni de la velocidad)",
+    "¿Cuánto vale la normal sobre un cuerpo en un plano inclinado θ sin otras fuerzas? (N = mg cos θ)",
+    "¿Qué componente del peso tira del cuerpo a lo largo del plano? (mg sen θ)",
+    "¿Qué es el ángulo crítico? (el ángulo en el que el cuerpo empieza a deslizar: la fricción estática llega a su máximo)",
+    "¿Cómo se obtiene μs con el ángulo crítico? (μs = tan θc)",
+    "¿Cómo se obtiene μk con el ángulo y la aceleración? (de mg sen θ − μk mg cos θ = ma: μk = tan θ − a/(g cos θ))",
+    "Si el cuerpo baja con velocidad constante, ¿cuánto vale μk? (μk = tan θ, porque la fuerza neta es cero)",
+    "¿Qué mide la herramienta «Aceleración (sin g)» de Phyphox? (la aceleración del celular sin incluir la gravedad, en los ejes x, y y z)",
+    "¿Por qué se repite 5 veces la medición del ángulo crítico? (para promediar y estimar la incertidumbre)",
+    "¿La fricción estática siempre vale μs·N? (no: vale lo necesario para evitar el deslizamiento, hasta un máximo de μs·N)",
+    "¿Por qué hay que alinear el celular para que no gire al bajar? (si gira, la aceleración se reparte entre ejes y cambia el contacto con el plano)",
+    "¿Qué unidades tienen los coeficientes de fricción? (ninguna: son adimensionales)"
+  ],
+  "conceptos_control": [
+    {
+      "id": "friccion",
+      "texto": "Fricción estática y cinética"
+    },
+    {
+      "id": "coeficientes",
+      "texto": "Coeficientes μs y μk"
+    },
+    {
+      "id": "normal_plano",
+      "texto": "Normal y componentes del peso en el plano inclinado"
+    },
+    {
+      "id": "angulo_critico",
+      "texto": "Ángulo crítico y μs = tan θc"
+    },
+    {
+      "id": "mu_cinetico",
+      "texto": "μk a partir de la aceleración"
+    },
+    {
+      "id": "segunda_ley",
+      "texto": "Segunda ley en el plano inclinado"
+    },
+    {
+      "id": "phyphox",
+      "texto": "Uso de Phyphox (inclinación y aceleración)"
+    },
+    {
+      "id": "errores",
+      "texto": "Repetición de medidas e incertidumbre"
+    }
+  ],
+  "etiquetas": [
+    {
+      "id": "dcl_plano_ok",
+      "signo": "+",
+      "texto": "Diagrama de cuerpo libre del plano inclinado completo y bien descompuesto"
+    },
+    {
+      "id": "mu_bien_deducido",
+      "signo": "+",
+      "texto": "Deduce μs y μk a partir de la segunda ley"
+    },
+    {
+      "id": "materiales_completos",
+      "signo": "+",
+      "texto": "Midió con los tres materiales"
+    },
+    {
+      "id": "sin_materiales",
+      "signo": "-",
+      "texto": "No trajo los materiales (plano, celular con Phyphox, superficies rugosas)"
+    },
+    {
+      "id": "componentes_cambiadas",
+      "signo": "-",
+      "texto": "Confunde sen θ y cos θ al descomponer el peso"
+    },
+    {
+      "id": "normal_igual_peso",
+      "signo": "-",
+      "texto": "Toma la normal igual al peso (N = mg)"
+    },
+    {
+      "id": "mus_menor",
+      "signo": "-",
+      "texto": "Obtiene μs < μk sin explicarlo"
+    },
+    {
+      "id": "eje_equivocado",
+      "signo": "-",
+      "texto": "Lee la aceleración en un eje distinto al del movimiento"
+    }
+  ],
+  "feedback": {
+    "partes": {
+      "integral": {
+        "sugerencia": {
+          "TRAD": "Completen las tareas pendientes del taller y revisen el análisis de fuerzas en el plano inclinado.",
+          "SQI": "¿Qué resultado del taller les sorprendió? Tráiganlo a la próxima sesión con una explicación basada en sus datos."
+        },
+        "reforzar": "Tareas y preguntas del taller de fuerzas de fricción."
+      }
+    },
+    "etiquetas": {
+      "dcl_plano_ok": {
+        "mejor": "Hicieron el diagrama de cuerpo libre del plano inclinado completo y bien descompuesto."
+      },
+      "mu_bien_deducido": {
+        "mejor": "Dedujeron μs y μk a partir de la segunda ley."
+      },
+      "materiales_completos": {
+        "mejor": "Midieron con los tres materiales y compararon sus resultados."
+      },
+      "sin_materiales": {
+        "mejorar": "El grupo no trajo los materiales del taller.",
+        "sugerencia": {
+          "TRAD": "Revisen la lista de materiales de la guía antes de cada taller: cada grupo trae el plano, un celular con Phyphox y las superficies rugosas.",
+          "SQI": "¿Qué parte del taller no pudieron hacer sin los materiales? ¿Cómo lo resolverían para la próxima?"
+        },
+        "reforzar": "Preparar los materiales que pide la guía."
+      },
+      "componentes_cambiadas": {
+        "mejorar": "Confundieron sen θ y cos θ al descomponer el peso.",
+        "sugerencia": {
+          "TRAD": "Con el eje x a lo largo del plano, la componente que tira hacia abajo es mg sen θ y la perpendicular es mg cos θ: compruébenlo con θ = 0.",
+          "SQI": "¿Qué pasa con cada componente si el plano está horizontal (θ = 0)? ¿Cuál debería anularse?"
+        },
+        "reforzar": "Descomposición del peso en el plano inclinado."
+      },
+      "normal_igual_peso": {
+        "mejorar": "Tomaron la normal igual al peso.",
+        "sugerencia": {
+          "TRAD": "En el plano inclinado la normal equilibra solo la componente perpendicular del peso: N = mg cos θ.",
+          "SQI": "En la dirección perpendicular al plano, ¿qué fuerzas se equilibran? ¿El peso completo o una parte?"
+        },
+        "reforzar": "Normal en un plano inclinado."
+      },
+      "mus_menor": {
+        "mejorar": "Obtuvieron μs menor que μk sin explicar por qué.",
+        "sugerencia": {
+          "TRAD": "Lo esperado es μs > μk: revisen si el ángulo crítico se midió subiendo despacio el plano y en qué eje leyeron la aceleración.",
+          "SQI": "Si sus datos dan μs < μk, ¿qué parte de la medición pudo producirlo? ¿Cómo lo comprobarían?"
+        },
+        "reforzar": "Relación entre μs y μk."
+      },
+      "eje_equivocado": {
+        "mejorar": "Leyeron la aceleración en un eje distinto al del movimiento.",
+        "sugerencia": {
+          "TRAD": "Identifiquen antes de soltar el celular en qué eje (x, y o z) se moverá y usen solo esa gráfica.",
+          "SQI": "¿Cómo pueden saber, antes de medir, qué eje del celular apunta a lo largo del plano?"
+        },
+        "reforzar": "Elegir el eje del movimiento en Phyphox."
+      }
+    }
+  }
+}
